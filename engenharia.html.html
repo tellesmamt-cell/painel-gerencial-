@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="pt-BR"><head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>GAP-GL — Controle de Saldos Contratuais</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
+<style>
+:root{--navy:#002060;--accent:#1A6AA5;--gold:#D4A017;--teal:#17A589;--red:#C0392B;--warn:#E67E22;--gray:#5D6D7E;--bg:#EFF2F7;--border:#DCE1E8;--text:#2C3E50;--muted:#8492A6;--hover:#E8F4FD}
+*{margin:0;padding:0;box-sizing:border-box}body{font-family:'DM Sans',system-ui,sans-serif;background:var(--bg);color:var(--text);overflow:hidden;height:100vh}
+.app{display:flex;height:100vh}.sidebar{width:232px;background:var(--navy);color:#fff;display:flex;flex-direction:column;flex-shrink:0}
+.sb-brand{padding:18px 16px 14px;border-bottom:1px solid rgba(255,255,255,.08)}.sb-brand .tag{font-size:9px;font-weight:700;color:var(--gold);letter-spacing:2.5px}.sb-brand h2{font-size:14px;font-weight:700;margin-top:3px}.sb-brand .sub{font-size:8.5px;color:#7FB3D8;margin-top:4px;line-height:1.4}
+.nav{padding:6px 0;flex:1}.ni{padding:11px 18px;display:flex;align-items:center;gap:10px;cursor:pointer;font-size:12px;font-weight:500;color:#AEB6BF;border-left:3px solid transparent;transition:all .15s}.ni:hover{background:rgba(26,106,165,.15);color:#fff}.ni.active{background:rgba(26,106,165,.25);color:#fff;border-left-color:var(--gold);font-weight:700}
+.sb-flt{border-top:1px solid rgba(255,255,255,.08);padding:12px 16px}.sb-flt label{font-size:8px;font-weight:700;color:#7FB3D8;letter-spacing:1.2px;display:block;margin-bottom:4px}.sb-flt select{width:100%;padding:5px 8px;background:#0D1B2A;border:1px solid #1A3A5C;border-radius:4px;color:#ECF0F1;font-size:10px;font-family:inherit;margin-bottom:8px;cursor:pointer}
+.sb-btns{padding:6px 16px;border-top:1px solid rgba(255,255,255,.08);display:flex;flex-direction:column;gap:5px}
+.sb-foot{padding:8px 16px;border-top:1px solid rgba(255,255,255,.08);font-size:7px;color:#5D6D7E;line-height:1.5}
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden}
+.topbar{background:linear-gradient(135deg,#0D2137,#1A3A5C);padding:12px 28px;display:flex;justify-content:space-between;align-items:center;flex-shrink:0}.topbar h1{font-size:15px;font-weight:700;color:#fff}.topbar .ts{font-size:9px;color:#7FB3D8;margin-top:2px}
+.btn{padding:5px 14px;border-radius:4px;border:none;font-family:inherit;font-size:10px;font-weight:600;cursor:pointer;transition:all .15s}
+.btn-g{background:rgba(255,255,255,.12);color:#fff;border:1px solid rgba(255,255,255,.2)}.btn-g:hover{background:rgba(255,255,255,.2)}.btn-gd{background:var(--gold);color:#fff}.btn-tl{background:var(--teal);color:#fff}.btn-ac{background:var(--accent);color:#fff}.btn-sb{width:100%;font-size:9px;padding:6px}
+.content{flex:1;overflow-y:auto;padding:14px 28px 28px}
+.kpis{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-bottom:14px}.kpi{background:#fff;border-radius:6px;padding:12px 14px;border-top:3px solid var(--accent);box-shadow:0 1px 4px rgba(0,0,0,.06)}.kpi:hover{transform:translateY(-1px);box-shadow:0 4px 12px rgba(0,0,0,.1)}.kpi .lb{font-size:8px;font-weight:700;color:var(--muted);letter-spacing:.5px;text-transform:uppercase}.kpi .vl{font-size:19px;font-weight:800;color:var(--text);margin:3px 0 1px}.kpi .s2{font-size:9px;color:var(--muted)}.kpi.gold{border-top-color:var(--gold)}.kpi.teal{border-top-color:var(--teal)}.kpi.red{border-top-color:var(--red)}
+.card{background:#fff;border-radius:6px;padding:16px;box-shadow:0 1px 4px rgba(0,0,0,.06)}.ct{font-size:12px;font-weight:700;margin-bottom:12px;display:flex;justify-content:space-between;align-items:center}.ct .hint{font-size:9px;font-weight:400;color:var(--muted)}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:14px}.g21{display:grid;grid-template-columns:1fr 320px;gap:14px}
+.tw{overflow:auto;max-height:360px}table{width:100%;border-collapse:collapse;font-size:11px}thead th{position:sticky;top:0;background:var(--navy);color:#fff;padding:7px 9px;font-weight:600;font-size:10px;text-align:left;z-index:1;white-space:nowrap}thead th.r{text-align:right}tbody tr{cursor:pointer;transition:background .1s}tbody tr:nth-child(even){background:#F7F8FA}tbody tr:hover{background:var(--hover)}tbody td{padding:6px 9px}tbody td.r{text-align:right}tbody td.b{font-weight:600}tbody td.ac{color:var(--accent);font-weight:700}
+.bg{display:inline-block;padding:2px 8px;border-radius:10px;font-size:9px;font-weight:700;color:#fff;background:var(--navy)}.bg-a{background:var(--accent)}.bg-t{background:var(--teal)}.bg-gd{background:var(--gold)}.bg-r{background:var(--red)}.bg-gr{background:var(--gray)}.bg-w{background:var(--warn)}
+.pr{display:flex;align-items:center;gap:4px;justify-content:flex-end}.pr-b{width:55px;height:5px;background:#E8E8E8;border-radius:3px;overflow:hidden}.pr-f{height:100%;border-radius:3px;transition:width .4s}.pr-t{font-size:10px;min-width:36px;text-align:right}
+.ltag{font-size:7px;background:var(--warn);color:#fff;padding:1px 5px;border-radius:8px;margin-left:3px;font-weight:600}
+.mo{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:100;display:flex;align-items:center;justify-content:center}.ml{background:#fff;border-radius:10px;width:640px;max-height:85vh;overflow:auto;box-shadow:0 20px 60px rgba(0,0,0,.3)}.mh{padding:14px 22px;background:var(--navy);color:#fff;border-radius:10px 10px 0 0;display:flex;justify-content:space-between;align-items:center}.mh h3{font-size:13px}.mc{background:none;border:none;color:#fff;font-size:18px;cursor:pointer}.mb{padding:18px 22px}.mb p{font-size:11px;color:var(--muted);margin-bottom:8px;line-height:1.5}.mb textarea{width:100%;height:140px;border:2px dashed var(--border);border-radius:6px;padding:10px;font-family:monospace;font-size:10px;resize:vertical}.mb textarea:focus{outline:none;border-color:var(--accent)}.mb input,.mb select{padding:6px 9px;border:1px solid var(--border);border-radius:4px;font-family:inherit;font-size:11px;width:100%}.fr{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:8px}.fg{margin-bottom:8px}.fg label{font-size:10px;font-weight:600;color:var(--text);display:block;margin-bottom:3px}.mf{padding:12px 22px;border-top:1px solid var(--border);display:flex;justify-content:flex-end;gap:8px}
+.al{margin-bottom:12px;padding:10px 14px;border-radius:6px;font-size:11px;display:flex;align-items:flex-start;gap:8px;line-height:1.5}.al-i{background:#D4E6F1;color:#1A5276;border-left:3px solid var(--accent)}.al-w{background:#FCF3CF;color:#7D6608;border-left:3px solid var(--gold)}.al-s{background:#D5F5E3;color:#1E8449;border-left:3px solid var(--teal)}
+.sr{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:14px}.sc{border-radius:6px;padding:10px 14px;text-align:center;color:#fff}.sc .vl{font-size:22px;font-weight:800}.sc .lb{font-size:8px;font-weight:700;letter-spacing:.5px;margin-top:2px}
+.cc{position:relative;height:260px}.hidden{display:none!important}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}.anim{animation:fadeIn .3s ease-out}
+.mensal-header{background:var(--navy);color:#fff;padding:14px 20px;border-radius:6px 6px 0 0;display:flex;justify-content:space-between;align-items:center}.mensal-header h3{font-size:13px;font-weight:700}.mensal-header .per{font-size:10px;color:#7FB3D8}
+.mensal-kpi{display:grid;grid-template-columns:repeat(4,1fr);gap:0;border:1px solid var(--border);border-top:none;border-radius:0 0 6px 6px;margin-bottom:14px}.mensal-kpi>div{padding:12px 14px;text-align:center;border-right:1px solid var(--border)}.mensal-kpi>div:last-child{border-right:none}.mensal-kpi .mk-v{font-size:17px;font-weight:800;color:var(--accent)}.mensal-kpi .mk-l{font-size:8px;font-weight:600;color:var(--muted);letter-spacing:.5px;text-transform:uppercase;margin-bottom:3px}
+.mt{border:1px solid var(--border);border-radius:6px;overflow:hidden;margin-bottom:14px}.mt thead th{background:var(--navy);font-size:9px;padding:7px 7px;white-space:nowrap}.mt tbody td{padding:5px 7px;font-size:10px;border-bottom:1px solid #F0F0F0}.mt tbody tr:last-child td{border-bottom:none}.mt .tr-t td{background:#E8F0FE;font-weight:700}.mc-r{text-align:right;font-variant-numeric:tabular-nums}.mc-a{background:#E8F4FD;font-weight:600;color:var(--accent)}.mc-z{color:#CCD1D9}
+.save-banner{background:#D5F5E3;color:#1E8449;padding:8px 16px;font-size:10px;text-align:center;border-radius:4px;margin-bottom:10px;display:none}
+@media print{.sidebar,.topbar,.btn,.bg-a,.bg-t{display:none!important}.app{display:block!important}.main{overflow:visible!important}.content{padding:10px!important;overflow:visible!important}.card{break-inside:avoid;box-shadow:none!important;border:1px solid #ddd}body{overflow:visible!important;height:auto!important}.kpi{box-shadow:none!important;border:1px solid #ddd}.print-hdr{display:block!important}}
+.print-hdr{display:none;text-align:center;margin-bottom:16px;padding:12px;border-bottom:3px solid var(--navy)}.print-hdr h2{font-size:15px;color:var(--navy)}.print-hdr p{font-size:10px;color:var(--muted)}
+</style>
+<script>window.__EMBEDDED_STATE__={"reqs":[{"om":"1","grupo":6,"valor":5151,"data":"29/04/2026"},{"om":"2","grupo":8,"valor":5606,"data":"29/04/2026"},{"om":"3","grupo":13,"valor":5610,"data":"29/04/2026"},{"om":"4","grupo":15,"valor":5608,"data":"29/04/2026"},{"om":"5","grupo":17,"valor":9843,"data":"29/04/2026"},{"om":"6","grupo":17,"valor":9857,"data":"29/04/2026"},{"om":"CGABEG","grupo":4,"valor":40153.58,"data":"06/04/2026"},{"om":"CEMAL","grupo":7,"valor":185000.12,"data":"08/04/2026"},{"om":"CEMAL","grupo":12,"valor":69042.6,"data":"13/04/2026"},{"om":"CEMAL","grupo":3,"valor":80004.81,"data":"15/04/2026"},{"om":"BAGL","grupo":7,"valor":12007.21,"data":"17/04/2026"},{"om":"BAGL","grupo":14,"valor":29363.84,"data":"17/04/2026"},{"om":"BAGL","grupo":7,"valor":3183.38,"data":"27/04/2026"},{"om":"BAGL","grupo":7,"valor":16535.46,"data":"27/04/2026"},{"om":"CBNB","grupo":8,"valor":54237.32,"data":"27/04/2026"},{"om":"GAP-GL","grupo":8,"valor":245761.2,"data":"27/04/2026"}],"lnk":{},"edits":[],"todOverrides":{}};</script></head>
+<body>
+<div class="app">
+<div class="sidebar">
+  <div class="sb-brand"><div class="tag">GAP-GL</div><h2>Controle de Saldos</h2><div class="sub">Pregão 900057/2025<br>NPA 145/GAP-GL/2026</div></div>
+  <div class="nav">
+    <div class="ni" data-view="geral"><span style="width:18px;text-align:center">📊</span>Visão Geral</div>
+    <div class="ni active" data-view="grupos"><span style="width:18px;text-align:center">📋</span>Por Grupo</div>
+    <div class="ni" data-view="oms"><span style="width:18px;text-align:center">🏛️</span>Por Organização</div>
+    <div class="ni" data-view="mensal"><span style="width:18px;text-align:center">📅</span>Execução Mensal</div>
+  </div>
+  <div class="sb-flt"><label>FILTRO</label><select id="fO"><option value="">Todas OMs</option><option>1º GCC</option><option>BAGL</option><option>CAE</option><option>CBNB</option><option>CCA-RJ</option><option>CEMAL</option><option>CGABEG</option><option>CTLA</option><option>DIRAP</option><option>DIRSA</option><option>DTCEA-GL</option><option>GAP-GL</option><option>HFAG</option><option>LAQFA</option><option>PAGL</option><option>PAMA-GL</option><option>PAMB-RJ</option><option>SAGAB</option><option>SERIPA III</option></select><select id="fG"><option value="">Todos Grupos</option><option value="1">G1 - Serv. Preliminares</option><option value="2">G2 - Infraestrutura</option><option value="3">G3 - Superestrutura</option><option value="4">G4 - Alvenaria/Divisórias</option><option value="5">G5 - Drywall/Forros</option><option value="6">G6 - Cobertura/Impermeab.</option><option value="7">G7 - Esquadrias</option><option value="8">G8 - Inst. Hidrossanitárias</option><option value="9">G9 - Inst. Elétricas</option><option value="10">G10 - Elétricas - Redes</option><option value="11">G11 - SPDA</option><option value="12">G12 - Automação/Telecom.</option><option value="13">G13 - Gás e Incêndio</option><option value="14">G14 - Pintura Interna</option><option value="15">G15 - Pintura Externa</option><option value="16">G16 - Rev. Internos</option><option value="17">G17 - Rev. Externos</option><option value="18">G18 - Pint. Piso/Metal</option><option value="19">G19 - Equipamentos</option><option value="20">G20 - Escavação/Drenagem</option><option value="21">G21 - Água/Esgoto</option></select></div>
+  <div class="sb-btns">
+    <button class="btn btn-gd btn-sb" onclick="showM('iM')">📥 Importar Requisições</button>
+    <button class="btn btn-ac btn-sb" onclick="showM('aM')">🏛️ Adicionar OM</button>
+    <button class="btn btn-g btn-sb" style="color:#AEB6BF" onclick="showM('eM')">✏️ Editar TOD</button>
+    <hr style="border:none;border-top:1px solid rgba(255,255,255,.1);margin:2px 0">
+    <button class="btn btn-tl btn-sb" onclick="exportHTML()">📤 Exportar p/ Compartilhar</button>
+    <button class="btn btn-g btn-sb" style="color:#AEB6BF" onclick="exportJSON()">💾 Salvar Estado (JSON)</button>
+    <button class="btn btn-g btn-sb" style="color:#AEB6BF" onclick="document.getElementById('loadJ').click()">📂 Carregar Estado</button>
+    <input type="file" id="loadJ" accept=".json" style="display:none" onchange="importJSON(this)">
+  </div>
+  <div class="sb-foot"><span id="rc">16 req.</span> · <span id="sv">Auto-save ativo</span></div>
+</div>
+<div class="main">
+  <div class="topbar">
+    <div><h1 id="pT">G1 — Serv. Preliminares</h1><div class="ts">Grupamento de Apoio do Galeão — Contratos Unificados de Engenharia</div></div>
+    <div style="display:flex;gap:6px">
+      <button class="btn btn-g" id="bB" onclick="goBack()" style="display: inline-block;">← Voltar</button>
+      <button class="btn btn-g" onclick="showM('iM')">📥</button>
+      <button class="btn btn-tl" onclick="exportHTML()" title="Gerar HTML compartilhável">📤 Compartilhar</button>
+      <button class="btn btn-g" onclick="window.print()">🖨️</button>
+    </div>
+  </div>
+  <div id="banner" class="save-banner" style="display: none;">✅ Estado salvo em JSON.</div>
+  <div class="content" id="ct"><div class="anim"><div class="kpis" style="grid-template-columns:repeat(4,1fr)"><div class="kpi "><div class="lb">TOD</div><div class="vl">R$&nbsp;1.966.807,57</div><div class="s2">Serv. Preliminares</div></div><div class="kpi gold"><div class="lb">CONSUMIDO</div><div class="vl">R$&nbsp;0,00</div><div class="s2">0,0 %</div></div><div class="kpi teal"><div class="lb">SALDO</div><div class="vl">R$&nbsp;1.966.807,57</div><div class="s2"></div></div><div class="kpi red"><div class="lb">OMs</div><div class="vl">19</div><div class="s2"></div></div></div><div class="g2"><div class="card"><div class="ct">Por OM</div><div class="cc" style="height:494px"><canvas id="c3" width="669" height="494" style="display: block; box-sizing: border-box; height: 494px; width: 669px;"></canvas></div></div><div class="card"><div class="ct">Detalhamento</div><div class="tw"><table><thead><tr><th>OM</th><th class="r">TOD</th><th class="r">Cons.</th><th class="r">Saldo</th><th></th></tr></thead><tbody><tr onclick="nav('oms',null,'PAMA-GL')"><td class="b">PAMA-GL</td><td class="r ac">R$&nbsp;483.324,20</td><td class="r">R$&nbsp;0,00</td><td class="r" style="color:inherit">R$&nbsp;483.324,20</td><td><span class="bg bg-a">→</span></td></tr><tr onclick="nav('oms',null,'PAGL')"><td class="b">PAGL</td><td class="r ac">R$&nbsp;456.618,01</td><td class="r">R$&nbsp;0,00</td><td class="r" style="color:inherit">R$&nbsp;456.618,01</td><td><span class="bg bg-a">→</span></td></tr><tr onclick="nav('oms',null,'BAGL')"><td class="b">BAGL</td><td class="r ac">R$&nbsp;255.344,01</td><td class="r">R$&nbsp;0,00</td><td class="r" style="color:inherit">R$&nbsp;255.344,01</td><td><span class="bg bg-a">→</span></td></tr><tr onclick="nav('oms',null,'CTLA')"><td class="b">CTLA</td><td class="r ac">R$&nbsp;176.842,71</td><td class="r">R$&nbsp;0,00</td><td class="r" style="color:inherit">R$&nbsp;176.842,71</td><td><span class="bg bg-a">→</span></td></tr><tr onclick="nav('oms',null,'PAMB-RJ')"><td class="b">PAMB-RJ</td><td class="r ac">R$&nbsp;150.794,36</td><td class="r">R$&nbsp;0,00</td><td class="r" style="color:inherit">R$&nbsp;150.794,36</td><td><span class="bg bg-a">→</span></td></tr><tr onclick="nav('oms',null,'CEMAL')"><td class="b">CEMAL</td><td class="r ac">R$&nbsp;98.503,77</td><td class="r">R$&nbsp;0,00</td><td class="r" style="color:inherit">R$&nbsp;98.503,77</td><td><span class="bg bg-a">→</span></td></tr><tr onclick="nav('oms',null,'GAP-GL')"><td class="b">GAP-GL</td><td class="r ac">R$&nbsp;54.930,32</td><td class="r">R$&nbsp;0,00</td><td class="r" style="color:inherit">R$&nbsp;54.930,32</td><td><span class="bg bg-a">→</span></td></tr><tr onclick="nav('oms',null,'CAE')"><td class="b">CAE</td><td class="r ac">R$&nbsp;53.805,24</td><td class="r">R$&nbsp;0,00</td><td class="r" style="color:inherit">R$&nbsp;53.805,24</td><td><span class="bg bg-a">→</span></td></tr><tr onclick="nav('oms',null,'CCA-RJ')"><td class="b">CCA-RJ</td><td class="r ac">R$&nbsp;43.921,34</td><td class="r">R$&nbsp;0,00</td><td class="r" style="color:inherit">R$&nbsp;43.921,34</td><td><span class="bg bg-a">→</span></td></tr><tr onclick="nav('oms',null,'CBNB')"><td class="b">CBNB</td><td class="r ac">R$&nbsp;39.661,77</td><td class="r">R$&nbsp;0,00</td><td class="r" style="color:inherit">R$&nbsp;39.661,77</td><td><span class="bg bg-a">→</span></td></tr><tr onclick="nav('oms',null,'CGABEG')"><td class="b">CGABEG</td><td class="r ac">R$&nbsp;35.695,12</td><td class="r">R$&nbsp;0,00</td><td class="r" style="color:inherit">R$&nbsp;35.695,12</td><td><span class="bg bg-a">→</span></td></tr><tr onclick="nav('oms',null,'HFAG')"><td class="b">HFAG</td><td class="r ac">R$&nbsp;32.134,97</td><td class="r">R$&nbsp;0,00</td><td class="r" style="color:inherit">R$&nbsp;32.134,97</td><td><span class="bg bg-a">→</span></td></tr><tr onclick="nav('oms',null,'LAQFA')"><td class="b">LAQFA</td><td class="r ac">R$&nbsp;21.597,22</td><td class="r">R$&nbsp;0,00</td><td class="r" style="color:inherit">R$&nbsp;21.597,22</td><td><span class="bg bg-a">→</span></td></tr><tr onclick="nav('oms',null,'DIRSA')"><td class="b">DIRSA</td><td class="r ac">R$&nbsp;20.368,01</td><td class="r">R$&nbsp;0,00</td><td class="r" style="color:inherit">R$&nbsp;20.368,01</td><td><span class="bg bg-a">→</span></td></tr><tr onclick="nav('oms',null,'DIRAP')"><td class="b">DIRAP</td><td class="r ac">R$&nbsp;14.755,83</td><td class="r">R$&nbsp;0,00</td><td class="r" style="color:inherit">R$&nbsp;14.755,83</td><td><span class="bg bg-a">→</span></td></tr><tr onclick="nav('oms',null,'SERIPA III')"><td class="b">SERIPA III</td><td class="r ac">R$&nbsp;11.652,37</td><td class="r">R$&nbsp;0,00</td><td class="r" style="color:inherit">R$&nbsp;11.652,37</td><td><span class="bg bg-a">→</span></td></tr><tr onclick="nav('oms',null,'SAGAB')"><td class="b">SAGAB</td><td class="r ac">R$&nbsp;7.801,40</td><td class="r">R$&nbsp;0,00</td><td class="r" style="color:inherit">R$&nbsp;7.801,40</td><td><span class="bg bg-a">→</span></td></tr><tr onclick="nav('oms',null,'DTCEA-GL')"><td class="b">DTCEA-GL</td><td class="r ac">R$&nbsp;6.457,33</td><td class="r">R$&nbsp;0,00</td><td class="r" style="color:inherit">R$&nbsp;6.457,33</td><td><span class="bg bg-a">→</span></td></tr><tr onclick="nav('oms',null,'1º GCC')"><td class="b">1º GCC</td><td class="r ac">R$&nbsp;2.599,59</td><td class="r">R$&nbsp;0,00</td><td class="r" style="color:inherit">R$&nbsp;2.599,59</td><td><span class="bg bg-a">→</span></td></tr></tbody></table></div></div></div></div></div>
+</div>
+</div>
+
+<!-- MODALS (import/addOM/editTOD) -->
+<div class="mo hidden" id="iM"><div class="ml"><div class="mh"><h3>📥 Importar Requisições</h3><button class="mc" onclick="hideM('iM')">×</button></div><div class="mb">
+<div class="al al-i"><span>ℹ️</span><div>Copie colunas <b>B(Data) D(OM) F(Grupo) H(Valor)</b> da planilha → cole abaixo.<br>Datas: DD/MM/AAAA, AAAA-MM-DD, AAAA-MM-DD HH:MM:SS</div></div>
+<textarea id="iD" placeholder="2026-04-06 00:00:00	CGABEG	4	40153,58
+06/04/2026	HFAG	7	250000,00
+HFAG	7	250000,00 (sem data = mês atual)"></textarea>
+</div><div class="mf"><button class="btn" style="background:#eee;color:var(--text)" onclick="hideM('iM')">Cancelar</button><button class="btn" style="background:#eee;color:var(--text)" onclick="loadEx()">📋 Exemplo</button><button class="btn btn-tl" onclick="doImport()">✅ Importar</button></div></div></div>
+
+<div class="mo hidden" id="aM"><div class="ml"><div class="mh"><h3>🏛️ Adicionar OM Vinculada</h3><button class="mc" onclick="hideM('aM')">×</button></div><div class="mb">
+<div class="al al-i"><span>ℹ️</span><div>OM sem TOD próprio → consome saldo da OM-mãe.</div></div>
+<div class="fr"><div class="fg"><label>Nova OM</label><input id="nN" placeholder="DECEA"></div><div class="fg"><label>OM-Mãe</label><select id="nP"></select></div></div><div id="lL"></div>
+</div><div class="mf"><button class="btn" style="background:#eee;color:var(--text)" onclick="hideM('aM')">Fechar</button><button class="btn btn-tl" onclick="addLnk()">✅ Adicionar</button></div></div></div>
+
+<div class="mo hidden" id="eM"><div class="ml"><div class="mh"><h3>✏️ Editar TOD</h3><button class="mc" onclick="hideM('eM')">×</button></div><div class="mb">
+<div class="fr"><div class="fg"><label>OM</label><select id="eO" onchange="ldEG()"></select></div><div class="fg"><label>Grupo</label><select id="eG"></select></div></div>
+<div class="fr"><div class="fg"><label>Atual</label><input id="eA" readonly="" style="background:#f0f0f0"></div><div class="fg"><label>Novo Valor</label><input id="eV" placeholder="150000,00"></div></div><div id="eL"></div>
+</div><div class="mf"><button class="btn" style="background:#eee;color:var(--text)" onclick="hideM('eM')">Fechar</button><button class="btn btn-gd" onclick="applyEdit()">✅ Aplicar</button></div></div></div>
+
+<script>
+// ═══════════════════════════════════════
+// DATA
+// ═══════════════════════════════════════
+const GRP={1:"Serv. Preliminares",2:"Infraestrutura",3:"Superestrutura",4:"Alvenaria/Divisórias",5:"Drywall/Forros",6:"Cobertura/Impermeab.",7:"Esquadrias",8:"Inst. Hidrossanitárias",9:"Inst. Elétricas",10:"Elétricas - Redes",11:"SPDA",12:"Automação/Telecom.",13:"Gás e Incêndio",14:"Pintura Interna",15:"Pintura Externa",16:"Rev. Internos",17:"Rev. Externos",18:"Pint. Piso/Metal",19:"Equipamentos",20:"Escavação/Drenagem",21:"Água/Esgoto"};
+const TOD_ORIGINAL={"GAP-GL":{1:54930.32,2:523984.72,3:375525.25,4:749731.21,5:126318.6,6:436462.9,7:575232.26,8:476147.53,9:417647.95,10:1136877.95,11:315957.29,12:358540.09,13:93920.85,14:167090.02,15:297500.13,16:302619.54,17:925972,18:487706.44,19:1214821.85,20:842551.27,21:179315.56},"HFAG":{1:32134.97,2:176523.42,3:214665.52,4:458526.58,5:584450.87,6:226859.24,7:337274.51,8:334211.33,9:141409.66,10:43582.91,11:37295.17,12:51162.1,13:194968.56,14:1674489.02,15:536444.26,16:43623.35,17:51146.91,18:136672.03,19:185435.89,20:6477.11,21:182690.85},"PAGL":{1:456618.01,2:169373.45,3:173159.77,4:349726.39,5:174413.56,6:230174.56,7:337307.53,8:281267.55,9:29983.94,10:43582.91,11:150923.76,12:1250911.47,13:1445459.09,14:365826.57,15:536444.26,16:43036.3,17:51146.91,18:136672.03,19:43443.14,20:6477.11,21:180707.66},"PAMA-GL":{1:483324.2,2:4815.89,3:84137.35,4:1566288.57,5:200452.77,6:204093.02,7:434287.08,8:81593.13,9:29762.52,10:14741.49,12:406467.32,13:78662.3,14:299722.14,15:5797.28,16:732347.6,19:21178.28,20:45068.72,21:1500.84},"PAMB-RJ":{1:150794.36,2:103016.26,3:315513.36,4:239508.05,5:280236.72,6:229626.76,7:53893.99,8:122543.88,9:90446.98,12:192500.37,13:377690.85,14:710893.83,15:8172.21,16:120738.59,19:13157.29,20:706452.46},"CEMAL":{1:98503.77,2:182383.67,3:84947.11,4:171997.28,5:254985.13,6:95851.74,7:340660.04,8:42351.48,9:104238.97,10:197099.42,11:41245.2,12:277243.8,13:233790.27,14:174977.57,15:79455.75,16:356151.57,17:8578.39,18:131053.37,19:22936.28,20:153237.54,21:85110.6},"LAQFA":{1:21597.22,2:65078.2,3:98838.77,4:82452.75,5:86381.94,6:115261.78,7:322272.65,8:181556.85,9:223831.1,10:590593.18,11:264696.85,12:60116.4,13:54570.64,14:429652.13,15:214577.7,16:43202.02,17:1146771.11,18:76935.89,19:28739.47,20:38909.98,21:39412.25},"DIRSA":{1:20368.01,2:309208.26,3:51094.34,4:63136.99,5:190612.91,6:150796.38,7:181338.4,8:130286.58,9:256052.38,10:307006.56,11:261013.22,12:143839.09,13:71673.29,14:137718.08,15:117307.39,16:148992.66,17:1147266.78,18:94038.84,19:62631.74,20:166070.62,21:45813.37},"CAE":{1:53805.24,2:112815.64,3:42666.23,4:106923.71,5:56548,6:77574.58,7:89689.67,8:88195.83,9:74595.14,10:50797.11,11:49973.77,12:193652.65,13:173382.69,14:81227.22,15:112600.86,16:8270.14,17:43139.36,18:139385.9,19:94010.47,20:246740.31,21:35862.21},"CBNB":{1:39661.77,2:116692.91,3:3682.51,4:79706.79,5:167901.38,6:102223,7:132924.97,8:54237.32,9:78091.29,10:23731.24,11:24986.89,12:195041.21,13:230537.75,14:53542.34,15:96660.85,16:48415.05,17:21187.68,18:73648.76,19:160280.38,20:30991.92,21:117570.54},"CGABEG":{1:35695.12,2:107998.01,3:69388.55,4:81080.81,5:16499.03,6:169357.18,7:188374.6,8:149371.87,9:11608.67,10:313801.96,11:34390.28,12:81487.77,13:72063.17,14:4333.94,15:55722.04,16:23157.38,17:25507.9,18:132122.88,19:91071.11,20:12309.88,21:94523.35},"CTLA":{1:176842.71,2:54990.78,3:239058.85,4:55992.68,5:67457.74,6:58358.73,7:108611.78,8:40754.97,9:109308.03,10:14696.41,12:162797.64,13:81405.59,14:89925.25,15:55722.04,16:30786.86,17:12753.95,18:65868.65,19:27572.14,20:112634.07,21:6235.3},"CCA-RJ":{1:43921.34,2:131174.6,3:39621.68,4:137098.3,5:55620.2,6:19934.75,7:241055.37,8:147926.66,9:52848.02,10:12845.04,11:39194.73,12:160088.09,13:147998.61,14:35767,15:40861.05,16:9972.6,17:18022.08,18:10769.2,19:24545.98,20:84470.23,21:25245.23},"DTCEA-GL":{1:6457.33,2:56118.46,3:34646.52,4:38315.12,5:35204.83,6:10992.07,7:33530.77,8:24110.79,9:23830.16,10:12317.88,11:12311.85,12:55091.99,13:99087.45,14:59865.62,15:145817.08,16:11983.02,17:64281.48,18:47673.29,19:42514.58,20:41323.4,21:22741.71},"DIRAP":{1:14755.83,3:21038.5,4:39308.62,5:66502.95,6:47176.88,7:5340.4,11:37680.95,12:20278.39,13:14282.21,14:71323.2,15:10375.11,16:9927.54,20:10297.35,21:21891.27},"1º GCC":{1:2599.59,2:67516.41,3:117082.71,4:48041.38,5:38614.86,6:14756.41,7:152917.12,8:48664.11,9:45866.22,10:12317.88,11:3222.1,12:99912.36,13:34563.95,14:35612.15,15:297500.13,16:10294.27,17:64281.48,18:118232.06,19:11807.31,20:6810.46,21:45074.59},"SERIPA III":{1:11652.37,2:14556.83,3:5279.74,4:19624.73,5:1856.32,6:19907.5,7:89689.67,8:74184.59,9:70435.86,10:62753.37,11:10907.7,12:18841.39,13:2308.23,14:1266.09,15:26141.64,16:10560.65,17:7392.83,18:13642.18,19:18918.07,20:2442.79,21:32883.88},"SAGAB":{1:7801.4,2:55941.68,3:36879.17,4:47456.89,5:39746.72,6:32633.82,7:38031.33,8:27118.66,9:21846.12,10:21705.32,11:24986.89,12:44165.24,13:44493.89,14:53542.34,15:9666.09,16:28357.9,17:21187.68,18:34028.56,19:91144.39,20:30991.92,21:38417},"BAGL":{1:255344.01,2:97619.64,3:19649.41,4:481973,5:191326.81,6:178387.61,7:124980.73,8:161315.51,9:29035.6,10:8563.37,11:13748.4,12:181201.1,13:1004423.5,14:87124.92,15:112600.84,16:91730.03,17:113112.46,18:182097.56,19:293108.69,20:161982.86,21:80273.91}};
+
+// Working copy (editable)
+const TOD=JSON.parse(JSON.stringify(TOD_ORIGINAL));
+let lnk={},reqs=[],edits=[],curView='geral',selGrp=null,selOM=null,chts={};
+
+// ═══ PERSISTENCE ═══
+const SAVE_KEY='gapgl_dashboard_v3';
+function saveState(){try{localStorage.setItem(SAVE_KEY,JSON.stringify({reqs,lnk,edits,todOverrides:getTODOverrides()}))}catch(e){}}
+function loadState(){
+  // Check for embedded state first (shared HTML)
+  if(window.__EMBEDDED_STATE__){
+    const s=window.__EMBEDDED_STATE__;
+    reqs=s.reqs||[];lnk=s.lnk||{};edits=s.edits||[];
+    if(s.todOverrides)Object.entries(s.todOverrides).forEach(([om,grps])=>{if(TOD[om])Object.entries(grps).forEach(([g,v])=>{TOD[om][+g]=v})});
+    return;
+  }
+  try{const d=JSON.parse(localStorage.getItem(SAVE_KEY));if(d){reqs=d.reqs||[];lnk=d.lnk||{};edits=d.edits||[];if(d.todOverrides)Object.entries(d.todOverrides).forEach(([om,grps])=>{if(TOD[om])Object.entries(grps).forEach(([g,v])=>{TOD[om][+g]=v})})}}catch(e){}}
+function getTODOverrides(){const ov={};Object.entries(TOD).forEach(([om,grps])=>{Object.entries(grps).forEach(([g,v])=>{if(!TOD_ORIGINAL[om]||TOD_ORIGINAL[om][+g]!==v){if(!ov[om])ov[om]={};ov[om][+g]=v}})});return ov}
+function flash(msg){const b=document.getElementById('banner');b.textContent='✅ '+msg;b.style.display='block';setTimeout(()=>b.style.display='none',3000)}
+
+// ═══ EXPORT HTML (shareable) ═══
+function exportHTML(){
+  const state=JSON.stringify({reqs,lnk,edits,todOverrides:getTODOverrides()});
+  // Get current page HTML and inject state
+  const html=document.documentElement.outerHTML;
+  const stateScript=`<script>window.__EMBEDDED_STATE__=${state};<\/script>`;
+  // Inject before closing </head>
+  const output=html.replace('</head>',stateScript+'</head>');
+  const blob=new Blob([`<!DOCTYPE html>\n${output}`],{type:'text/html;charset=utf-8'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');
+  const now=new Date();
+  const dateStr=now.toISOString().slice(0,10);
+  a.href=url;a.download=`Dashboard_GAP-GL_${dateStr}.html`;a.click();
+  URL.revokeObjectURL(url);
+  flash(`Dashboard exportado com ${reqs.length} requisições. Envie o arquivo HTML para visualização.`);
+}
+function exportJSON(){
+  const state=JSON.stringify({reqs,lnk,edits,todOverrides:getTODOverrides(),exportDate:new Date().toISOString()},null,2);
+  const blob=new Blob([state],{type:'application/json'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);
+  a.download=`GAP-GL_estado_${new Date().toISOString().slice(0,10)}.json`;a.click();
+  flash('Estado salvo em JSON.');
+}
+function importJSON(input){
+  const file=input.files[0];if(!file)return;
+  const reader=new FileReader();
+  reader.onload=e=>{
+    try{
+      const d=JSON.parse(e.target.result);
+      if(d.reqs)reqs=d.reqs;if(d.lnk)lnk=d.lnk;if(d.edits)edits=d.edits;
+      if(d.todOverrides)Object.entries(d.todOverrides).forEach(([om,grps])=>{if(TOD[om])Object.entries(grps).forEach(([g,v])=>{TOD[om][+g]=v})});
+      saveState();initF();render();
+      flash(`Estado carregado: ${reqs.length} requisições, ${Object.keys(lnk).length} OMs vinculadas.`);
+    }catch(err){alert('Arquivo JSON inválido.')}
+  };reader.readAsText(file);input.value='';
+}
+
+// ═══ UTILS ═══
+function allOMs(){return[...Object.keys(TOD),...Object.keys(lnk)].sort()}
+function eff(om){return lnk[om]||om}
+function isL(om){return!!lnk[om]}
+const F=v=>v.toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
+const FS=v=>{if(v>=1e6)return'R$ '+(v/1e6).toFixed(2).replace('.',',')+' mi';if(v>=1e3)return'R$ '+(v/1e3).toFixed(1).replace('.',',')+' mil';return F(v)};
+const PC=v=>(v*100).toFixed(1).replace('.',',')+' %';
+function pV(s){s=s.trim().replace('R$','').replace(/\s/g,'');if(s.includes(',')&&s.includes('.'))s=s.replace(/\./g,'').replace(',','.');else if(s.includes(','))s=s.replace(',','.');return parseFloat(s)||0}
+function parseDate(s){if(!s)return null;s=String(s).trim();let m;if(m=s.match(/^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{4})/))return{d:+m[1],m:+m[2],y:+m[3]};if(m=s.match(/^(\d{4})[\/\-](\d{1,2})[\/\-](\d{1,2})/))return{d:+m[3],m:+m[2],y:+m[1]};return null}
+function fmtD(pd){return pd?String(pd.d).padStart(2,'0')+'/'+String(pd.m).padStart(2,'0')+'/'+pd.y:''}
+function mOf(r){const pd=parseDate(r.data);return pd?pd.m-1:-1}
+
+function compute(){const D={tT:0,tC:0,grps:{},oms:{}};for(let g=1;g<=21;g++)D.grps[g]={tod:0,cons:0};
+Object.keys(TOD).forEach(om=>{D.oms[om]={tod:0,cons:0,grps:{},linked:[]};Object.entries(TOD[om]).forEach(([g,v])=>{D.grps[+g].tod+=v;D.tT+=v;D.oms[om].tod+=v;D.oms[om].grps[+g]={tod:v,cons:0}})});
+Object.entries(lnk).forEach(([om,p])=>{D.oms[om]={tod:0,cons:0,grps:{},parent:p,linked:[]};if(D.oms[p])D.oms[p].linked.push(om)});
+reqs.forEach(r=>{const g=+r.grupo,v=+r.valor,om=r.om,pay=eff(om);if(D.grps[g])D.grps[g].cons+=v;D.tC+=v;if(D.oms[om]){D.oms[om].cons+=v;if(!D.oms[om].grps[g])D.oms[om].grps[g]={tod:0,cons:0};D.oms[om].grps[g].cons+=v}if(pay!==om&&D.oms[pay]){D.oms[pay].cons+=v;if(!D.oms[pay].grps[g])D.oms[pay].grps[g]={tod:0,cons:0};D.oms[pay].grps[g].cons+=v}});return D}
+
+function nav(v,g=null,o=null){curView=v;selGrp=g;selOM=o;document.querySelectorAll('.ni').forEach(n=>n.classList.toggle('active',n.dataset.view===v));document.getElementById('bB').style.display=(g||o)?'inline-block':'none';render()}
+function goBack(){nav(curView)}
+document.querySelectorAll('.ni').forEach(n=>n.addEventListener('click',()=>nav(n.dataset.view)));
+function initF(){const f1=document.getElementById('fO'),f2=document.getElementById('fG');f1.innerHTML='<option value="">Todas OMs</option>'+allOMs().map(o=>`<option>${o}</option>`).join('');f2.innerHTML='<option value="">Todos Grupos</option>'+Object.entries(GRP).map(([g,n])=>`<option value="${g}">G${g} - ${n}</option>`).join('');f1.onchange=()=>{f1.value?nav('oms',null,f1.value):nav('oms')};f2.onchange=()=>{f2.value?nav('grupos',+f2.value):nav('grupos')}}
+
+function render(){const D=compute(),C=document.getElementById('ct');Object.values(chts).forEach(c=>{try{c.destroy()}catch(e){}});chts={};
+if(curView==='geral')rGeral(D,C);else if(curView==='grupos'&&selGrp)rGD(D,C);else if(curView==='grupos')rGs(D,C);else if(curView==='oms'&&selOM)rOD(D,C);else if(curView==='oms')rOs(D,C);else if(curView==='mensal')rMensal(D,C);
+document.getElementById('rc').textContent=reqs.length+' req.';saveState()}
+
+function K(l,v,s,c=''){return`<div class="kpi ${c}"><div class="lb">${l}</div><div class="vl">${v}</div><div class="s2">${s}</div></div>`}
+function P(p,c='var(--teal)',w=55){return`<div class="pr"><div class="pr-b" style="width:${w}px"><div class="pr-f" style="width:${Math.min(100,p*100)}%;background:${c}"></div></div><span class="pr-t">${PC(p)}</span></div>`}
+function SB(p){if(p>1)return'<span class="bg bg-r">⛔</span>';if(p>.8)return'<span class="bg bg-gd">⚠</span>';if(p>0)return'<span class="bg bg-t">✅</span>';return'<span class="bg bg-gr">➖</span>'}
+function oT(om){return isL(om)?`<span class="ltag">→${lnk[om]}</span>`:''}
+
+// ═══ VIEWS (same logic, abbreviated) ═══
+function rGeral(D,C){document.getElementById('pT').textContent='Visão Geral';const s=D.tT-D.tC,p=D.tT?D.tC/D.tT:0;const nE=Object.values(D.grps).filter(g=>g.tod>0&&g.cons>g.tod).length,nA=Object.values(D.grps).filter(g=>g.tod>0&&g.cons/g.tod>.8&&g.cons<=g.tod).length,nO=Object.values(D.grps).filter(g=>g.cons>0&&g.tod>0&&g.cons/g.tod<=.8).length,nS=21-nE-nA-nO;
+let h=`<div class="anim"><div class="kpis">${K('VALOR GLOBAL TOD','R$ '+FS(D.tT),'<a onclick="showM(\'eM\')" style="cursor:pointer;color:var(--accent)">✏️ Editar</a>')}${K('CONSUMIDO','R$ '+FS(D.tC),reqs.length+' req.','gold')}${K('SALDO','R$ '+FS(s),PC(1-p)+' restante','teal')}${K('UTILIZAÇÃO',PC(p),'','gold')}${K('ORGANIZAÇÕES',allOMs().length,Object.keys(lnk).length+' vinc.')}</div>`;
+h+=`<div class="sr"><div class="sc" style="background:var(--red)"><div class="vl">${nE}</div><div class="lb">⛔ EXTRAP.</div></div><div class="sc" style="background:var(--warn)"><div class="vl">${nA}</div><div class="lb">⚠ ATENÇÃO</div></div><div class="sc" style="background:var(--teal)"><div class="vl">${nO}</div><div class="lb">✅ EXEC.</div></div><div class="sc" style="background:var(--gray)"><div class="vl">${nS}</div><div class="lb">➖ SEM USO</div></div></div>`;
+h+=`<div class="g21" style="margin-bottom:14px"><div class="card"><div class="ct">Execução por Grupo <span class="hint">Clique → detalhe</span></div><div class="cc"><canvas id="c1"></canvas></div></div><div class="card"><div class="ct">Status</div><div class="cc"><canvas id="c2"></canvas></div></div></div>`;
+const oa=allOMs().map(om=>{const o=D.oms[om]||{tod:0,cons:0};return{om,...o,sl:o.tod-o.cons,p:o.tod?o.cons/o.tod:0}}).sort((a,b)=>b.tod-a.tod);
+h+=`<div class="card"><div class="ct">Organizações Militares</div><div class="tw"><table><thead><tr><th>#</th><th>OM</th><th class="r">TOD</th><th class="r">Consumido</th><th class="r">Saldo</th><th class="r">%</th><th></th></tr></thead><tbody>`;
+oa.forEach((o,i)=>{h+=`<tr onclick="nav('oms',null,'${o.om}')"><td>${i+1}</td><td class="b">${o.om}${oT(o.om)}</td><td class="r ac">${o.tod?F(o.tod):'-'}</td><td class="r">${F(o.cons)}</td><td class="r b" style="color:${o.sl<0?'var(--red)':'var(--teal)'}">${o.tod?F(o.sl):'-'}</td><td class="r">${o.tod?P(o.p):'-'}</td><td><span class="bg bg-a">→</span></td></tr>`});
+h+=`</tbody></table></div></div></div>`;C.innerHTML=h;
+const gd=Object.entries(D.grps).filter(([,d])=>d.tod>0).sort((a,b)=>b[1].tod-a[1].tod);
+chts.c1=new Chart(document.getElementById('c1'),{type:'bar',data:{labels:gd.map(([g])=>'G'+g),datasets:[{label:'TOD',data:gd.map(([,d])=>d.tod),backgroundColor:'#1A6AA5'},{label:'Consumido',data:gd.map(([,d])=>d.cons),backgroundColor:'#D4A017'}]},options:{responsive:true,maintainAspectRatio:false,onClick:(e,el)=>{if(el.length)nav('grupos',+gd[el[0].index][0])},plugins:{legend:{position:'bottom',labels:{font:{size:10}}}},scales:{y:{ticks:{callback:v=>v>=1e6?(v/1e6).toFixed(0)+'M':v>=1e3?(v/1e3).toFixed(0)+'k':v,font:{size:9}}},x:{ticks:{font:{size:9}}}}}});
+chts.c2=new Chart(document.getElementById('c2'),{type:'doughnut',data:{labels:['⛔','⚠','✅','➖'],datasets:[{data:[nE,nA,nO,nS],backgroundColor:['#C0392B','#F39C12','#17A589','#95A5A6']}]},options:{responsive:true,maintainAspectRatio:false,cutout:'55%',plugins:{legend:{position:'bottom',labels:{font:{size:10}}}}}})}
+
+function rGs(D,C){document.getElementById('pT').textContent='Grupos';const ga=Object.entries(D.grps).filter(([,d])=>d.tod>0).map(([g,d])=>({id:+g,name:GRP[+g],...d,sl:d.tod-d.cons,p:d.tod?d.cons/d.tod:0})).sort((a,b)=>b.tod-a.tod);let h=`<div class="anim"><div class="card"><div class="ct">Grupos <span class="hint">Clique → detalhe</span></div><div class="tw"><table><thead><tr><th>G</th><th>Descrição</th><th class="r">TOD</th><th class="r">Cons.</th><th class="r">Saldo</th><th class="r">%</th><th></th></tr></thead><tbody>`;ga.forEach(g=>{h+=`<tr onclick="nav('grupos',${g.id})"><td><span class="bg">${g.id}</span></td><td class="b">${g.name}</td><td class="r ac">${F(g.tod)}</td><td class="r">${F(g.cons)}</td><td class="r" style="color:${g.sl<0?'var(--red)':'var(--teal)'}">${F(g.sl)}</td><td class="r">${P(g.p)}</td><td><span class="bg bg-t">→</span></td></tr>`});h+=`</tbody></table></div></div></div>`;C.innerHTML=h}
+
+function rGD(D,C){const g=selGrp,gd=D.grps[g];document.getElementById('pT').textContent=`G${g} — ${GRP[g]}`;const det=allOMs().filter(o=>{const e=eff(o);return TOD[e]&&TOD[e][g]}).map(o=>{const t=isL(o)?0:(TOD[o]||{})[g]||0;const c=D.oms[o]?.grps[g]?.cons||0;return{om:o,tod:t,cons:c,sl:t-c,p:t?c/t:0}}).sort((a,b)=>b.tod-a.tod);
+let h=`<div class="anim"><div class="kpis" style="grid-template-columns:repeat(4,1fr)">${K('TOD',F(gd.tod),GRP[g])}${K('CONSUMIDO',F(gd.cons),PC(gd.tod?gd.cons/gd.tod:0),'gold')}${K('SALDO',F(gd.tod-gd.cons),'','teal')}${K('OMs',det.length,'','red')}</div><div class="g2"><div class="card"><div class="ct">Por OM</div><div class="cc" style="height:${Math.max(220,det.length*26)}px"><canvas id="c3"></canvas></div></div><div class="card"><div class="ct">Detalhamento</div><div class="tw"><table><thead><tr><th>OM</th><th class="r">TOD</th><th class="r">Cons.</th><th class="r">Saldo</th><th></th></tr></thead><tbody>`;
+det.forEach(d=>{h+=`<tr onclick="nav('oms',null,'${d.om}')"><td class="b">${d.om}${oT(d.om)}</td><td class="r ac">${d.tod?F(d.tod):'-'}</td><td class="r">${F(d.cons)}</td><td class="r" style="color:${d.sl<0?'var(--red)':'inherit'}">${d.tod?F(d.sl):'-'}</td><td><span class="bg bg-a">→</span></td></tr>`});
+h+=`</tbody></table></div></div></div></div>`;C.innerHTML=h;
+chts.c3=new Chart(document.getElementById('c3'),{type:'bar',data:{labels:det.map(d=>d.om),datasets:[{label:'TOD',data:det.map(d=>d.tod),backgroundColor:'#1A6AA5'},{label:'Consumido',data:det.map(d=>d.cons),backgroundColor:'#D4A017'}]},options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,onClick:(e,el)=>{if(el.length)nav('oms',null,det[el[0].index].om)},plugins:{legend:{position:'bottom',labels:{font:{size:10}}}},scales:{x:{ticks:{callback:v=>v>=1e6?(v/1e6).toFixed(1)+'M':v>=1e3?(v/1e3).toFixed(0)+'k':v,font:{size:9}}},y:{ticks:{font:{size:10}}}}}})}
+
+function rOs(D,C){document.getElementById('pT').textContent='Organizações';const oa=allOMs().map(om=>{const o=D.oms[om]||{tod:0,cons:0};return{om,...o,sl:o.tod-o.cons,p:o.tod?o.cons/o.tod:0}}).sort((a,b)=>b.tod-a.tod);let h=`<div class="anim"><div class="card"><div class="ct">Todas as OMs</div><div class="tw"><table><thead><tr><th>#</th><th>OM</th><th class="r">TOD</th><th class="r">Cons.</th><th class="r">Saldo</th><th class="r">%</th><th></th></tr></thead><tbody>`;oa.forEach((o,i)=>{h+=`<tr onclick="nav('oms',null,'${o.om}')"><td>${i+1}</td><td class="b">${o.om}${oT(o.om)}</td><td class="r ac">${o.tod?F(o.tod):'-'}</td><td class="r">${F(o.cons)}</td><td class="r" style="color:${o.sl<0?'var(--red)':'var(--teal)'}">${o.tod?F(o.sl):'-'}</td><td class="r">${o.tod?P(o.p):'-'}</td><td><span class="bg bg-t">→</span></td></tr>`});h+=`</tbody></table></div></div></div>`;C.innerHTML=h}
+
+function rOD(D,C){const om=selOM,od=D.oms[om];if(!od){nav('oms');return}document.getElementById('pT').textContent=om;const det=Object.entries(od.grps||{}).filter(([,d])=>d.tod>0||d.cons>0).map(([g,d])=>({g:+g,name:GRP[+g],...d,sl:d.tod-d.cons,p:d.tod?d.cons/d.tod:0})).sort((a,b)=>b.tod-a.tod);let pi='';if(isL(om))pi=`<div class="al al-w"><span>🔗</span>Vinculada a <b>${lnk[om]}</b>.</div>`;if(od.linked?.length)pi+=`<div class="al al-i"><span>🏛️</span>Vinculadas: <b>${od.linked.join(', ')}</b></div>`;
+let h=`<div class="anim">${pi}<div class="kpis" style="grid-template-columns:repeat(4,1fr)">${K('TOD',od.tod?F(od.tod):'Vinculada',om)}${K('CONSUMIDO',F(od.cons),'','gold')}${K('SALDO',od.tod?F(od.tod-od.cons):'-','','teal')}${K('GRUPOS',det.length,'','red')}</div><div class="g2"><div class="card"><div class="ct">Grupos</div><div class="cc" style="height:${Math.max(220,det.length*26)}px"><canvas id="c4"></canvas></div></div><div class="card"><div class="ct">Detalhamento</div><div class="tw"><table><thead><tr><th>G</th><th>Descrição</th><th class="r">TOD</th><th class="r">Cons.</th><th class="r">Saldo</th><th></th></tr></thead><tbody>`;
+det.forEach(d=>{h+=`<tr onclick="nav('grupos',${d.g})"><td><span class="bg">${d.g}</span></td><td style="font-size:10px">${d.name||'G'+d.g}</td><td class="r ac">${d.tod?F(d.tod):'-'}</td><td class="r">${F(d.cons)}</td><td class="r" style="color:${d.sl<0?'var(--red)':'inherit'}">${d.tod?F(d.sl):'-'}</td><td><span class="bg bg-t">→</span></td></tr>`});
+h+=`</tbody></table></div></div></div></div>`;C.innerHTML=h;
+if(det.length)chts.c4=new Chart(document.getElementById('c4'),{type:'bar',data:{labels:det.map(d=>'G'+d.g),datasets:[{label:'TOD',data:det.map(d=>d.tod),backgroundColor:'#17A589'},{label:'Consumido',data:det.map(d=>d.cons),backgroundColor:'#D4A017'}]},options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,onClick:(e,el)=>{if(el.length)nav('grupos',det[el[0].index].g)},plugins:{legend:{position:'bottom',labels:{font:{size:10}}}},scales:{x:{ticks:{callback:v=>v>=1e6?(v/1e6).toFixed(1)+'M':v>=1e3?(v/1e3).toFixed(0)+'k':v,font:{size:9}}},y:{ticks:{font:{size:10}}}}}})}
+
+// ═══ EXECUÇÃO MENSAL ═══
+function rMensal(D,C){document.getElementById('pT').textContent='Execução Mensal';const ML=['JAN','FEV','MAR','ABR','MAI','JUN','JUL','AGO','SET','OUT','NOV','DEZ'];const mv=Array(12).fill(0),mc=Array(12).fill(0),omM={},grpM={};allOMs().forEach(o=>omM[o]=Array(12).fill(0));for(let g=1;g<=21;g++)grpM[g]=Array(12).fill(0);
+reqs.forEach(r=>{const mi=mOf(r);if(mi>=0&&mi<12){mv[mi]+=+r.valor;mc[mi]++;if(omM[r.om])omM[r.om][mi]+=+r.valor;if(grpM[+r.grupo])grpM[+r.grupo][mi]+=+r.valor}});
+const tE=mv.reduce((a,b)=>a+b,0),tR=mc.reduce((a,b)=>a+b,0),aM=mc.filter(v=>v>0).length,avg=aM?tE/aM:0;
+let h=`<div class="anim"><div class="print-hdr"><h2>PRESTAÇÃO DE CONTAS — EXECUÇÃO MENSAL</h2><p>Pregão 900057/2025 | NPA 145/GAP-GL/2026 | Contratos Unificados de Engenharia</p></div>`;
+if(!reqs.length)h+=`<div class="al al-w"><span>⚠️</span>Importe requisições com data para ver a execução mensal.</div>`;
+h+=`<div class="mensal-header"><h3>EXECUÇÃO FINANCEIRA — CONTRATOS UNIFICADOS DE ENGENHARIA</h3><div class="per">Exercício ${new Date().getFullYear()}</div></div><div class="mensal-kpi"><div><div class="mk-l">Total Executado</div><div class="mk-v">${FS(tE)}</div></div><div><div class="mk-l">Requisições</div><div class="mk-v">${tR}</div></div><div><div class="mk-l">Meses Ativos</div><div class="mk-v">${aM}/12</div></div><div><div class="mk-l">Média Mensal</div><div class="mk-v">${FS(avg)}</div></div></div>`;
+h+=`<div class="card" style="margin-bottom:14px"><div class="ct">Evolução Mensal (R$)</div><div class="cc"><canvas id="c5"></canvas></div></div>`;
+// Summary table
+h+=`<div class="mt"><table><thead><tr><th style="width:110px">INDICADOR</th>`;ML.forEach(m=>h+=`<th class="r">${m}</th>`);h+=`<th class="r" style="background:#1A6AA5;width:85px">ACUMULADO</th></tr></thead><tbody>`;
+h+=`<tr><td class="b">Nº Requisições</td>`;mc.forEach(v=>h+=`<td class="mc-r ${v?'mc-a':'mc-z'}">${v||'—'}</td>`);h+=`<td class="mc-r" style="font-weight:800;color:var(--accent)">${tR}</td></tr>`;
+h+=`<tr><td class="b">Valor (R$)</td>`;mv.forEach(v=>h+=`<td class="mc-r ${v?'mc-a':'mc-z'}">${v?F(v):'—'}</td>`);h+=`<td class="mc-r" style="font-weight:800;color:var(--accent)">${F(tE)}</td></tr>`;
+h+=`<tr><td class="b">Média/Req.</td>`;mv.forEach((v,i)=>h+=`<td class="mc-r ${v?'':'mc-z'}">${mc[i]?F(v/mc[i]):'—'}</td>`);h+=`<td class="mc-r">${tR?F(tE/tR):'—'}</td></tr>`;
+let acc=0;h+=`<tr class="tr-t"><td class="b">% Acumulado</td>`;mv.forEach(v=>{acc+=v;h+=`<td class="mc-r">${tE?PC(acc/tE):'—'}</td>`});h+=`<td class="mc-r" style="font-weight:800">100%</td></tr></tbody></table></div>`;
+// Per OM
+h+=`<div class="mt"><table><thead><tr><th>Nº</th><th>OM</th>`;ML.forEach(m=>h+=`<th class="r">${m}</th>`);h+=`<th class="r" style="background:#1A6AA5">TOTAL</th><th class="r" style="background:#1A6AA5">%</th></tr></thead><tbody>`;
+const os=allOMs().map(o=>({om:o,d:omM[o]||Array(12).fill(0),t:(omM[o]||[]).reduce((a,b)=>a+b,0)})).filter(o=>o.t>0).sort((a,b)=>b.t-a.t);
+os.forEach((o,i)=>{h+=`<tr onclick="nav('oms',null,'${o.om}')"><td style="text-align:center">${i+1}</td><td class="b">${o.om}${oT(o.om)}</td>`;o.d.forEach(v=>h+=`<td class="mc-r ${v?'mc-a':'mc-z'}">${v?F(v):'—'}</td>`);h+=`<td class="mc-r" style="font-weight:700;color:var(--accent)">${F(o.t)}</td><td class="mc-r">${tE?PC(o.t/tE):'—'}</td></tr>`});
+if(!os.length)h+=`<tr><td colspan="${ML.length+4}" style="text-align:center;padding:16px;color:var(--muted)">Sem dados</td></tr>`;
+h+=`<tr class="tr-t"><td></td><td class="b">TOTAL</td>`;ML.forEach((m,i)=>h+=`<td class="mc-r">${mv[i]?F(mv[i]):'—'}</td>`);h+=`<td class="mc-r" style="color:var(--accent)">${F(tE)}</td><td class="mc-r">100%</td></tr></tbody></table></div>`;
+// Per Group
+h+=`<div class="mt"><table><thead><tr><th>G</th><th>GRUPO</th>`;ML.forEach(m=>h+=`<th class="r">${m}</th>`);h+=`<th class="r" style="background:#1A6AA5">TOTAL</th><th class="r" style="background:#1A6AA5">%</th></tr></thead><tbody>`;
+const gs=Object.entries(grpM).filter(([,d])=>d.some(v=>v>0)).map(([g,d])=>({g:+g,name:GRP[+g],d,t:d.reduce((a,b)=>a+b,0)})).sort((a,b)=>b.t-a.t);
+gs.forEach(g=>{h+=`<tr onclick="nav('grupos',${g.g})"><td style="text-align:center"><span class="bg">${g.g}</span></td><td class="b" style="font-size:10px">${g.name||'G'+g.g}</td>`;g.d.forEach(v=>h+=`<td class="mc-r ${v?'mc-a':'mc-z'}">${v?F(v):'—'}</td>`);h+=`<td class="mc-r" style="font-weight:700;color:var(--accent)">${F(g.t)}</td><td class="mc-r">${tE?PC(g.t/tE):'—'}</td></tr>`});
+if(!gs.length)h+=`<tr><td colspan="${ML.length+4}" style="text-align:center;padding:16px;color:var(--muted)">Sem dados</td></tr>`;
+h+=`<tr class="tr-t"><td></td><td class="b">TOTAL</td>`;ML.forEach((m,i)=>h+=`<td class="mc-r">${mv[i]?F(mv[i]):'—'}</td>`);h+=`<td class="mc-r" style="color:var(--accent)">${F(tE)}</td><td class="mc-r">100%</td></tr></tbody></table></div></div>`;C.innerHTML=h;
+chts.c5=new Chart(document.getElementById('c5'),{type:'bar',data:{labels:ML,datasets:[{label:'Executado',data:mv,backgroundColor:mv.map(v=>v>0?'#1A6AA5':'#D5D8DC'),borderRadius:3}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{ticks:{callback:v=>v>=1e6?(v/1e6).toFixed(1)+'M':v>=1e3?(v/1e3).toFixed(0)+'k':v,font:{size:9}},grid:{color:'#F0F0F0'}},x:{ticks:{font:{size:10,weight:'bold'}},grid:{display:false}}}}})}
+
+// ═══ MODALS ═══
+function showM(id){document.getElementById(id).classList.remove('hidden');if(id==='aM'){document.getElementById('nP').innerHTML='<option value="">Selecione...</option>'+Object.keys(TOD).sort().map(o=>`<option>${o}</option>`).join('');rLL()}if(id==='eM'){document.getElementById('eO').innerHTML='<option value="">Selecione...</option>'+Object.keys(TOD).sort().map(o=>`<option>${o}</option>`).join('');document.getElementById('eG').innerHTML='<option>—</option>';document.getElementById('eA').value='';document.getElementById('eV').value='';rEL()}}
+function hideM(id){document.getElementById(id).classList.add('hidden')}
+function doImport(){const raw=document.getElementById('iD').value.trim();if(!raw){alert('Cole os dados.');return}const lines=raw.split('\n').filter(l=>l.trim());const nr=[];let err=0;
+lines.forEach(line=>{let p=line.split('\t');if(p.length<3)p=line.split(';');if(p.length>=3){let data='',om,grupo,valorStr;const f0=p[0].trim();const isDate=f0.match(/^\d{1,4}[\/\-]\d{1,2}[\/\-]\d{1,4}/)||f0.match(/^\d{4}-\d{2}-\d{2}\s/);
+if(p.length>=4&&isDate){const pd=parseDate(f0);data=pd?fmtD(pd):'';om=p[1].trim().toUpperCase();grupo=parseInt(p[2]);valorStr=p[3].trim()}else{om=p[0].trim().toUpperCase();grupo=parseInt(p[1]);valorStr=p[2].trim();if(p.length>=4){const pd=parseDate(p[3].trim());data=pd?fmtD(pd):''}}
+const valor=pV(valorStr);if(om&&grupo>=1&&grupo<=21&&valor>0){if(!data){const now=new Date();data=String(now.getDate()).padStart(2,'0')+'/'+String(now.getMonth()+1).padStart(2,'0')+'/'+now.getFullYear()}nr.push({om,grupo,valor,data})}else err++}else err++});
+if(!nr.length){alert('Nenhum dado válido.');return}reqs=reqs.concat(nr);hideM('iM');document.getElementById('iD').value='';initF();render();flash(`${nr.length} requisições importadas`)}
+function loadEx(){document.getElementById('iD').value=`2026-04-06 00:00:00\tCGABEG\t4\t40153,58\n06/04/2026\tHFAG\t7\t250000,00\n15/04/2026\tHFAG\t16\t180000,00\n18/04/2026\tPAGL\t14\t320000,00\n20/04/2026\tPAGL\t15\t150000,00\n2026-05-10 00:00:00\tCEMAL\t9\t95000,00\n25/05/2026\tCEMAL\t14\t145000,00\n10/06/2026\tPAMA-GL\t6\t500000,00\n12/06/2026\tLAQFA\t12\t200000,00\n15/06/2026\tDIRSA\t4\t175000,00\n18/06/2026\tCAE\t14\t120000,00\n20/07/2026\tCBNB\t15\t85000,00\n05/07/2026\tCCA-RJ\t9\t210000,00\n08/08/2026\tCTLA\t14\t90000,00\n10/08/2026\tDTCEA-GL\t17\t55000,00\n15/09/2026\t1º GCC\t17\t130000,00\n20/09/2026\tPAMB-RJ\t16\t450000,00\n10/10/2026\tBAGL\t13\t320000,00\n15/10/2026\tSAGAB\t19\t45000,00`}
+function addLnk(){const n=document.getElementById('nN').value.trim().toUpperCase(),p=document.getElementById('nP').value;if(!n||!p){alert('Preencha.');return}if(TOD[n]){alert(n+' tem TOD.');return}if(lnk[n]){alert(n+' já vinculada.');return}lnk[n]=p;document.getElementById('nN').value='';rLL();initF();render();flash(`${n} vinculada a ${p}`)}
+function rmLnk(om){delete lnk[om];rLL();initF();render()}
+function rLL(){const el=document.getElementById('lL'),e=Object.entries(lnk);if(!e.length){el.innerHTML='<p style="font-size:11px;color:var(--muted)">Nenhuma vinculada.</p>';return}let h='<table style="font-size:11px"><thead><tr><th>OM</th><th>Mãe</th><th></th></tr></thead><tbody>';e.forEach(([om,p])=>{h+=`<tr><td class="b">${om}</td><td>${p}</td><td><button onclick="rmLnk('${om}')" style="background:var(--red);color:#fff;border:none;border-radius:3px;padding:2px 8px;font-size:9px;cursor:pointer">×</button></td></tr>`});h+='</tbody></table>';el.innerHTML=h}
+function ldEG(){const om=document.getElementById('eO').value,s=document.getElementById('eG');if(!om||!TOD[om]){s.innerHTML='<option>—</option>';return}s.innerHTML='<option value="">Selecione...</option>'+Object.entries(TOD[om]).map(([g,v])=>`<option value="${g}">G${g} - ${GRP[+g]||'G'+g} (${F(v)})</option>`).join('')+'<option value="new">➕ Novo</option>';s.onchange=()=>{const g=s.value;document.getElementById('eA').value=g==='new'?'R$ 0,00':g&&TOD[om][+g]!==undefined?F(TOD[om][+g]):'';document.getElementById('eV').value=''}}
+function applyEdit(){const om=document.getElementById('eO').value;let g=document.getElementById('eG').value;const nv=document.getElementById('eV').value;if(!om||!g){alert('Selecione OM e grupo.');return}const novo=pV(nv);if(g==='new'){const gn=prompt('Grupo (1-21):');if(!gn||+gn<1||+gn>21)return;g=+gn}else g=+g;const old=TOD[om][g]||0;TOD[om][g]=novo;edits.push({om,g,de:old,para:novo,dt:new Date().toLocaleString('pt-BR')});rEL();render();document.getElementById('eA').value=F(novo);document.getElementById('eV').value='';ldEG();flash(`TOD ${om} G${g}: ${F(old)} → ${F(novo)}`)}
+function rEL(){const el=document.getElementById('eL');if(!edits.length){el.innerHTML='';return}let h='<div style="font-size:9px;font-weight:700;margin:6px 0 3px">Histórico:</div><table style="font-size:9px"><thead><tr><th>Data</th><th>OM</th><th>G</th><th class="r">De</th><th class="r">Para</th></tr></thead><tbody>';edits.slice(-8).reverse().forEach(e=>{h+=`<tr><td>${e.dt}</td><td>${e.om}</td><td>G${e.g}</td><td class="r">${F(e.de)}</td><td class="r" style="color:var(--teal)">${F(e.para)}</td></tr>`});h+='</tbody></table>';el.innerHTML=h}
+
+// ═══ INIT ═══
+loadState();initF();render();
+</script>
+
+
+</body></html>
