@@ -139,13 +139,13 @@
 
 <script>
 var M=['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
-var SK='util-v14-shared',SO='util-v14-oms-shared';
+var SK='util-v15',SO='util-v15-oms';
 var oms=[],dados=[],selOM=null,editId=null,isAdmin=false;
 var ADMIN_PIN='2024';
 
-async function loadS(){try{var d=await window.storage.get(SK,true),o=await window.storage.get(SO,true);if(d&&o){dados=JSON.parse(d.value);oms=JSON.parse(o.value)}else{seed();await forceSave()}}catch(e){seed()}render()}
-async function forceSave(){try{await window.storage.set(SK,JSON.stringify(dados),true);await window.storage.set(SO,JSON.stringify(oms),true)}catch(e){console.error(e)}}
-async function sv(){if(!isAdmin)return;await forceSave()}
+async function loadS(){try{var d=localStorage.getItem(SK),o=localStorage.getItem(SO);if(d&&o){dados=JSON.parse(d);oms=JSON.parse(o)}else{seed();forceSave()}}catch(e){seed()}render()}
+function forceSave(){try{localStorage.setItem(SK,JSON.stringify(dados));localStorage.setItem(SO,JSON.stringify(oms))}catch(e){console.error(e)}}
+function sv(){if(!isAdmin)return;forceSave()}
 
 var SEED_OMS=[{id:'1gcc',nome:'1 GCC',area:0,efetivo:0},{id:'bagl',nome:'BAGL',area:0,efetivo:0},{id:'cae',nome:'CAE',area:0,efetivo:0},{id:'cbnb',nome:'CBNB',area:0,efetivo:0},{id:'ccarj',nome:'CCA-RJ',area:0,efetivo:0},{id:'cemal',nome:'CEMAL',area:0,efetivo:0},{id:'cgabeg',nome:'CGABEG',area:0,efetivo:0},{id:'dirap',nome:'DIRAP',area:0,efetivo:0},{id:'dirsa',nome:'DIRSA',area:0,efetivo:0},{id:'hfag',nome:'HFAG',area:0,efetivo:0},{id:'laqfa',nome:'LAQFA',area:0,efetivo:0},{id:'pagl',nome:'PAGL',area:0,efetivo:0},{id:'pama',nome:'PAMA',area:0,efetivo:0},{id:'pamb',nome:'PAMB',area:0,efetivo:0},{id:'sagab',nome:'SAGAB',area:0,efetivo:0}];
 
@@ -345,7 +345,60 @@ function printReport(){var content=document.getElementById('reportContent');if(!
 
 function rMet(){document.getElementById('s-metodologia').innerHTML='<div class="ts">Metodologia</div><div class="cd" style="line-height:1.8"><div class="tc" style="font-size:14px">Detecção de anomalias</div><p class="sm" style="color:var(--mt);margin-bottom:14px">Três ferramentas estatísticas:</p><div style="margin-bottom:16px"><div style="font-weight:600;margin-bottom:4px">1. Desvio Padrão (σ)</div><div style="margin:10px 0;display:flex;flex-direction:column;gap:6px"><div style="display:flex;align-items:center;gap:8px"><span class="bg bg-ok">✓ NORMAL</span><span class="xs" style="color:var(--mt)">Até <b>1,2σ</b></span></div><div style="display:flex;align-items:center;gap:8px"><span class="bg bg-wr">● ATENÇÃO</span><span class="xs" style="color:var(--mt)">Entre <b>1,2σ e 2σ</b></span></div><div style="display:flex;align-items:center;gap:8px"><span class="bg bg-cr">▲ CRÍTICO</span><span class="xs" style="color:var(--mt)">Acima de <b>2σ</b></span></div></div></div><div style="margin-bottom:16px"><div style="font-weight:600;margin-bottom:4px">2. Média Móvel (3 meses)</div><p class="xs" style="color:var(--mt)">Tendência real. <span style="color:var(--wr)">Linha amarela tracejada</span>.</p></div><div style="margin-bottom:16px"><div style="font-weight:600;margin-bottom:4px">3. Gráfico de Controle</div><p class="xs" style="color:var(--mt)"><span style="color:var(--ac)">■</span> μ, <span style="color:var(--cr)">■</span> UCL/LCL (±2σ), <span style="color:var(--wr)">■</span> zona atenção. Pontos: <span style="color:var(--ok)">●</span> <span style="color:var(--wr)">●</span> <span style="color:var(--cr)">●</span></p></div><div style="border-top:1px solid var(--bd);padding-top:12px"><div style="font-weight:600;margin-bottom:4px">Exemplo</div><p class="xs" style="color:var(--mt)">μ=R$50k, σ=R$10k → até R$62k=Normal, R$62k–70k=Atenção, &gt;R$70k=Crítico.</p></div></div><div class="cd"><div class="tc">Fontes</div><div class="xs" style="color:var(--mt);line-height:1.7"><b style="color:var(--luz)">⚡ Light</b> — Ct 100/GAP-GL/2024<br><b style="color:var(--agua)">💧 Águas do Rio</b> — Ct 110/GAP-GL/2024<br>SILOMS (ref. mês anterior). Gestor Fiscal ABR/2025+.</div></div>'}
 
-function rC(){var items='';for(var i=0;i<oms.length;i++){var om=oms[i];items+='<div style="display:flex;justify-content:space-between;align-items:center;padding:6px 10px;border-radius:6px;background:var(--s2)"><div><span style="font-weight:600;font-size:12px">'+om.nome+'</span><span class="xxs" style="color:var(--dm);margin-left:8px">'+(om.efetivo?'Efet: '+om.efetivo:'—')+' | '+(om.area?fN(om.area)+' m²':'—')+'</span></div><button onclick="rmOM(\''+om.id+'\')" style="background:0;border:0;color:var(--cr);cursor:pointer;font-size:14px;padding:2px 6px">×</button></div>'}document.getElementById('s-config').innerHTML='<div class="ts">Configurações</div><div class="cd"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px"><div class="tc" style="margin:0">OMs ('+oms.length+')</div><button class="btn btn-p" style="font-size:11px;padding:5px 10px" onclick="openM(\'mOM\')">+ Nova OM</button></div><div style="display:flex;flex-direction:column;gap:4px">'+items+'</div></div><button class="btn" style="color:var(--cr);border-color:rgba(248,113,113,.2);align-self:start" onclick="resetAll()">Recarregar Dados Originais</button>'}
+function rC(){var items='';for(var i=0;i<oms.length;i++){var om=oms[i];items+='<div style="display:flex;justify-content:space-between;align-items:center;padding:6px 10px;border-radius:6px;background:var(--s2)"><div><span style="font-weight:600;font-size:12px">'+om.nome+'</span><span class="xxs" style="color:var(--dm);margin-left:8px">'+(om.efetivo?'Efet: '+om.efetivo:'—')+' | '+(om.area?fN(om.area)+' m²':'—')+'</span></div><button onclick="rmOM(\''+om.id+'\')" style="background:0;border:0;color:var(--cr);cursor:pointer;font-size:14px;padding:2px 6px">×</button></div>'}document.getElementById('s-config').innerHTML='<div class="ts">Configurações</div><div class="cd"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px"><div class="tc" style="margin:0">OMs ('+oms.length+')</div><button class="btn btn-p" style="font-size:11px;padding:5px 10px" onclick="openM(\'mOM\')">+ Nova OM</button></div><div style="display:flex;flex-direction:column;gap:4px">'+items+'</div></div><div class="cd" style="margin-top:12px"><div class="tc">Publicar no GitHub</div><div class="xs" style="color:var(--mt);line-height:1.6;margin-bottom:12px">Gera o HTML completo do dashboard com os dados atuais. Copie e cole no GitHub para atualizar o painel online.</div><div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn btn-p" onclick="copyHTML()">📋 Copiar HTML para GitHub</button><button class="btn" onclick="downloadHTML()">💾 Baixar index.html</button></div><div id="copyMsg" class="xs" style="color:var(--ok);margin-top:8px;display:none">✅ Copiado! Cole no GitHub: index.html → ✏️ Editar → Cole tudo → Commit</div></div><button class="btn" style="color:var(--cr);border-color:rgba(248,113,113,.2);align-self:start;margin-top:12px" onclick="resetAll()">Recarregar Dados Originais</button>'}
+
+function generateHTML(){
+  // Build a fresh seed function with current data
+  var omsCopy=JSON.stringify(oms);
+  var dadosCopy=JSON.stringify(dados);
+  // Get the full page HTML but replace the seed/load to embed current data
+  var fullHTML=document.documentElement.outerHTML;
+  // Replace the loadS function to use embedded data on first load
+  var marker='/*EMBED_DATA*/';
+  if(fullHTML.indexOf(marker)===-1){
+    // Inject current data into the HTML by replacing the loadS function
+    var oldLoad='async function loadS(){try{var d=localStorage.getItem(SK),o=localStorage.getItem(SO);if(d&&o){dados=JSON.parse(d);oms=JSON.parse(o)}else{seed();forceSave()}}catch(e){seed()}render()}';
+    var newLoad='async function loadS(){/*EMBED_DATA*/try{var d=localStorage.getItem(SK),o=localStorage.getItem(SO);if(d&&o){dados=JSON.parse(d);oms=JSON.parse(o)}else{oms='+omsCopy+';dados='+dadosCopy+';forceSave()}}catch(e){oms='+omsCopy+';dados='+dadosCopy+'}render()}';
+    fullHTML=fullHTML.replace(oldLoad,newLoad);
+  }else{
+    // Already has embedded data, update it
+    var regex=/\/\*EMBED_DATA\*\/try\{var d=localStorage\.getItem\(SK\),o=localStorage\.getItem\(SO\);if\(d&&o\)\{dados=JSON\.parse\(d\);oms=JSON\.parse\(o\)\}else\{oms=.*?;dados=.*?;forceSave\(\)\}\}catch\(e\)\{oms=.*?;dados=.*?\}/;
+    var newBlock='/*EMBED_DATA*/try{var d=localStorage.getItem(SK),o=localStorage.getItem(SO);if(d&&o){dados=JSON.parse(d);oms=JSON.parse(o)}else{oms='+omsCopy+';dados='+dadosCopy+';forceSave()}}catch(e){oms='+omsCopy+';dados='+dadosCopy+'}';
+    fullHTML=fullHTML.replace(regex,newBlock);
+  }
+  return '<!DOCTYPE html>\n<html'+fullHTML.substring(fullHTML.indexOf('<html')+5);
+}
+
+function copyHTML(){
+  var html=generateHTML();
+  navigator.clipboard.writeText(html).then(function(){
+    var msg=document.getElementById('copyMsg');
+    if(msg){msg.style.display='block';setTimeout(function(){msg.style.display='none'},8000)}
+  }).catch(function(e){
+    // Fallback: create textarea
+    var ta=document.createElement('textarea');
+    ta.value=html;
+    ta.style.position='fixed';
+    ta.style.left='-9999px';
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand('copy');
+    document.body.removeChild(ta);
+    var msg=document.getElementById('copyMsg');
+    if(msg){msg.style.display='block';setTimeout(function(){msg.style.display='none'},8000)}
+  });
+}
+
+function downloadHTML(){
+  var html=generateHTML();
+  var blob=new Blob([html],{type:'text/html'});
+  var url=URL.createObjectURL(blob);
+  var a=document.createElement('a');
+  a.href=url;a.download='index.html';
+  document.body.appendChild(a);a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
 
 function go(id){if(id!=='oms')selOM=null;var navs=document.querySelectorAll('.nav-item');for(var i=0;i<navs.length;i++)navs[i].classList.toggle('on',navs[i].getAttribute('data-t')===id);var secs=document.querySelectorAll('.sec');for(var i=0;i<secs.length;i++)secs[i].classList.toggle('on',secs[i].id==='s-'+id);var titles={dashboard:'Dashboard',oms:'Por OM',benchmark:'Ranking',projecao:'Projeção',relatorio:'Relatório',metodologia:'Metodologia',config:'Configurações'};var pt=document.getElementById('pageTitle');if(pt)pt.textContent=titles[id]||id;document.getElementById('sidebar').classList.remove('open');render()}
 function openM(id){if(!isAdmin&&(id==='mAdd'||id==='mImp'||id==='mOM'||id==='mEdit'))return;document.getElementById(id).classList.add('open')}
@@ -361,7 +414,7 @@ function openEdit(id){if(!isAdmin)return;var d=null;for(var i=0;i<dados.length;i
 function saveEdit(){if(!isAdmin||!editId)return;var d=null;for(var i=0;i<dados.length;i++)if(dados[i].id===editId)d=dados[i];if(!d)return;var v=parseFloat(document.getElementById('eVal').value);if(!v){alert('Informe o valor.');return}d.consumo=parseFloat(document.getElementById('eCons').value)||0;d.valor=v;editId=null;sv();closeM();render()}
 function delRec(){if(!isAdmin||!editId)return;if(!confirm('Excluir?'))return;dados=dados.filter(function(r){return r.id!==editId});editId=null;sv();closeM();render()}
 function doImport(){if(!isAdmin){alert('Restrito ao admin.');return}var file=document.getElementById('impFile').files[0];if(!file){alert('Selecione arquivo.');return}var ext=file.name.split('.').pop().toLowerCase();if(ext==='xlsx'||ext==='xls'){var reader=new FileReader();reader.onload=function(e){var wb=XLSX.read(e.target.result,{type:'array'});var count=0;wb.SheetNames.forEach(function(sn){var ws=wb.Sheets[sn];var arr=XLSX.utils.sheet_to_json(ws,{header:1});for(var r=0;r<Math.min(arr.length,10);r++){var row=arr[r];if(!row)continue;var h=row.map(function(c){return String(c||'').toLowerCase().trim()});var omI=-1;for(var ci=0;ci<h.length;ci++)if(h[ci]==='om'){omI=ci;break}if(omI>=0){for(var i=r+1;i<arr.length;i++){var dr=arr[i];if(!dr||!dr[omI])continue;var omN=String(dr[omI]).trim();if(omN.toUpperCase()==='TOTAL'||!omN)continue;for(var c=omI+1;c<Math.min(h.length,omI+13);c++){var hdr=h[c];if(!hdr)continue;var mm=hdr.match(/(jan|fev|mar|abr|mai|jun|jul|ago|set|out|nov|dez)(\d{2})/i);if(!mm)continue;var mN2=['jan','fev','mar','abr','mai','jun','jul','ago','set','out','nov','dez'];var mes=mN2.indexOf(mm[1].toLowerCase())+1;var ano2=2000+parseInt(mm[2]);var val=parseFloat(String(dr[c]||'0').replace(/\./g,'').replace(',','.'));if(isNaN(val)||val<=0)continue;var snL=sn.toLowerCase();var tipo2=snL.indexOf('luz')>=0||snL.indexOf('light')>=0||snL.indexOf('energia')>=0?'luz':'agua';var isC2=snL.indexOf('consumo')>=0||snL.indexOf('m³')>=0||snL.indexOf('kwh')>=0;var match=null;for(var mi=0;mi<oms.length;mi++){if(oms[mi].nome.toLowerCase()===omN.toLowerCase()||oms[mi].id===omN.toLowerCase().replace(/[^a-z0-9]/g,'')){match=oms[mi];break}}if(!match){var nid='om_'+omN.toLowerCase().replace(/[^a-z0-9]/g,'');match={id:nid,nome:omN,area:0,efetivo:0};oms.push(match)}if(isC2){for(var di=0;di<dados.length;di++){if(dados[di].omId===match.id&&dados[di].ano===ano2&&dados[di].mes===mes&&dados[di].tipo===tipo2){dados[di].consumo=val;break}}}else{dados.push({id:'imp_'+Date.now()+'_'+Math.random().toString(36).slice(2),omId:match.id,ano:ano2,mes:mes,tipo:tipo2,consumo:0,valor:val});count++}}}break}}});sv();closeM();alert(count+' registros importados!');render()};reader.readAsArrayBuffer(file)}else{var reader2=new FileReader();reader2.onload=function(e){var lines=e.target.result.trim().split('\n');var count2=0;if(lines.length<2){alert('Vazio.');return}var hdr2=lines[0].split(/[;,\t]/).map(function(h){return h.trim().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'')});for(var i=1;i<lines.length;i++){var c=lines[i].split(/[;,\t]/).map(function(x){return x.trim().replace(/^"|"$/g,'')});if(c.length<5)continue;var row2={};for(var j=0;j<hdr2.length;j++)row2[hdr2[j]]=c[j];var omRef=row2.om||row2.omid||'';var match2=null;for(var mi=0;mi<oms.length;mi++){if(oms[mi].id===omRef||oms[mi].nome.toLowerCase()===omRef.toLowerCase()){match2=oms[mi];break}}dados.push({id:'imp_'+Date.now()+'_'+Math.random().toString(36).slice(2),omId:match2?match2.id:omRef,ano:parseInt(row2.ano)||2025,mes:parseInt(row2.mes)||1,tipo:(row2.tipo||'').indexOf('agua')>=0?'agua':'luz',consumo:parseFloat((row2.consumo||'0').replace(/\./g,'').replace(',','.'))||0,valor:parseFloat((row2.valor||'0').replace(/\./g,'').replace(',','.'))||0});count2++}sv();closeM();alert(count2+' importados!');render()};reader2.readAsText(file)}}
-async function resetAll(){if(!isAdmin)return;if(!confirm('Recarregar dados originais?'))return;seed();await sv();render()}
+async function resetAll(){if(!isAdmin)return;if(!confirm('Recarregar dados originais?'))return;seed();sv();render()}
 loadS();
 </script>
 </body>
