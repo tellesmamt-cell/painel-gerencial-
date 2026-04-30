@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="pt-BR"><head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dashboard Gerencial — GAP-GL | Crédito Recebido × Empenhado</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#f5f6fa;--card:#fff;--border:#e2e5ee;--blue-900:#0c2340;--blue-700:#14365d;--blue-600:#1a4b8c;--blue-500:#2563eb;--blue-100:#dbeafe;--blue-50:#eff6ff;--gold-500:#d4a017;--gold-400:#e6b422;--gold-100:#fef9e7;--green-600:#059669;--green-100:#d1fae5;--red-600:#dc2626;--red-100:#fee2e2;--orange-500:#f59e0b;--orange-100:#fef3c7;--gray-50:#f9fafb;--gray-100:#f3f4f6;--gray-200:#e5e7eb;--gray-300:#d1d5db;--gray-400:#9ca3af;--gray-500:#6b7280;--gray-600:#4b5563;--gray-700:#374151;--gray-800:#1f2937;--gray-900:#111827;--shadow:0 1px 3px rgba(0,0,0,.08),0 1px 2px rgba(0,0,0,.04);--shadow-md:0 4px 6px rgba(0,0,0,.07),0 2px 4px rgba(0,0,0,.04);--shadow-lg:0 10px 15px rgba(0,0,0,.1),0 4px 6px rgba(0,0,0,.05);--radius:10px;--radius-sm:6px}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--gray-800);line-height:1.5;min-height:100vh}
+.header{background:var(--blue-900);color:#fff;padding:14px 32px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100}
+.header h1{font-size:17px;font-weight:700;letter-spacing:-.3px}
+.header .subtitle{font-size:11px;color:rgba(255,255,255,.5);margin-top:2px}
+.header-right{display:flex;align-items:center;gap:8px}
+.badge{background:var(--gold-500);color:var(--blue-900);padding:4px 12px;border-radius:20px;font-size:11px;font-weight:700}
+.hdr-btn{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.15);color:#fff;padding:7px 14px;border-radius:var(--radius-sm);font-size:12px;font-family:inherit;font-weight:500;cursor:pointer;display:flex;align-items:center;gap:6px;transition:all .15s;white-space:nowrap}
+.hdr-btn:hover{background:rgba(255,255,255,.2)}
+.hdr-btn.active{background:var(--green-600);border-color:var(--green-600)}
+.hdr-btn svg{width:14px;height:14px}
+.admin-bar{background:var(--blue-700);padding:10px 32px;display:none;align-items:center;gap:12px;flex-wrap:wrap;border-bottom:2px solid var(--gold-500)}
+.admin-bar.show{display:flex}
+.ab-label{font-size:12px;color:var(--gold-400);font-weight:700;text-transform:uppercase;letter-spacing:.5px;display:flex;align-items:center;gap:6px}
+.ab-label svg{width:14px;height:14px}
+.ab-btn{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);color:#fff;padding:7px 16px;border-radius:var(--radius-sm);font-size:12px;font-family:inherit;font-weight:500;cursor:pointer;display:flex;align-items:center;gap:6px;transition:all .15s}
+.ab-btn:hover{background:rgba(255,255,255,.25)}
+.ab-btn svg{width:14px;height:14px}
+.ab-sep{width:1px;height:24px;background:rgba(255,255,255,.15);margin:0 4px}
+.main{display:flex;min-height:calc(100vh - 64px)}
+.sidebar{width:340px;background:var(--card);border-right:1px solid var(--border);overflow-y:auto;flex-shrink:0}
+.content{flex:1;padding:28px 32px;overflow-y:auto;max-height:calc(100vh - 64px)}
+.sidebar-header{padding:16px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px}
+.sidebar-header h2{font-size:13px;font-weight:700;color:var(--gray-500);text-transform:uppercase;letter-spacing:.5px}
+.sidebar-search{padding:12px 16px;border-bottom:1px solid var(--border)}
+.sidebar-search input{width:100%;padding:8px 12px;border:1px solid var(--border);border-radius:var(--radius-sm);font-size:13px;font-family:inherit;background:var(--gray-50);outline:none;transition:border .2s}
+.sidebar-search input:focus{border-color:var(--blue-500);background:#fff}
+.pi-list{padding:4px 0}
+.pi-item{padding:12px 20px;cursor:pointer;border-left:3px solid transparent;transition:all .15s;display:flex;align-items:center;justify-content:space-between;gap:8px}
+.pi-item:hover{background:var(--blue-50);border-left-color:var(--blue-500)}
+.pi-item.active{background:var(--blue-50);border-left-color:var(--blue-500)}
+.pi-code{font-size:12px;font-weight:700;color:var(--blue-600);font-family:monospace}
+.pi-desc{font-size:11px;color:var(--gray-500);margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:180px}
+.pi-value{font-size:12px;font-weight:600;color:var(--gray-700);white-space:nowrap}
+.pi-bar{height:3px;background:var(--gray-200);border-radius:2px;margin-top:4px;overflow:hidden;width:100%}
+.pi-bar-fill{height:100%;background:var(--blue-500);border-radius:2px;transition:width .3s}
+.pi-left{min-width:0;flex:1}
+.pi-right{text-align:right;flex-shrink:0}
+.pi-count{font-size:10px;color:var(--gray-400);margin-top:1px}
+.kpi-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:14px;margin-bottom:24px}
+.kpi{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:18px 20px;box-shadow:var(--shadow);transition:transform .15s,box-shadow .15s}
+.kpi:hover{transform:translateY(-1px);box-shadow:var(--shadow-md)}
+.kpi-label{font-size:11px;font-weight:600;color:var(--gray-500);text-transform:uppercase;letter-spacing:.4px;margin-bottom:6px}
+.kpi-value{font-size:22px;font-weight:700;color:var(--gray-900);letter-spacing:-.5px}
+.kpi-sub{font-size:11px;color:var(--gray-400);margin-top:4px}
+.kpi.primary{border-top:3px solid var(--blue-600)}
+.kpi.success{border-top:3px solid var(--green-600)}
+.kpi.warning{border-top:3px solid var(--orange-500)}
+.kpi.danger{border-top:3px solid var(--red-600)}
+.kpi.gold{border-top:3px solid var(--gold-500)}
+.section{margin-bottom:28px}
+.section-title{font-size:15px;font-weight:700;color:var(--gray-800);margin-bottom:14px;display:flex;align-items:center;gap:8px}
+.section-title::before{content:'';display:block;width:4px;height:18px;background:var(--blue-600);border-radius:2px}
+.table-wrap{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow)}
+table{width:100%;border-collapse:collapse}
+thead{background:var(--blue-900);color:#fff}
+th{padding:12px 16px;text-align:left;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;white-space:nowrap;cursor:pointer;user-select:none}
+th:hover{background:var(--blue-700)}
+th.right,td.right{text-align:right}
+td{padding:10px 16px;font-size:13px;border-bottom:1px solid var(--gray-100)}
+tbody tr{transition:background .1s}
+tbody tr:hover{background:var(--blue-50)}
+tbody tr.clickable{cursor:pointer}
+.money{font-variant-numeric:tabular-nums;font-weight:500}
+.text-green{color:var(--green-600)}.text-orange{color:var(--orange-500)}
+.tag{display:inline-block;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:600}
+.tag-blue{background:var(--blue-100);color:var(--blue-600)}
+.charts-row{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:24px}
+.chart-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:var(--shadow)}
+.chart-card h3{font-size:13px;font-weight:700;color:var(--gray-700);margin-bottom:14px}
+.chart-container{position:relative;height:260px}
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:200;display:none;align-items:center;justify-content:center;padding:20px}
+.modal-overlay.show{display:flex}
+.modal{background:var(--card);border-radius:var(--radius);max-width:900px;width:100%;max-height:85vh;overflow:hidden;box-shadow:var(--shadow-lg);display:flex;flex-direction:column}
+.modal-header{padding:20px 24px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+.modal-header h2{font-size:16px;font-weight:700;color:var(--gray-900)}
+.modal-close{width:32px;height:32px;border:none;background:var(--gray-100);border-radius:50%;cursor:pointer;font-size:18px;color:var(--gray-600);display:flex;align-items:center;justify-content:center;transition:all .15s}
+.modal-close:hover{background:var(--red-100);color:var(--red-600)}
+.modal-body{padding:24px;overflow-y:auto;flex:1}
+.pagination{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;border-top:1px solid var(--gray-100)}
+.pagination .info{font-size:12px;color:var(--gray-500)}
+.pagination .btns{display:flex;gap:4px}
+.pagination button{padding:6px 10px;border:1px solid var(--border);background:var(--card);border-radius:var(--radius-sm);font-size:12px;cursor:pointer;font-family:inherit}
+.pagination button:hover:not(:disabled){background:var(--blue-50);border-color:var(--blue-500)}
+.pagination button:disabled{opacity:.4;cursor:default}
+.progress{height:6px;background:var(--gray-200);border-radius:3px;overflow:hidden}
+.progress-fill{height:100%;border-radius:3px;transition:width .4s}
+.toast{position:fixed;bottom:24px;right:24px;background:var(--blue-900);color:#fff;padding:14px 22px;border-radius:var(--radius);font-size:13px;font-weight:500;box-shadow:var(--shadow-lg);z-index:500;transform:translateY(80px);opacity:0;transition:all .3s;display:flex;align-items:center;gap:10px;max-width:420px}
+.toast.show{transform:translateY(0);opacity:1}
+.toast.success{background:var(--green-600)}
+.toast.error{background:var(--red-600)}
+.toast svg{width:18px;height:18px;flex-shrink:0}
+.login-overlay{position:fixed;inset:0;background:rgba(12,35,64,.85);z-index:300;display:none;align-items:center;justify-content:center}
+.login-overlay.show{display:flex}
+.login-box{background:var(--card);border-radius:var(--radius);padding:40px;width:380px;box-shadow:var(--shadow-lg);text-align:center}
+.login-box h2{font-size:18px;font-weight:700;margin-bottom:6px;color:var(--gray-900)}
+.login-box p{font-size:13px;color:var(--gray-500);margin-bottom:24px}
+.login-box input{width:100%;padding:12px 16px;border:1px solid var(--border);border-radius:var(--radius-sm);font-size:14px;font-family:inherit;text-align:center;letter-spacing:2px;outline:none;margin-bottom:16px}
+.login-box input:focus{border-color:var(--blue-500)}
+.login-btn{width:100%;padding:12px;background:var(--blue-600);color:#fff;border:none;border-radius:var(--radius-sm);font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;transition:background .15s}
+.login-btn:hover{background:var(--blue-500)}
+.login-cancel{margin-top:12px;font-size:12px;color:var(--gray-400);cursor:pointer;border:none;background:none;font-family:inherit}
+.login-cancel:hover{color:var(--gray-600)}
+.login-error{color:var(--red-600);font-size:12px;margin-bottom:12px;display:none}
+.import-zone{border:2px dashed var(--border);border-radius:var(--radius);padding:40px;text-align:center;cursor:pointer;transition:all .2s;background:var(--gray-50)}
+.import-zone:hover,.import-zone.dragover{border-color:var(--blue-500);background:var(--blue-50)}
+.import-zone svg{width:40px;height:40px;color:var(--gray-400);margin-bottom:12px}
+.import-zone h3{font-size:14px;color:var(--gray-700);margin-bottom:4px}
+.import-zone p{font-size:12px;color:var(--gray-400)}
+.import-status{padding:12px 16px;border-radius:var(--radius-sm);margin-top:12px;font-size:13px;display:none}
+.import-status.show{display:block}
+.import-status.ok{background:var(--green-100);color:var(--green-600)}
+.import-status.err{background:var(--red-100);color:var(--red-600)}
+.footer{padding:12px 32px;text-align:center;font-size:11px;color:var(--gray-400);border-top:1px solid var(--border);background:var(--card)}
+::-webkit-scrollbar{width:6px;height:6px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:var(--gray-300);border-radius:3px}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.animate-in{animation:fadeIn .3s ease forwards}
+@media(max-width:1024px){.sidebar{width:280px}.charts-row{grid-template-columns:1fr}}
+@media(max-width:768px){.main{flex-direction:column}.sidebar{width:100%;max-height:240px}.content{max-height:none}.header{padding:12px 16px;flex-wrap:wrap;gap:8px}}
+</style>
+</head>
+<body>
+<div class="header">
+  <div><h1>Crédito Recebido × Empenhado — UPAG Centralizadora</h1><div class="subtitle">Grupamento de Apoio do Galeão (120645)</div></div>
+  <div class="header-right">
+    <div class="badge">2026</div>
+    <button class="hdr-btn active" id="btnAdmin" onclick="toggleAdmin()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0110 0v4"></path></svg><span>Admin ✓</span></button>
+  </div>
+</div>
+<div class="admin-bar show" id="adminBar">
+  <div class="ab-label"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>MODO ADMINISTRADOR</div>
+  <div class="ab-sep"></div>
+  <button class="ab-btn" onclick="showImportModal()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>Importar Planilhas</button>
+  <button class="ab-btn" onclick="exportDashboard()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>Exportar HTML</button>
+  <button class="ab-btn" onclick="copyForGitHub()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 00-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0020 4.77 5.07 5.07 0 0019.91 1S18.73.65 16 2.48a13.38 13.38 0 00-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 005 4.77a5.44 5.44 0 00-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 009 18.13V22"></path></svg>Copiar p/ GitHub</button>
+  <div class="ab-sep"></div>
+  <button class="ab-btn" onclick="logoutAdmin()" style="margin-left:auto"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>Sair</button>
+</div>
+<div class="main">
+  <div class="sidebar">
+    <div class="sidebar-header"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect></svg><h2>Planos Internos</h2></div>
+    <div class="sidebar-search"><input type="text" id="searchPI" placeholder="Buscar PI ou descrição..."></div>
+    <div class="pi-list" id="piList"><div class="pi-item " onclick="selectPI('CA063100100')"><div class="pi-left"><div class="pi-code">CA063100100</div><div class="pi-desc" title="VIDA VEGETATIVA - COMGAP">VIDA VEGETATIVA - COMGAP</div><div class="pi-bar"><div class="pi-bar-fill" style="width:0.11388736555573813%"></div></div></div><div class="pi-right"><div class="pi-value">R$ 15.6K</div><div class="pi-count">0 emp.</div></div></div><div class="pi-item " onclick="selectPI('CE0101ECOOP')"><div class="pi-left"><div class="pi-code">CE0101ECOOP</div><div class="pi-desc" title="EXERCICIO MULTINACIONAL COOPERACION">EXERCICIO MULTINACIONAL COOPERACION</div><div class="pi-bar"><div class="pi-bar-fill" style="width:0.07974226284711242%"></div></div></div><div class="pi-right"><div class="pi-value">R$ 10.9K</div><div class="pi-count">0 emp.</div></div></div><div class="pi-item " onclick="selectPI('CG1662SSESO')"><div class="pi-left"><div class="pi-code">CG1662SSESO</div><div class="pi-desc" title="ASSISTENCIA SOCIAL - SISESO">ASSISTENCIA SOCIAL - SISESO</div><div class="pi-bar"><div class="pi-bar-fill" style="width:0.96301072884926%"></div></div></div><div class="pi-right"><div class="pi-value">R$ 131.9K</div><div class="pi-count">0 emp.</div></div></div><div class="pi-item " onclick="selectPI('D0000010000')"><div class="pi-left"><div class="pi-code">D0000010000</div><div class="pi-desc" title="DESTAQUES">DESTAQUES</div><div class="pi-bar"><div class="pi-bar-fill" style="width:0%"></div></div></div><div class="pi-right"><div class="pi-value">R$ 0,00</div><div class="pi-count">0 emp.</div></div></div><div class="pi-item " onclick="selectPI('DC060401100')"><div class="pi-left"><div class="pi-code">DC060401100</div><div class="pi-desc" title="VIDA VEGETATIVA - DECEA">VIDA VEGETATIVA - DECEA</div><div class="pi-bar"><div class="pi-bar-fill" style="width:0%"></div></div></div><div class="pi-right"><div class="pi-value">R$ 0,00</div><div class="pi-count">0 emp.</div></div></div><div class="pi-item " onclick="selectPI('GB063100001')"><div class="pi-left"><div class="pi-code">GB063100001</div><div class="pi-desc" title="CONTINGENCIA GABAER">CONTINGENCIA GABAER</div><div class="pi-bar"><div class="pi-bar-fill" style="width:0%"></div></div></div><div class="pi-right"><div class="pi-value">R$ 0,00</div><div class="pi-count">0 emp.</div></div></div><div class="pi-item " onclick="selectPI('P0011690200')"><div class="pi-left"><div class="pi-code">P0011690200</div><div class="pi-desc" title="PESE(PROG ESTR SIST ESPACIAIS) - DESENV IMPLA">PESE(PROG ESTR SIST ESPACIAIS) - DESENV IMPLA</div><div class="pi-bar"><div class="pi-bar-fill" style="width:0%"></div></div></div><div class="pi-right"><div class="pi-value">R$ 0,00</div><div class="pi-count">0 emp.</div></div></div><div class="pi-item " onclick="selectPI('SENS14PFM03')"><div class="pi-left"><div class="pi-code">SENS14PFM03</div><div class="pi-desc" title="POS-FORMACAO DE MILITARES">POS-FORMACAO DE MILITARES</div><div class="pi-bar"><div class="pi-bar-fill" style="width:0%"></div></div></div><div class="pi-right"><div class="pi-value">R$ 0,00</div><div class="pi-count">0 emp.</div></div></div><div class="pi-item " onclick="selectPI('SF0617TRLOG')"><div class="pi-left"><div class="pi-code">SF0617TRLOG</div><div class="pi-desc" title="TRANSPORTE LOGISTICO DE SUPERFICIE">TRANSPORTE LOGISTICO DE SUPERFICIE</div><div class="pi-bar"><div class="pi-bar-fill" style="width:0%"></div></div></div><div class="pi-right"><div class="pi-value">R$ 0,00</div><div class="pi-count">0 emp.</div></div></div><div class="pi-item " onclick="selectPI('SF062202300')"><div class="pi-left"><div class="pi-code">SF062202300</div><div class="pi-desc" title="PAGAMENTO SERVIDOR CIVIL ATIVO">PAGAMENTO SERVIDOR CIVIL ATIVO</div><div class="pi-bar"><div class="pi-bar-fill" style="width:0.036491974577664475%"></div></div></div><div class="pi-right"><div class="pi-value">R$ 5.0K</div><div class="pi-count">0 emp.</div></div></div><div class="pi-item " onclick="selectPI('SF062224000')"><div class="pi-left"><div class="pi-code">SF062224000</div><div class="pi-desc" title="PAGAMENTO MILITAR ATIVA">PAGAMENTO MILITAR ATIVA</div><div class="pi-bar"><div class="pi-bar-fill" style="width:100%"></div></div></div><div class="pi-right"><div class="pi-value">R$ 13.7M</div><div class="pi-count">0 emp.</div></div></div><div class="pi-item " onclick="selectPI('SF062244501')"><div class="pi-left"><div class="pi-code">SF062244501</div><div class="pi-desc" title="AUXILIO FUNERAL/NATALIDADE MILITAR ATIVO">AUXILIO FUNERAL/NATALIDADE MILITAR ATIVO</div><div class="pi-bar"><div class="pi-bar-fill" style="width:3.781767765514611%"></div></div></div><div class="pi-right"><div class="pi-value">R$ 518.2K</div><div class="pi-count">0 emp.</div></div></div><div class="pi-item " onclick="selectPI('SF062317200')"><div class="pi-left"><div class="pi-code">SF062317200</div><div class="pi-desc" title="ALIMENTACAO MILITAR">ALIMENTACAO MILITAR</div><div class="pi-bar"><div class="pi-bar-fill" style="width:43.66162558793552%"></div></div></div><div class="pi-right"><div class="pi-value">R$ 6.0M</div><div class="pi-count">0 emp.</div></div></div><div class="pi-item " onclick="selectPI('SF062317303')"><div class="pi-left"><div class="pi-code">SF062317303</div><div class="pi-desc" title="COMBUSTIVEIS PREPARO ALIMENTACAO - SISUB">COMBUSTIVEIS PREPARO ALIMENTACAO - SISUB</div><div class="pi-bar"><div class="pi-bar-fill" style="width:0.2877857103204963%"></div></div></div><div class="pi-right"><div class="pi-value">R$ 39.4K</div><div class="pi-count">0 emp.</div></div></div><div class="pi-item " onclick="selectPI('SF063100003')"><div class="pi-left"><div class="pi-code">SF063100003</div><div class="pi-desc" title="CONTINGENCIA SEFA">CONTINGENCIA SEFA</div><div class="pi-bar"><div class="pi-bar-fill" style="width:0%"></div></div></div><div class="pi-right"><div class="pi-value">R$ 0,00</div><div class="pi-count">0 emp.</div></div></div><div class="pi-item " onclick="selectPI('SF063100100')"><div class="pi-left"><div class="pi-code">SF063100100</div><div class="pi-desc" title="VIDA VEGETATIVA - SEFA">VIDA VEGETATIVA - SEFA</div><div class="pi-bar"><div class="pi-bar-fill" style="width:1.2287766708219494%"></div></div></div><div class="pi-right"><div class="pi-value">R$ 168.4K</div><div class="pi-count">0 emp.</div></div></div><div class="pi-item " onclick="selectPI('SF063100109')"><div class="pi-left"><div class="pi-code">SF063100109</div><div class="pi-desc" title="MANUT/CONS BENS IMOVEIS - SEFA">MANUT/CONS BENS IMOVEIS - SEFA</div><div class="pi-bar"><div class="pi-bar-fill" style="width:0.7089507554655428%"></div></div></div><div class="pi-right"><div class="pi-value">R$ 97.1K</div><div class="pi-count">0 emp.</div></div></div><div class="pi-item " onclick="selectPI('SF063100200')"><div class="pi-left"><div class="pi-code">SF063100200</div><div class="pi-desc" title="SERVICOS PUBLICOS - SEFA">SERVICOS PUBLICOS - SEFA</div><div class="pi-bar"><div class="pi-bar-fill" style="width:21.025714699007793%"></div></div></div><div class="pi-right"><div class="pi-value">R$ 2.9M</div><div class="pi-count">0 emp.</div></div></div><div class="pi-item " onclick="selectPI('SF063100600')"><div class="pi-left"><div class="pi-code">SF063100600</div><div class="pi-desc" title="CONTRATOS CONTINUADOS - SEFA">CONTRATOS CONTINUADOS - SEFA</div><div class="pi-bar"><div class="pi-bar-fill" style="width:5.552352022419314%"></div></div></div><div class="pi-right"><div class="pi-value">R$ 760.8K</div><div class="pi-count">0 emp.</div></div></div><div class="pi-item " onclick="selectPI('SF063202700')"><div class="pi-left"><div class="pi-code">SF063202700</div><div class="pi-desc" title="SUPRIMENTO DE FARDAMENTO">SUPRIMENTO DE FARDAMENTO</div><div class="pi-bar"><div class="pi-bar-fill" style="width:0.012821820187608189%"></div></div></div><div class="pi-right"><div class="pi-value">R$ 1.8K</div><div class="pi-count">0 emp.</div></div></div><div class="pi-item " onclick="selectPI('SF066602700')"><div class="pi-left"><div class="pi-code">SF066602700</div><div class="pi-desc" title="SUPRIMENTO DE FARDAMENTO">SUPRIMENTO DE FARDAMENTO</div><div class="pi-bar"><div class="pi-bar-fill" style="width:0%"></div></div></div><div class="pi-right"><div class="pi-value">R$ 0,00</div><div class="pi-count">0 emp.</div></div></div><div class="pi-item " onclick="selectPI('SF066700104')"><div class="pi-left"><div class="pi-code">SF066700104</div><div class="pi-desc" title="SISHT - SEFA">SISHT - SEFA</div><div class="pi-bar"><div class="pi-bar-fill" style="width:1.044243177970226%"></div></div></div><div class="pi-right"><div class="pi-value">R$ 143.1K</div><div class="pi-count">0 emp.</div></div></div><div class="pi-item " onclick="selectPI('SF0817EP000')"><div class="pi-left"><div class="pi-code">SF0817EP000</div><div class="pi-desc" title="EMENDA PARLAMENTAR">EMENDA PARLAMENTAR</div><div class="pi-bar"><div class="pi-bar-fill" style="width:0%"></div></div></div><div class="pi-right"><div class="pi-value">R$ 0,00</div><div class="pi-count">0 emp.</div></div></div><div class="pi-item " onclick="selectPI('SF0817VSPFC')"><div class="pi-left"><div class="pi-code">SF0817VSPFC</div><div class="pi-desc" title="RECOMPOSICAO FROTA SUPERFICIE">RECOMPOSICAO FROTA SUPERFICIE</div><div class="pi-bar"><div class="pi-bar-fill" style="width:0%"></div></div></div><div class="pi-right"><div class="pi-value">R$ 0,00</div><div class="pi-count">0 emp.</div></div></div><div class="pi-item " onclick="selectPI('SF082317302')"><div class="pi-left"><div class="pi-code">SF082317302</div><div class="pi-desc" title="LOGISTICA ALIMENTACAO - SISUB">LOGISTICA ALIMENTACAO - SISUB</div><div class="pi-bar"><div class="pi-bar-fill" style="width:15.282143489074382%"></div></div></div><div class="pi-right"><div class="pi-value">R$ 2.1M</div><div class="pi-count">0 emp.</div></div></div><div class="pi-item " onclick="selectPI('SF132300PPO')"><div class="pi-left"><div class="pi-code">SF132300PPO</div><div class="pi-desc" title="PLANO DE OBRAS - SISUB">PLANO DE OBRAS - SISUB</div><div class="pi-bar"><div class="pi-bar-fill" style="width:0%"></div></div></div><div class="pi-right"><div class="pi-value">R$ 0,00</div><div class="pi-count">0 emp.</div></div></div></div>
+  </div>
+  <div class="content" id="content"><div class="animate-in"><div class="kpi-row"><div class="kpi primary"><div class="kpi-label">Recebido</div><div class="kpi-value">R$ 28.3M</div></div><div class="kpi gold"><div class="kpi-label">Disponível</div><div class="kpi-value">R$ 1.7M</div><div class="kpi-sub">6.1% do recebido</div></div><div class="kpi warning"><div class="kpi-label">Empenhado</div><div class="kpi-value">R$ 26.6M</div><div class="kpi-sub">93.9% do recebido</div></div><div class="kpi danger"><div class="kpi-label">A Liquidar</div><div class="kpi-value">R$ 0,00</div><div class="kpi-sub">0.0% do empenhado</div></div><div class="kpi success"><div class="kpi-label">Pago</div><div class="kpi-value">R$ 0,00</div><div class="kpi-sub">0.0% do empenhado</div></div></div><div class="charts-row"><div class="chart-card"><h3>Composição Orçamentária</h3><div class="chart-container"><canvas id="chartComp" width="594" height="260" style="display: block; box-sizing: border-box; height: 260px; width: 594px;"></canvas></div></div><div class="chart-card"><h3>Top Planos Internos</h3><div class="chart-container"><canvas id="chartTop" width="594" height="260" style="display: block; box-sizing: border-box; height: 260px; width: 594px;"></canvas></div></div></div><div class="section"><div class="section-title">Visão Geral por Plano Interno</div><div class="table-wrap"><table><thead><tr><th>Plano Interno</th><th>Descrição PI</th><th class="right">Disponível</th><th class="right">Recebido</th><th class="right">Empenhado</th></tr></thead><tbody><tr class="clickable" onclick="selectPI('SF062224000')"><td><span class="tag tag-blue">SF062224000</span></td><td>PAGAMENTO MILITAR ATIVA</td><td class="right money">R$ 0,00</td><td class="right money">R$ 13.701.642,78</td><td class="right money">R$ 13.701.642,78</td></tr><tr class="clickable" onclick="selectPI('SF062317200')"><td><span class="tag tag-blue">SF062317200</span></td><td>ALIMENTACAO MILITAR</td><td class="right money">R$ 559.103,91</td><td class="right money">R$ 6.541.463,88</td><td class="right money">R$ 5.982.359,97</td></tr><tr class="clickable" onclick="selectPI('SF063100200')"><td><span class="tag tag-blue">SF063100200</span></td><td>SERVICOS PUBLICOS - SEFA</td><td class="right money">R$ 0,00</td><td class="right money">R$ 2.880.868,32</td><td class="right money">R$ 2.880.868,32</td></tr><tr class="clickable" onclick="selectPI('SF082317302')"><td><span class="tag tag-blue">SF082317302</span></td><td>LOGISTICA ALIMENTACAO - SISUB</td><td class="right money">R$ 11,27</td><td class="right money">R$ 2.093.915,98</td><td class="right money">R$ 2.093.904,71</td></tr><tr class="clickable" onclick="selectPI('SF063100600')"><td><span class="tag tag-blue">SF063100600</span></td><td>CONTRATOS CONTINUADOS - SEFA</td><td class="right money">R$ 129.318,06</td><td class="right money">R$ 890.081,50</td><td class="right money">R$ 760.763,44</td></tr><tr class="clickable" onclick="selectPI('SF062244501')"><td><span class="tag tag-blue">SF062244501</span></td><td>AUXILIO FUNERAL/NATALIDADE MILITAR ATIVO</td><td class="right money">R$ 0,00</td><td class="right money">R$ 518.164,31</td><td class="right money">R$ 518.164,31</td></tr><tr class="clickable" onclick="selectPI('SF063100100')"><td><span class="tag tag-blue">SF063100100</span></td><td>VIDA VEGETATIVA - SEFA</td><td class="right money">R$ 552,08</td><td class="right money">R$ 168.914,67</td><td class="right money">R$ 168.362,59</td></tr><tr class="clickable" onclick="selectPI('SF066700104')"><td><span class="tag tag-blue">SF066700104</span></td><td>SISHT - SEFA</td><td class="right money">R$ 900.000,00</td><td class="right money">R$ 1.043.078,47</td><td class="right money">R$ 143.078,47</td></tr><tr class="clickable" onclick="selectPI('CG1662SSESO')"><td><span class="tag tag-blue">CG1662SSESO</span></td><td>ASSISTENCIA SOCIAL - SISESO</td><td class="right money">R$ 11.200,07</td><td class="right money">R$ 143.148,36</td><td class="right money">R$ 131.948,29</td></tr><tr class="clickable" onclick="selectPI('SF063100109')"><td><span class="tag tag-blue">SF063100109</span></td><td>MANUT/CONS BENS IMOVEIS - SEFA</td><td class="right money">R$ 4,32</td><td class="right money">R$ 97.142,22</td><td class="right money">R$ 97.137,90</td></tr><tr class="clickable" onclick="selectPI('SF062317303')"><td><span class="tag tag-blue">SF062317303</span></td><td>COMBUSTIVEIS PREPARO ALIMENTACAO - SISUB</td><td class="right money">R$ 86.749,02</td><td class="right money">R$ 126.180,39</td><td class="right money">R$ 39.431,37</td></tr><tr class="clickable" onclick="selectPI('CA063100100')"><td><span class="tag tag-blue">CA063100100</span></td><td>VIDA VEGETATIVA - COMGAP</td><td class="right money">R$ 0,53</td><td class="right money">R$ 15.604,97</td><td class="right money">R$ 15.604,44</td></tr><tr class="clickable" onclick="selectPI('CE0101ECOOP')"><td><span class="tag tag-blue">CE0101ECOOP</span></td><td>EXERCICIO MULTINACIONAL COOPERACION</td><td class="right money">R$ 0,00</td><td class="right money">R$ 10.926,00</td><td class="right money">R$ 10.926,00</td></tr><tr class="clickable" onclick="selectPI('SF062202300')"><td><span class="tag tag-blue">SF062202300</span></td><td>PAGAMENTO SERVIDOR CIVIL ATIVO</td><td class="right money">R$ 22.658,32</td><td class="right money">R$ 27.658,32</td><td class="right money">R$ 5.000,00</td></tr><tr class="clickable" onclick="selectPI('SF063202700')"><td><span class="tag tag-blue">SF063202700</span></td><td>SUPRIMENTO DE FARDAMENTO</td><td class="right money">R$ 0,00</td><td class="right money">R$ 1.756,80</td><td class="right money">R$ 1.756,80</td></tr></tbody></table></div></div></div></div>
+</div>
+<div class="modal-overlay" id="modalOverlay"><div class="modal"><div class="modal-header"><h2 id="modalTitle">Detalhes</h2><button class="modal-close" onclick="closeModal()">×</button></div><div class="modal-body" id="modalBody"></div></div></div>
+<div class="login-overlay" id="loginOverlay"><div class="login-box"><h2>Acesso Administrativo</h2><p>Insira a senha de administrador para gerenciar o dashboard.</p><div class="login-error" id="loginError" style="display: none;">Senha incorreta. Tente novamente.</div><input type="password" id="loginPass" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()"><button class="login-btn" onclick="doLogin()">Entrar</button><button class="login-cancel" onclick="cancelLogin()">Cancelar</button></div></div>
+<div class="modal-overlay" id="importOverlay"><div class="modal" style="max-width:700px"><div class="modal-header"><h2>Importar Planilhas para Atualização</h2><button class="modal-close" onclick="closeImport()">×</button></div><div class="modal-body">
+<p style="font-size:13px;color:var(--gray-500);margin-bottom:20px">Importe as planilhas <strong>Crédito Recebido × Empenhado</strong> e/ou <strong>Despesas Empenhadas</strong> para atualizar os dados.</p>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+<div><h4 style="font-size:13px;font-weight:700;margin-bottom:8px;color:var(--blue-600)">Crédito Recebido × Empenhado</h4><div class="import-zone" id="dropCredito" onclick="document.getElementById('fileCredito').click()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg><h3>Arraste ou clique</h3><p>.xlsx / .xls</p></div><input type="file" id="fileCredito" accept=".xlsx,.xls" style="display:none" onchange="handleFile(this,'credito')"><div class="import-status show ok" id="statusCredito">✓ 44 registros de crédito.</div></div>
+<div><h4 style="font-size:13px;font-weight:700;margin-bottom:8px;color:var(--blue-600)">Despesas Empenhadas</h4><div class="import-zone" id="dropDespesas" onclick="document.getElementById('fileDespesas').click()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg><h3>Arraste ou clique</h3><p>.xlsx / .xls</p></div><input type="file" id="fileDespesas" accept=".xlsx,.xls" style="display:none" onchange="handleFile(this,'despesas')"><div class="import-status show ok" id="statusDespesas">✓ 0 empenhos.</div></div>
+</div>
+<div style="margin-top:20px;text-align:right"><button class="ab-btn" id="btnProcessImport" onclick="processImport()" style="background:var(--blue-600);border-color:var(--blue-600);padding:10px 24px;font-size:13px">Processar e Atualizar Dashboard</button></div>
+</div></div></div>
+<div class="toast success" id="toast"><span style="font-size:16px">✔</span><span>HTML copiado! Cole no repositório GitHub.</span></div>
+<div class="footer">Data da última atualização: <span id="lastUpdate">30/04/2026 15:06:49</span> &nbsp;|&nbsp; Dashboard Gerencial GAP-GL</div>
+<script>
+var DATA_B64="W3sicGkiOiJDQTA2MzEwMDEwMCIsInBpX2Rlc2MiOiJWSURBIFZFR0VUQVRJVkEgLSBDT01HQVAiLCJyZWNlYmlkbyI6MTU2MDQuOTcsImRpc3Bvbml2ZWwiOjAuNTMsImVtcGVuaGFkbyI6MTU2MDQuNDQsInJwX3Byb2MiOjAsInJwX25hb19wcm9jIjowLCJwYWdvIjowLCJsaXF1aWRhZG8iOjAsImFfbGlxdWlkYXIiOjAsIm5kcyI6W3sibmQiOiIzMzkwMzAiLCJuZF9kZXNjIjoiTUFURVJJQUwgREUgQ09OU1VNTyIsInB0cmVzIjoiMTY4OTE5IiwiYWNhbyI6IjIwMDAiLCJhY2FvX2Rlc2MiOiJBRE1JTklTVFJBQ0FPIERBIFVOSURBREUiLCJyZWNlYmlkbyI6MTU2MDQuOTcsImRpc3Bvbml2ZWwiOjAuNTMsImVtcGVuaGFkbyI6MTU2MDQuNDR9XSwiZW1wZW5ob3MiOltdfSx7InBpIjoiQ0UwMTAxRUNPT1AiLCJwaV9kZXNjIjoiRVhFUkNJQ0lPIE1VTFRJTkFDSU9OQUwgQ09PUEVSQUNJT04iLCJyZWNlYmlkbyI6MTA5MjYsImRpc3Bvbml2ZWwiOjAsImVtcGVuaGFkbyI6MTA5MjYsInJwX3Byb2MiOjAsInJwX25hb19wcm9jIjowLCJwYWdvIjowLCJsaXF1aWRhZG8iOjAsImFfbGlxdWlkYXIiOjAsIm5kcyI6W3sibmQiOiIzMzkwMTUiLCJuZF9kZXNjIjoiRElBUklBUyAtIFBFU1NPQUwgTUlMSVRBUiIsInB0cmVzIjoiMTY4OTE5IiwiYWNhbyI6IjIwMDAiLCJhY2FvX2Rlc2MiOiJBRE1JTklTVFJBQ0FPIERBIFVOSURBREUiLCJyZWNlYmlkbyI6MTA5MjYsImRpc3Bvbml2ZWwiOjAsImVtcGVuaGFkbyI6MTA5MjZ9XSwiZW1wZW5ob3MiOltdfSx7InBpIjoiQ0cxNjYyU1NFU08iLCJwaV9kZXNjIjoiQVNTSVNURU5DSUEgU09DSUFMIC0gU0lTRVNPIiwicmVjZWJpZG8iOjE0MzE0OC4zNiwiZGlzcG9uaXZlbCI6MTEyMDAuMDcsImVtcGVuaGFkbyI6MTMxOTQ4LjI5LCJycF9wcm9jIjowLCJycF9uYW9fcHJvYyI6MTg4MTkuNTIsInBhZ28iOjAsImxpcXVpZGFkbyI6MCwiYV9saXF1aWRhciI6MCwibmRzIjpbeyJuZCI6IjMzOTAzMCIsIm5kX2Rlc2MiOiJNQVRFUklBTCBERSBDT05TVU1PIiwicHRyZXMiOiIxNjg5MDEiLCJhY2FvIjoiMjAwMCIsImFjYW9fZGVzYyI6IkFETUlOSVNUUkFDQU8gREEgVU5JREFERSIsInJlY2ViaWRvIjo2MDAwLCJkaXNwb25pdmVsIjowLCJlbXBlbmhhZG8iOjYwMDB9LHsibmQiOiIzMzkwOTMiLCJuZF9kZXNjIjoiSU5ERU5JWkFDT0VTIEUgUkVTVElUVUlDT0VTIiwicHRyZXMiOiIxNjg5MDEiLCJhY2FvIjoiMjAwMCIsImFjYW9fZGVzYyI6IkFETUlOSVNUUkFDQU8gREEgVU5JREFERSIsInJlY2ViaWRvIjoxMzcxNDguMzYsImRpc3Bvbml2ZWwiOjExMjAwLjA3LCJlbXBlbmhhZG8iOjEyNTk0OC4yOX1dLCJlbXBlbmhvcyI6W119LHsicGkiOiJEMDAwMDAxMDAwMCIsInBpX2Rlc2MiOiJERVNUQVFVRVMiLCJyZWNlYmlkbyI6MTUwMCwiZGlzcG9uaXZlbCI6MTUwMCwiZW1wZW5oYWRvIjowLCJycF9wcm9jIjowLCJycF9uYW9fcHJvYyI6MjMyNzcuMDMsInBhZ28iOjAsImxpcXVpZGFkbyI6MCwiYV9saXF1aWRhciI6MCwibmRzIjpbeyJuZCI6IjMzOTAzMCIsIm5kX2Rlc2MiOiJNQVRFUklBTCBERSBDT05TVU1PIiwicHRyZXMiOiIyMTM1MzYiLCJhY2FvIjoiMjAwMCIsImFjYW9fZGVzYyI6IkFETUlOSVNUUkFDQU8gREEgVU5JREFERSIsInJlY2ViaWRvIjoxNTAwLCJkaXNwb25pdmVsIjoxNTAwLCJlbXBlbmhhZG8iOjB9LHsibmQiOiI0NDkwNTIiLCJuZF9kZXNjIjoiRVFVSVBBTUVOVE9TIEUgTUFURVJJQUwgUEVSTUFORU5URSIsInB0cmVzIjoiMjI4NjM3IiwiYWNhbyI6IjIxMkIiLCJhY2FvX2Rlc2MiOiJCRU5FRklDSU9TIE9CUklHQVRPUklPUyBBT1MgU0VSVklET1JFUyBDSVZJUywgRU1QUkVHQURPUywgTUkiLCJyZWNlYmlkbyI6MCwiZGlzcG9uaXZlbCI6MCwiZW1wZW5oYWRvIjowfV0sImVtcGVuaG9zIjpbXX0seyJwaSI6IkRDMDYwNDAxMTAwIiwicGlfZGVzYyI6IlZJREEgVkVHRVRBVElWQSAtIERFQ0VBIiwicmVjZWJpZG8iOjAsImRpc3Bvbml2ZWwiOjAsImVtcGVuaGFkbyI6MCwicnBfcHJvYyI6Mjc4MTIuNiwicnBfbmFvX3Byb2MiOjEzOTk0NC4xMSwicGFnbyI6MCwibGlxdWlkYWRvIjowLCJhX2xpcXVpZGFyIjowLCJuZHMiOlt7Im5kIjoiMzM5MDMwIiwibmRfZGVzYyI6Ik1BVEVSSUFMIERFIENPTlNVTU8iLCJwdHJlcyI6IjIyOTE2NiIsImFjYW8iOiIyMFhWIiwiYWNhb19kZXNjIjoiT1BFUkFDQU8gRE8gU0lTVEVNQSBERSBDT05UUk9MRSBETyBFU1BBQ08gQUVSRU8gQlJBU0lMRUlSTyAtIiwicmVjZWJpZG8iOjAsImRpc3Bvbml2ZWwiOjAsImVtcGVuaGFkbyI6MH0seyJuZCI6IjMzOTEzOSIsIm5kX2Rlc2MiOiJPVVRST1MgU0VSVklDT1MgREUgVEVSQ0VJUk9TIC0gUEVTU09BIEpVUklESUNBIChJTlRSQSkiLCJwdHJlcyI6IjIyOTE2NiIsImFjYW8iOiIyMFhWIiwiYWNhb19kZXNjIjoiT1BFUkFDQU8gRE8gU0lTVEVNQSBERSBDT05UUk9MRSBETyBFU1BBQ08gQUVSRU8gQlJBU0lMRUlSTyAtIiwicmVjZWJpZG8iOjAsImRpc3Bvbml2ZWwiOjAsImVtcGVuaGFkbyI6MH1dLCJlbXBlbmhvcyI6W119LHsicGkiOiJHQjA2MzEwMDAwMSIsInBpX2Rlc2MiOiJDT05USU5HRU5DSUEgR0FCQUVSIiwicmVjZWJpZG8iOjAsImRpc3Bvbml2ZWwiOjAsImVtcGVuaGFkbyI6MCwicnBfcHJvYyI6MCwicnBfbmFvX3Byb2MiOjE0Ni4yOCwicGFnbyI6MCwibGlxdWlkYWRvIjowLCJhX2xpcXVpZGFyIjowLCJuZHMiOlt7Im5kIjoiMzM5MDMwIiwibmRfZGVzYyI6Ik1BVEVSSUFMIERFIENPTlNVTU8iLCJwdHJlcyI6IjE2ODkxOSIsImFjYW8iOiIyMDAwIiwiYWNhb19kZXNjIjoiQURNSU5JU1RSQUNBTyBEQSBVTklEQURFIiwicmVjZWJpZG8iOjAsImRpc3Bvbml2ZWwiOjAsImVtcGVuaGFkbyI6MH1dLCJlbXBlbmhvcyI6W119LHsicGkiOiJQMDAxMTY5MDIwMCIsInBpX2Rlc2MiOiJQRVNFKFBST0cgRVNUUiBTSVNUIEVTUEFDSUFJUykgLSBERVNFTlYgSU1QTEEiLCJyZWNlYmlkbyI6MCwiZGlzcG9uaXZlbCI6MCwiZW1wZW5oYWRvIjowLCJycF9wcm9jIjoxNDg3LjMsInJwX25hb19wcm9jIjowLCJwYWdvIjowLCJsaXF1aWRhZG8iOjAsImFfbGlxdWlkYXIiOjAsIm5kcyI6W3sibmQiOiIzMzkwMzAiLCJuZF9kZXNjIjoiTUFURVJJQUwgREUgQ09OU1VNTyIsInB0cmVzIjoiMjI4NjUzIiwiYWNhbyI6IjIxQksiLCJhY2FvX2Rlc2MiOiJNQU5VVEVOQ0FPIERBUyBFU1RSVVRVUkFTIERPIFBST0dSQU1BIEVTVFJBVEVHSUNPIERFIFNJU1RFTUEiLCJyZWNlYmlkbyI6MCwiZGlzcG9uaXZlbCI6MCwiZW1wZW5oYWRvIjowfV0sImVtcGVuaG9zIjpbXX0seyJwaSI6IlNFTlMxNFBGTTAzIiwicGlfZGVzYyI6IlBPUy1GT1JNQUNBTyBERSBNSUxJVEFSRVMiLCJyZWNlYmlkbyI6MCwiZGlzcG9uaXZlbCI6MCwiZW1wZW5oYWRvIjowLCJycF9wcm9jIjo0NjYuNzMsInJwX25hb19wcm9jIjowLCJwYWdvIjowLCJsaXF1aWRhZG8iOjAsImFfbGlxdWlkYXIiOjAsIm5kcyI6W3sibmQiOiIzMzkwMzkiLCJuZF9kZXNjIjoiT1VUUk9TIFNFUlZJQ09TIERFIFRFUkNFSVJPUyAtIFBFU1NPQSBKVVJJRElDQSIsInB0cmVzIjoiMjI5MjAzIiwiYWNhbyI6IjIxR1EiLCJhY2FvX2Rlc2MiOiJGVU5DSU9OQU1FTlRPIERPUyBFU1RBQkVMRUNJTUVOVE9TIERFIEVOU0lOTyBTVVBFUklPUiBNSUxJVEEiLCJyZWNlYmlkbyI6MCwiZGlzcG9uaXZlbCI6MCwiZW1wZW5oYWRvIjowfV0sImVtcGVuaG9zIjpbXX0seyJwaSI6IlNGMDYxN1RSTE9HIiwicGlfZGVzYyI6IlRSQU5TUE9SVEUgTE9HSVNUSUNPIERFIFNVUEVSRklDSUUiLCJyZWNlYmlkbyI6MCwiZGlzcG9uaXZlbCI6MCwiZW1wZW5oYWRvIjowLCJycF9wcm9jIjoxNzg4Ny40MiwicnBfbmFvX3Byb2MiOjE1MDQ0Ny43MSwicGFnbyI6MCwibGlxdWlkYWRvIjowLCJhX2xpcXVpZGFyIjowLCJuZHMiOlt7Im5kIjoiMzM5MDMwIiwibmRfZGVzYyI6Ik1BVEVSSUFMIERFIENPTlNVTU8iLCJwdHJlcyI6IjI1OTI1NiIsImFjYW8iOiIyMUEwIiwiYWNhb19kZXNjIjoiQVBSRVNUQU1FTlRPIERBUyBGT1JDQVMgLSBNQU5VVEVOQ0FPIERBIFBST05USURBTyBFIERBIENBUEFDIiwicmVjZWJpZG8iOjAsImRpc3Bvbml2ZWwiOjAsImVtcGVuaGFkbyI6MH0seyJuZCI6IjMzOTAzOSIsIm5kX2Rlc2MiOiJPVVRST1MgU0VSVklDT1MgREUgVEVSQ0VJUk9TIC0gUEVTU09BIEpVUklESUNBIiwicHRyZXMiOiIyNTkyNTYiLCJhY2FvIjoiMjFBMCIsImFjYW9fZGVzYyI6IkFQUkVTVEFNRU5UTyBEQVMgRk9SQ0FTIC0gTUFOVVRFTkNBTyBEQSBQUk9OVElEQU8gRSBEQSBDQVBBQyIsInJlY2ViaWRvIjowLCJkaXNwb25pdmVsIjowLCJlbXBlbmhhZG8iOjB9XSwiZW1wZW5ob3MiOltdfSx7InBpIjoiU0YwNjIyMDIzMDAiLCJwaV9kZXNjIjoiUEFHQU1FTlRPIFNFUlZJRE9SIENJVklMIEFUSVZPIiwicmVjZWJpZG8iOjI3NjU4LjMyLCJkaXNwb25pdmVsIjoyMjY1OC4zMiwiZW1wZW5oYWRvIjo1MDAwLCJycF9wcm9jIjowLCJycF9uYW9fcHJvYyI6MCwicGFnbyI6MCwibGlxdWlkYWRvIjowLCJhX2xpcXVpZGFyIjowLCJuZHMiOlt7Im5kIjoiMzE5MDExIiwibmRfZGVzYyI6IlZFTkNJTUVOVE9TIEUgVkFOVEFHRU5TIEZJWEFTIC0gUEVTU09BTCBDSVZJTCIsInB0cmVzIjoiMTY4ODY5IiwiYWNhbyI6IjIwVFAiLCJhY2FvX2Rlc2MiOiJBVElWT1MgQ0lWSVMgREEgVU5JQU8iLCJyZWNlYmlkbyI6MjI2NTguMzIsImRpc3Bvbml2ZWwiOjIyNjU4LjMyLCJlbXBlbmhhZG8iOjB9LHsibmQiOiIzMTkwMTMiLCJuZF9kZXNjIjoiT0JSSUdBQ09FUyBQQVRST05BSVMiLCJwdHJlcyI6IjE2ODg2OSIsImFjYW8iOiIyMFRQIiwiYWNhb19kZXNjIjoiQVRJVk9TIENJVklTIERBIFVOSUFPIiwicmVjZWJpZG8iOjUwMDAsImRpc3Bvbml2ZWwiOjAsImVtcGVuaGFkbyI6NTAwMH1dLCJlbXBlbmhvcyI6W119LHsicGkiOiJTRjA2MjIyNDAwMCIsInBpX2Rlc2MiOiJQQUdBTUVOVE8gTUlMSVRBUiBBVElWQSIsInJlY2ViaWRvIjoxMzcwMTY0Mi43OCwiZGlzcG9uaXZlbCI6MCwiZW1wZW5oYWRvIjoxMzcwMTY0Mi43OCwicnBfcHJvYyI6MCwicnBfbmFvX3Byb2MiOjAsInBhZ28iOjAsImxpcXVpZGFkbyI6MCwiYV9saXF1aWRhciI6MCwibmRzIjpbeyJuZCI6IjMxOTAxMiIsIm5kX2Rlc2MiOiJWRU5DSU1FTlRPUyBFIFZBTlRBR0VOUyBGSVhBUyAtIFBFUy4gTUlMSVRBUiIsInB0cmVzIjoiMTY4ODcxIiwiYWNhbyI6IjI4NjciLCJhY2FvX2Rlc2MiOiJBVElWT1MgTUlMSVRBUkVTIERBIFVOSUFPIiwicmVjZWJpZG8iOjEzNzAxNjQyLjc4LCJkaXNwb25pdmVsIjowLCJlbXBlbmhhZG8iOjEzNzAxNjQyLjc4fV0sImVtcGVuaG9zIjpbXX0seyJwaSI6IlNGMDYyMjQ0NTAxIiwicGlfZGVzYyI6IkFVWElMSU8gRlVORVJBTC9OQVRBTElEQURFIE1JTElUQVIgQVRJVk8iLCJyZWNlYmlkbyI6NTE4MTY0LjMxLCJkaXNwb25pdmVsIjowLCJlbXBlbmhhZG8iOjUxODE2NC4zMSwicnBfcHJvYyI6MCwicnBfbmFvX3Byb2MiOjAsInBhZ28iOjAsImxpcXVpZGFkbyI6MCwiYV9saXF1aWRhciI6MCwibmRzIjpbeyJuZCI6IjMzOTAwOCIsIm5kX2Rlc2MiOiJPVVRST1MgQkVORUYuQVNTSVNULiBETyBTRVJWSURPUiBFIERPIE1JTElUQVIiLCJwdHJlcyI6IjIxNDU0NCIsImFjYW8iOiIyMTJCIiwiYWNhb19kZXNjIjoiQkVORUZJQ0lPUyBPQlJJR0FUT1JJT1MgQU9TIFNFUlZJRE9SRVMgQ0lWSVMsIEVNUFJFR0FET1MsIE1JIiwicmVjZWJpZG8iOjUxODE2NC4zMSwiZGlzcG9uaXZlbCI6MCwiZW1wZW5oYWRvIjo1MTgxNjQuMzF9XSwiZW1wZW5ob3MiOltdfSx7InBpIjoiU0YwNjIzMTcyMDAiLCJwaV9kZXNjIjoiQUxJTUVOVEFDQU8gTUlMSVRBUiIsInJlY2ViaWRvIjo2NTQxNDYzLjg4LCJkaXNwb25pdmVsIjo1NTkxMDMuOTEsImVtcGVuaGFkbyI6NTk4MjM1OS45NywicnBfcHJvYyI6NzA1MzYuNTksInJwX25hb19wcm9jIjo3MTI1OTU3LjYsInBhZ28iOjAsImxpcXVpZGFkbyI6MCwiYV9saXF1aWRhciI6MCwibmRzIjpbeyJuZCI6IjMzOTAzMCIsIm5kX2Rlc2MiOiJNQVRFUklBTCBERSBDT05TVU1PIiwicHRyZXMiOiIxNjg4ODQiLCJhY2FvIjoiMjEyQiIsImFjYW9fZGVzYyI6IkJFTkVGSUNJT1MgT0JSSUdBVE9SSU9TIEFPUyBTRVJWSURPUkVTIENJVklTLCBFTVBSRUdBRE9TLCBNSSIsInJlY2ViaWRvIjo2NTQxNDYzLjg4LCJkaXNwb25pdmVsIjo1NTkxMDMuOTEsImVtcGVuaGFkbyI6NTk4MjM1OS45N31dLCJlbXBlbmhvcyI6W119LHsicGkiOiJTRjA2MjMxNzMwMyIsInBpX2Rlc2MiOiJDT01CVVNUSVZFSVMgUFJFUEFSTyBBTElNRU5UQUNBTyAtIFNJU1VCIiwicmVjZWJpZG8iOjEyNjE4MC4zOSwiZGlzcG9uaXZlbCI6ODY3NDkuMDIsImVtcGVuaGFkbyI6Mzk0MzEuMzcsInJwX3Byb2MiOjAsInJwX25hb19wcm9jIjoxMjUwOTEuNDgsInBhZ28iOjAsImxpcXVpZGFkbyI6MCwiYV9saXF1aWRhciI6MCwibmRzIjpbeyJuZCI6IjMzOTAzMCIsIm5kX2Rlc2MiOiJNQVRFUklBTCBERSBDT05TVU1PIiwicHRyZXMiOiIxNjg4ODQiLCJhY2FvIjoiMjEyQiIsImFjYW9fZGVzYyI6IkJFTkVGSUNJT1MgT0JSSUdBVE9SSU9TIEFPUyBTRVJWSURPUkVTIENJVklTLCBFTVBSRUdBRE9TLCBNSSIsInJlY2ViaWRvIjowLCJkaXNwb25pdmVsIjowLCJlbXBlbmhhZG8iOjB9LHsibmQiOiIzMzkwMzkiLCJuZF9kZXNjIjoiT1VUUk9TIFNFUlZJQ09TIERFIFRFUkNFSVJPUyAtIFBFU1NPQSBKVVJJRElDQSIsInB0cmVzIjoiMTY4ODg0IiwiYWNhbyI6IjIxMkIiLCJhY2FvX2Rlc2MiOiJCRU5FRklDSU9TIE9CUklHQVRPUklPUyBBT1MgU0VSVklET1JFUyBDSVZJUywgRU1QUkVHQURPUywgTUkiLCJyZWNlYmlkbyI6MTI2MTgwLjM5LCJkaXNwb25pdmVsIjo4Njc0OS4wMiwiZW1wZW5oYWRvIjozOTQzMS4zN31dLCJlbXBlbmhvcyI6W119LHsicGkiOiJTRjA2MzEwMDAwMyIsInBpX2Rlc2MiOiJDT05USU5HRU5DSUEgU0VGQSIsInJlY2ViaWRvIjowLCJkaXNwb25pdmVsIjowLCJlbXBlbmhhZG8iOjAsInJwX3Byb2MiOjUxNjQyLjY0LCJycF9uYW9fcHJvYyI6NTM0MjMuODYsInBhZ28iOjAsImxpcXVpZGFkbyI6MCwiYV9saXF1aWRhciI6MCwibmRzIjpbeyJuZCI6IjMzOTAzMSIsIm5kX2Rlc2MiOiJQUkVNSUFDT0VTIENVTFQuLCBBUlQuLCBDSUVOVC4sIERFU1AuIEUgT1VUUi4iLCJwdHJlcyI6IjE2ODkxOSIsImFjYW8iOiIyMDAwIiwiYWNhb19kZXNjIjoiQURNSU5JU1RSQUNBTyBEQSBVTklEQURFIiwicmVjZWJpZG8iOjAsImRpc3Bvbml2ZWwiOjAsImVtcGVuaGFkbyI6MH0seyJuZCI6IjMzOTAzOSIsIm5kX2Rlc2MiOiJPVVRST1MgU0VSVklDT1MgREUgVEVSQ0VJUk9TIC0gUEVTU09BIEpVUklESUNBIiwicHRyZXMiOiIxNjg5MTkiLCJhY2FvIjoiMjAwMCIsImFjYW9fZGVzYyI6IkFETUlOSVNUUkFDQU8gREEgVU5JREFERSIsInJlY2ViaWRvIjowLCJkaXNwb25pdmVsIjowLCJlbXBlbmhhZG8iOjB9LHsibmQiOiI0NDkwNTIiLCJuZF9kZXNjIjoiRVFVSVBBTUVOVE9TIEUgTUFURVJJQUwgUEVSTUFORU5URSIsInB0cmVzIjoiMTY4OTAxIiwiYWNhbyI6IjIwMDAiLCJhY2FvX2Rlc2MiOiJBRE1JTklTVFJBQ0FPIERBIFVOSURBREUiLCJyZWNlYmlkbyI6MCwiZGlzcG9uaXZlbCI6MCwiZW1wZW5oYWRvIjowfV0sImVtcGVuaG9zIjpbXX0seyJwaSI6IlNGMDYzMTAwMTAwIiwicGlfZGVzYyI6IlZJREEgVkVHRVRBVElWQSAtIFNFRkEiLCJyZWNlYmlkbyI6MTY4OTE0LjY3LCJkaXNwb25pdmVsIjo1NTIuMDgsImVtcGVuaGFkbyI6MTY4MzYyLjU5LCJycF9wcm9jIjozNDI1Mi4xNywicnBfbmFvX3Byb2MiOjE2NTExOS4zLCJwYWdvIjowLCJsaXF1aWRhZG8iOjAsImFfbGlxdWlkYXIiOjAsIm5kcyI6W3sibmQiOiIzMzkwMzAiLCJuZF9kZXNjIjoiTUFURVJJQUwgREUgQ09OU1VNTyIsInB0cmVzIjoiMTY4OTE5IiwiYWNhbyI6IjIwMDAiLCJhY2FvX2Rlc2MiOiJBRE1JTklTVFJBQ0FPIERBIFVOSURBREUiLCJyZWNlYmlkbyI6NzMzNTMuNjQsImRpc3Bvbml2ZWwiOjU1MS45OCwiZW1wZW5oYWRvIjo3MjgwMS42Nn0seyJuZCI6IjMzOTAzOSIsIm5kX2Rlc2MiOiJPVVRST1MgU0VSVklDT1MgREUgVEVSQ0VJUk9TIC0gUEVTU09BIEpVUklESUNBIiwicHRyZXMiOiIxNjg5MTkiLCJhY2FvIjoiMjAwMCIsImFjYW9fZGVzYyI6IkFETUlOSVNUUkFDQU8gREEgVU5JREFERSIsInJlY2ViaWRvIjo5NTU2MS4wMywiZGlzcG9uaXZlbCI6MC4xLCJlbXBlbmhhZG8iOjk1NTYwLjkzfSx7Im5kIjoiMzM5MDQwIiwibmRfZGVzYyI6IlNFUlZJQ09TIERFIFRFQ05PTE9HSUEgREEgSU5GT1JNQUNBTyBFIENPTVVOSUNBQ0FPIC0gUEoiLCJwdHJlcyI6IjE2ODkxOSIsImFjYW8iOiIyMDAwIiwiYWNhb19kZXNjIjoiQURNSU5JU1RSQUNBTyBEQSBVTklEQURFIiwicmVjZWJpZG8iOjAsImRpc3Bvbml2ZWwiOjAsImVtcGVuaGFkbyI6MH1dLCJlbXBlbmhvcyI6W119LHsicGkiOiJTRjA2MzEwMDEwOSIsInBpX2Rlc2MiOiJNQU5VVC9DT05TIEJFTlMgSU1PVkVJUyAtIFNFRkEiLCJyZWNlYmlkbyI6OTcxNDIuMjIsImRpc3Bvbml2ZWwiOjQuMzIsImVtcGVuaGFkbyI6OTcxMzcuOSwicnBfcHJvYyI6MzczMTcuNzQsInJwX25hb19wcm9jIjo1NjQyLjAxLCJwYWdvIjowLCJsaXF1aWRhZG8iOjAsImFfbGlxdWlkYXIiOjAsIm5kcyI6W3sibmQiOiIzMzkwMzAiLCJuZF9kZXNjIjoiTUFURVJJQUwgREUgQ09OU1VNTyIsInB0cmVzIjoiMTY4OTE5IiwiYWNhbyI6IjIwMDAiLCJhY2FvX2Rlc2MiOiJBRE1JTklTVFJBQ0FPIERBIFVOSURBREUiLCJyZWNlYmlkbyI6OTcxNDIuMjIsImRpc3Bvbml2ZWwiOjQuMzIsImVtcGVuaGFkbyI6OTcxMzcuOX0seyJuZCI6IjMzOTAzOSIsIm5kX2Rlc2MiOiJPVVRST1MgU0VSVklDT1MgREUgVEVSQ0VJUk9TIC0gUEVTU09BIEpVUklESUNBIiwicHRyZXMiOiIxNjg5MTkiLCJhY2FvIjoiMjAwMCIsImFjYW9fZGVzYyI6IkFETUlOSVNUUkFDQU8gREEgVU5JREFERSIsInJlY2ViaWRvIjowLCJkaXNwb25pdmVsIjowLCJlbXBlbmhhZG8iOjB9XSwiZW1wZW5ob3MiOltdfSx7InBpIjoiU0YwNjMxMDAyMDAiLCJwaV9kZXNjIjoiU0VSVklDT1MgUFVCTElDT1MgLSBTRUZBIiwicmVjZWJpZG8iOjI4ODA4NjguMzIsImRpc3Bvbml2ZWwiOjAsImVtcGVuaGFkbyI6Mjg4MDg2OC4zMiwicnBfcHJvYyI6NzE5NTUuNTcsInJwX25hb19wcm9jIjo2OTg2ODg0LjIzLCJwYWdvIjowLCJsaXF1aWRhZG8iOjAsImFfbGlxdWlkYXIiOjAsIm5kcyI6W3sibmQiOiIzMzkwMzkiLCJuZF9kZXNjIjoiT1VUUk9TIFNFUlZJQ09TIERFIFRFUkNFSVJPUyAtIFBFU1NPQSBKVVJJRElDQSIsInB0cmVzIjoiMTY4OTE5IiwiYWNhbyI6IjIwMDAiLCJhY2FvX2Rlc2MiOiJBRE1JTklTVFJBQ0FPIERBIFVOSURBREUiLCJyZWNlYmlkbyI6Mjg4MDg2OC4zMiwiZGlzcG9uaXZlbCI6MCwiZW1wZW5oYWRvIjoyODgwODY4LjMyfV0sImVtcGVuaG9zIjpbXX0seyJwaSI6IlNGMDYzMTAwNjAwIiwicGlfZGVzYyI6IkNPTlRSQVRPUyBDT05USU5VQURPUyAtIFNFRkEiLCJyZWNlYmlkbyI6ODkwMDgxLjUsImRpc3Bvbml2ZWwiOjEyOTMxOC4wNiwiZW1wZW5oYWRvIjo3NjA3NjMuNDQsInJwX3Byb2MiOjYwNjc4Ljg3LCJycF9uYW9fcHJvYyI6MTg5NzE1LjcyLCJwYWdvIjowLCJsaXF1aWRhZG8iOjAsImFfbGlxdWlkYXIiOjAsIm5kcyI6W3sibmQiOiIzMzkwMzAiLCJuZF9kZXNjIjoiTUFURVJJQUwgREUgQ09OU1VNTyIsInB0cmVzIjoiMTY4OTE5IiwiYWNhbyI6IjIwMDAiLCJhY2FvX2Rlc2MiOiJBRE1JTklTVFJBQ0FPIERBIFVOSURBREUiLCJyZWNlYmlkbyI6MTAwMDAwLCJkaXNwb25pdmVsIjowLCJlbXBlbmhhZG8iOjEwMDAwMH0seyJuZCI6IjMzOTAzOSIsIm5kX2Rlc2MiOiJPVVRST1MgU0VSVklDT1MgREUgVEVSQ0VJUk9TIC0gUEVTU09BIEpVUklESUNBIiwicHRyZXMiOiIxNjg5MTkiLCJhY2FvIjoiMjAwMCIsImFjYW9fZGVzYyI6IkFETUlOSVNUUkFDQU8gREEgVU5JREFERSIsInJlY2ViaWRvIjo3OTAwODEuNSwiZGlzcG9uaXZlbCI6MTI5MzE4LjA2LCJlbXBlbmhhZG8iOjY2MDc2My40NH1dLCJlbXBlbmhvcyI6W119LHsicGkiOiJTRjA2MzIwMjcwMCIsInBpX2Rlc2MiOiJTVVBSSU1FTlRPIERFIEZBUkRBTUVOVE8iLCJyZWNlYmlkbyI6MTc1Ni44LCJkaXNwb25pdmVsIjowLCJlbXBlbmhhZG8iOjE3NTYuOCwicnBfcHJvYyI6MCwicnBfbmFvX3Byb2MiOjAsInBhZ28iOjAsImxpcXVpZGFkbyI6MCwiYV9saXF1aWRhciI6MCwibmRzIjpbeyJuZCI6IjMzOTAzOSIsIm5kX2Rlc2MiOiJPVVRST1MgU0VSVklDT1MgREUgVEVSQ0VJUk9TIC0gUEVTU09BIEpVUklESUNBIiwicHRyZXMiOiIxNjg4NzIiLCJhY2FvIjoiMjg2NSIsImFjYW9fZGVzYyI6IlNVUFJJTUVOVE8gREUgRkFSREFNRU5UTyIsInJlY2ViaWRvIjoxNzU2LjgsImRpc3Bvbml2ZWwiOjAsImVtcGVuaGFkbyI6MTc1Ni44fV0sImVtcGVuaG9zIjpbXX0seyJwaSI6IlNGMDY2NjAyNzAwIiwicGlfZGVzYyI6IlNVUFJJTUVOVE8gREUgRkFSREFNRU5UTyIsInJlY2ViaWRvIjowLCJkaXNwb25pdmVsIjowLCJlbXBlbmhhZG8iOjAsInJwX3Byb2MiOjAsInJwX25hb19wcm9jIjozNjk1LjQsInBhZ28iOjAsImxpcXVpZGFkbyI6MCwiYV9saXF1aWRhciI6MCwibmRzIjpbeyJuZCI6IjMzOTAzOSIsIm5kX2Rlc2MiOiJPVVRST1MgU0VSVklDT1MgREUgVEVSQ0VJUk9TIC0gUEVTU09BIEpVUklESUNBIiwicHRyZXMiOiIxNjg4NzIiLCJhY2FvIjoiMjg2NSIsImFjYW9fZGVzYyI6IlNVUFJJTUVOVE8gREUgRkFSREFNRU5UTyIsInJlY2ViaWRvIjowLCJkaXNwb25pdmVsIjowLCJlbXBlbmhhZG8iOjB9XSwiZW1wZW5ob3MiOltdfSx7InBpIjoiU0YwNjY3MDAxMDQiLCJwaV9kZXNjIjoiU0lTSFQgLSBTRUZBIiwicmVjZWJpZG8iOjEwNDMwNzguNDcsImRpc3Bvbml2ZWwiOjkwMDAwMCwiZW1wZW5oYWRvIjoxNDMwNzguNDcsInJwX3Byb2MiOjMyNjYuNDEsInJwX25hb19wcm9jIjoxMDc2MS4xOSwicGFnbyI6MCwibGlxdWlkYWRvIjowLCJhX2xpcXVpZGFyIjowLCJuZHMiOlt7Im5kIjoiMzM5MDM5IiwibmRfZGVzYyI6Ik9VVFJPUyBTRVJWSUNPUyBERSBURVJDRUlST1MgLSBQRVNTT0EgSlVSSURJQ0EiLCJwdHJlcyI6IjE2ODkwMSIsImFjYW8iOiIyMDAwIiwiYWNhb19kZXNjIjoiQURNSU5JU1RSQUNBTyBEQSBVTklEQURFIiwicmVjZWJpZG8iOjEwNDMwNzguNDcsImRpc3Bvbml2ZWwiOjkwMDAwMCwiZW1wZW5oYWRvIjoxNDMwNzguNDd9XSwiZW1wZW5ob3MiOltdfSx7InBpIjoiU0YwODE3RVAwMDAiLCJwaV9kZXNjIjoiRU1FTkRBIFBBUkxBTUVOVEFSIiwicmVjZWJpZG8iOjAsImRpc3Bvbml2ZWwiOjAsImVtcGVuaGFkbyI6MCwicnBfcHJvYyI6MCwicnBfbmFvX3Byb2MiOjQzMTcuNiwicGFnbyI6MCwibGlxdWlkYWRvIjowLCJhX2xpcXVpZGFyIjowLCJuZHMiOlt7Im5kIjoiNDQ5MDUyIiwibmRfZGVzYyI6IkVRVUlQQU1FTlRPUyBFIE1BVEVSSUFMIFBFUk1BTkVOVEUiLCJwdHJlcyI6IjI1MTM4MCIsImFjYW8iOiIyMDAwIiwiYWNhb19kZXNjIjoiQURNSU5JU1RSQUNBTyBEQSBVTklEQURFIiwicmVjZWJpZG8iOjAsImRpc3Bvbml2ZWwiOjAsImVtcGVuaGFkbyI6MH1dLCJlbXBlbmhvcyI6W119LHsicGkiOiJTRjA4MTdWU1BGQyIsInBpX2Rlc2MiOiJSRUNPTVBPU0lDQU8gRlJPVEEgU1VQRVJGSUNJRSIsInJlY2ViaWRvIjowLCJkaXNwb25pdmVsIjowLCJlbXBlbmhhZG8iOjAsInJwX3Byb2MiOjEwMDExLCJycF9uYW9fcHJvYyI6ODc0ODUuNjgsInBhZ28iOjAsImxpcXVpZGFkbyI6MCwiYV9saXF1aWRhciI6MCwibmRzIjpbeyJuZCI6IjQ0OTA1MiIsIm5kX2Rlc2MiOiJFUVVJUEFNRU5UT1MgRSBNQVRFUklBTCBQRVJNQU5FTlRFIiwicHRyZXMiOiIxNjg5MDEiLCJhY2FvIjoiMjAwMCIsImFjYW9fZGVzYyI6IkFETUlOSVNUUkFDQU8gREEgVU5JREFERSIsInJlY2ViaWRvIjowLCJkaXNwb25pdmVsIjowLCJlbXBlbmhhZG8iOjB9XSwiZW1wZW5ob3MiOltdfSx7InBpIjoiU0YwODIzMTczMDIiLCJwaV9kZXNjIjoiTE9HSVNUSUNBIEFMSU1FTlRBQ0FPIC0gU0lTVUIiLCJyZWNlYmlkbyI6MjA5MzkxNS45OCwiZGlzcG9uaXZlbCI6MTEuMjcsImVtcGVuaGFkbyI6MjA5MzkwNC43MSwicnBfcHJvYyI6NzA3NjYuODgsInJwX25hb19wcm9jIjoxMjM1MzkzLjA1LCJwYWdvIjowLCJsaXF1aWRhZG8iOjAsImFfbGlxdWlkYXIiOjAsIm5kcyI6W3sibmQiOiIzMzkwMzAiLCJuZF9kZXNjIjoiTUFURVJJQUwgREUgQ09OU1VNTyIsInB0cmVzIjoiMTY4ODg0IiwiYWNhbyI6IjIxMkIiLCJhY2FvX2Rlc2MiOiJCRU5FRklDSU9TIE9CUklHQVRPUklPUyBBT1MgU0VSVklET1JFUyBDSVZJUywgRU1QUkVHQURPUywgTUkiLCJyZWNlYmlkbyI6MTAwMjYzMi4xNiwiZGlzcG9uaXZlbCI6MTEuMjcsImVtcGVuaGFkbyI6MTAwMjYyMC44OX0seyJuZCI6IjMzOTAzOSIsIm5kX2Rlc2MiOiJPVVRST1MgU0VSVklDT1MgREUgVEVSQ0VJUk9TIC0gUEVTU09BIEpVUklESUNBIiwicHRyZXMiOiIxNjg4ODQiLCJhY2FvIjoiMjEyQiIsImFjYW9fZGVzYyI6IkJFTkVGSUNJT1MgT0JSSUdBVE9SSU9TIEFPUyBTRVJWSURPUkVTIENJVklTLCBFTVBSRUdBRE9TLCBNSSIsInJlY2ViaWRvIjoxMDkxMjgzLjgyLCJkaXNwb25pdmVsIjowLCJlbXBlbmhhZG8iOjEwOTEyODMuODJ9LHsibmQiOiI0NDkwNTIiLCJuZF9kZXNjIjoiRVFVSVBBTUVOVE9TIEUgTUFURVJJQUwgUEVSTUFORU5URSIsInB0cmVzIjoiMTY4ODg0IiwiYWNhbyI6IjIxMkIiLCJhY2FvX2Rlc2MiOiJCRU5FRklDSU9TIE9CUklHQVRPUklPUyBBT1MgU0VSVklET1JFUyBDSVZJUywgRU1QUkVHQURPUywgTUkiLCJyZWNlYmlkbyI6MCwiZGlzcG9uaXZlbCI6MCwiZW1wZW5oYWRvIjowfV0sImVtcGVuaG9zIjpbXX0seyJwaSI6IlNGMTMyMzAwUFBPIiwicGlfZGVzYyI6IlBMQU5PIERFIE9CUkFTIC0gU0lTVUIiLCJyZWNlYmlkbyI6MCwiZGlzcG9uaXZlbCI6MCwiZW1wZW5oYWRvIjowLCJycF9wcm9jIjowLCJycF9uYW9fcHJvYyI6MTI0MDAwMCwicGFnbyI6MCwibGlxdWlkYWRvIjowLCJhX2xpcXVpZGFyIjowLCJuZHMiOlt7Im5kIjoiNDQ5MDUxIiwibmRfZGVzYyI6Ik9CUkFTIEUgSU5TVEFMQUNPRVMiLCJwdHJlcyI6IjE2ODg4NCIsImFjYW8iOiIyMTJCIiwiYWNhb19kZXNjIjoiQkVORUZJQ0lPUyBPQlJJR0FUT1JJT1MgQU9TIFNFUlZJRE9SRVMgQ0lWSVMsIEVNUFJFR0FET1MsIE1JIiwicmVjZWJpZG8iOjAsImRpc3Bvbml2ZWwiOjAsImVtcGVuaGFkbyI6MH1dLCJlbXBlbmhvcyI6W119XQ==";
+var DATA=JSON.parse(atob(DATA_B64));
+var isAdmin=false;
+var importedCredito=null,importedDespesas=null;
+var selectedPI=null,sortCol=null,sortAsc=true,currentPage=1,PAGE_SIZE=20;
+
+function checkPass(p){return p==="gapgl2026";}
+function fmt(v){return "R$ "+(v||0).toLocaleString("pt-BR",{minimumFractionDigits:2,maximumFractionDigits:2});}
+function fmtShort(v){if(Math.abs(v)>=1e6)return "R$ "+(v/1e6).toFixed(1)+"M";if(Math.abs(v)>=1e3)return "R$ "+(v/1e3).toFixed(1)+"K";return fmt(v);}
+function pct(a,b){return b?((a/b)*100).toFixed(1)+"%":"\u2014";}
+
+function showToast(msg,type){
+  var t=document.getElementById("toast");
+  var ic=type==="success"?"\u2714":type==="error"?"\u2716":"\u2139";
+  t.className="toast "+(type||"");
+  t.innerHTML="<span style='font-size:16px'>"+ic+"</span><span>"+msg+"</span>";
+  t.classList.add("show");
+  setTimeout(function(){t.classList.remove("show");},3500);
+}
+function toggleAdmin(){
+  if(isAdmin){logoutAdmin();return;}
+  document.getElementById("loginOverlay").classList.add("show");
+  document.getElementById("loginPass").value="";
+  document.getElementById("loginError").style.display="none";
+  setTimeout(function(){document.getElementById("loginPass").focus();},200);
+}
+function doLogin(){
+  if(checkPass(document.getElementById("loginPass").value)){
+    isAdmin=true;
+    document.getElementById("loginOverlay").classList.remove("show");
+    document.getElementById("adminBar").classList.add("show");
+    document.getElementById("btnAdmin").classList.add("active");
+    document.getElementById("btnAdmin").querySelector("span").textContent="Admin \u2713";
+    showToast("Modo administrador ativado.","success");
+  }else{document.getElementById("loginError").style.display="block";}
+}
+function cancelLogin(){document.getElementById("loginOverlay").classList.remove("show");}
+function logoutAdmin(){
+  isAdmin=false;
+  document.getElementById("adminBar").classList.remove("show");
+  document.getElementById("btnAdmin").classList.remove("active");
+  document.getElementById("btnAdmin").querySelector("span").textContent="Admin";
+  showToast("Sess\u00e3o administrativa encerrada.");
+}
+function showImportModal(){
+  if(!isAdmin){showToast("Acesso restrito ao administrador.","error");return;}
+  document.getElementById("importOverlay").classList.add("show");
+  importedCredito=null;importedDespesas=null;
+  document.getElementById("statusCredito").className="import-status";
+  document.getElementById("statusDespesas").className="import-status";
+  document.getElementById("btnProcessImport").disabled=true;
+}
+function closeImport(){document.getElementById("importOverlay").classList.remove("show");}
+
+["dropCredito","dropDespesas"].forEach(function(id){
+  var el=document.getElementById(id);
+  var tp=id==="dropCredito"?"credito":"despesas";
+  el.addEventListener("dragover",function(e){e.preventDefault();el.classList.add("dragover");});
+  el.addEventListener("dragleave",function(){el.classList.remove("dragover");});
+  el.addEventListener("drop",function(e){e.preventDefault();el.classList.remove("dragover");if(e.dataTransfer.files.length>0)processFile(e.dataTransfer.files[0],tp);});
+});
+function handleFile(input,type){if(input.files.length>0)processFile(input.files[0],type);}
+
+function processFile(file,type){
+  var stEl=document.getElementById(type==="credito"?"statusCredito":"statusDespesas");
+  var reader=new FileReader();
+  reader.onload=function(e){
+    try{
+      var wb=XLSX.read(e.target.result,{type:"array"});
+      var ws=wb.Sheets[wb.SheetNames[0]];
+      var json=XLSX.utils.sheet_to_json(ws,{header:1,defval:""});
+      if(type==="credito"){importedCredito=parseCredito(json);stEl.className="import-status show ok";stEl.textContent="\u2713 "+importedCredito.length+" registros de cr\u00e9dito.";}
+      else{importedDespesas=parseDespesas(json);stEl.className="import-status show ok";stEl.textContent="\u2713 "+importedDespesas.length+" empenhos.";}
+      document.getElementById("btnProcessImport").disabled=!(importedCredito||importedDespesas);
+    }catch(err){stEl.className="import-status show err";stEl.textContent="Erro: "+err.message;}
+  };reader.readAsArrayBuffer(file);
+}
+
+function parseCredito(rows){
+  var r=[];var started=false;
+  for(var i=0;i<rows.length;i++){
+    var rw=rows[i];if(!started){if(rw[0]&&String(rw[0]).match(/^\d{6}$/))started=true;else continue;}
+    if(!rw[0]||String(rw[0]).toLowerCase()==="total")break;
+    r.push({ug:String(rw[0]),acao:String(rw[2]),acao_desc:String(rw[3]||""),ptres:String(rw[4]||""),nd:String(rw[5]||""),nd_desc:String(rw[6]||""),pi:String(rw[7]||""),pi_desc:String(rw[8]||""),recebido:Number(rw[9])||0,disponivel:Number(rw[10])||0,empenhado:Number(rw[11])||0,rp_proc:Number(rw[12])||0,rp_nao_proc:Number(rw[13])||0});
+  }return r;
+}
+function parseDespesas(rows){
+  var r=[];var curUG="";var inD=false;var cl="";
+  for(var i=0;i<rows.length;i++){
+    var rw=rows[i];var c0=String(rw[0]||"");
+    if(c0.indexOf("UG Executora")>=0){var m=c0.match(/(\d{6})/);curUG=m?m[1]:"";inD=false;continue;}
+    if(c0==="NE CCor"){inD=true;cl=(rows[i+2]&&rows[i+2][11]!==undefined&&rows[i+2][11]!=="")?"4col":"3col";i+=2;continue;}
+    if(c0.toLowerCase()==="total"||c0==="aci"){inD=false;continue;}
+    if(!inD||!c0||c0.indexOf("NE")<0)continue;
+    var emp=Number(rw[8])||0;var pg,lp,al;
+    if(cl==="4col"){pg=Number(rw[9])||0;lp=Number(rw[10])||0;al=Number(rw[11])||0;}
+    else{pg=0;lp=0;al=Number(rw[9])||0;}
+    r.push({ne:c0,cnpj:String(rw[1]||""),favorecido:String(rw[2]||""),pi:String(rw[3]||""),pi_desc:String(rw[4]||""),ptres:String(rw[5]||""),nd:String(rw[6]||""),nd_desc:String(rw[7]||""),empenhado:emp,pago:pg,liquidado_a_pagar:lp,a_liquidar:al,liquidado:pg+lp,ug:curUG});
+  }return r;
+}
+
+function processImport(){
+  if(!isAdmin)return;
+  var cRows=importedCredito||extractCredFromDATA();
+  var dRows=importedDespesas||extractDespFromDATA();
+  var pc={};
+  cRows.forEach(function(c){var k=c.pi;if(!pc[k])pc[k]={pi:c.pi,pi_desc:c.pi_desc,recebido:0,disponivel:0,empenhado:0,rp_proc:0,rp_nao_proc:0,nds:{}};pc[k].recebido+=c.recebido;pc[k].disponivel+=c.disponivel;pc[k].empenhado+=c.empenhado;pc[k].rp_proc+=c.rp_proc;pc[k].rp_nao_proc+=c.rp_nao_proc;var nk=c.nd;if(!pc[k].nds[nk])pc[k].nds[nk]={nd:c.nd,nd_desc:c.nd_desc,ptres:c.ptres,acao:c.acao,acao_desc:c.acao_desc,recebido:0,disponivel:0,empenhado:0};pc[k].nds[nk].recebido+=c.recebido;pc[k].nds[nk].disponivel+=c.disponivel;pc[k].nds[nk].empenhado+=c.empenhado;});
+  var pd={};
+  dRows.forEach(function(d){var k=d.pi;if(!pd[k])pd[k]={empenhado:0,pago:0,liquidado_a_pagar:0,a_liquidar:0,liquidado:0,empenhos:[]};pd[k].empenhado+=d.empenhado;pd[k].pago+=d.pago;pd[k].liquidado_a_pagar+=d.liquidado_a_pagar;pd[k].a_liquidar+=d.a_liquidar;pd[k].liquidado+=d.liquidado;pd[k].empenhos.push(d);});
+  var all={};Object.keys(pc).forEach(function(k){all[k]=1;});Object.keys(pd).forEach(function(k){all[k]=1;});
+  var merged=[];
+  Object.keys(all).sort().forEach(function(pi){var c=pc[pi]||{};var d=pd[pi]||{};var desc=c.pi_desc||(d.empenhos&&d.empenhos[0]?d.empenhos[0].pi_desc:"")||"";merged.push({pi:pi,pi_desc:desc,recebido:Math.round((c.recebido||0)*100)/100,disponivel:Math.round((c.disponivel||0)*100)/100,empenhado:Math.round((c.empenhado||0)*100)/100,rp_proc:Math.round((c.rp_proc||0)*100)/100,rp_nao_proc:Math.round((c.rp_nao_proc||0)*100)/100,pago:Math.round((d.pago||0)*100)/100,liquidado:Math.round((d.liquidado||0)*100)/100,a_liquidar:Math.round((d.a_liquidar||0)*100)/100,nds:c.nds?Object.values(c.nds):[],empenhos:d.empenhos||[]});});
+  DATA=merged;DATA_B64=btoa(unescape(encodeURIComponent(JSON.stringify(DATA))));
+  var now=new Date();document.getElementById("lastUpdate").textContent=now.toLocaleDateString("pt-BR")+" "+now.toLocaleTimeString("pt-BR");
+  closeImport();selectedPI=null;renderSidebar("");renderOverview();
+  showToast("Dashboard atualizado! "+merged.length+" Planos Internos.","success");
+}
+function extractCredFromDATA(){var r=[];DATA.forEach(function(d){d.nds.forEach(function(n){r.push({ug:"120645",acao:n.acao,acao_desc:n.acao_desc,ptres:n.ptres,nd:n.nd,nd_desc:n.nd_desc,pi:d.pi,pi_desc:d.pi_desc,recebido:n.recebido,disponivel:n.disponivel,empenhado:n.empenhado,rp_proc:0,rp_nao_proc:0});});});return r;}
+function extractDespFromDATA(){var r=[];DATA.forEach(function(d){d.empenhos.forEach(function(e){r.push(e);});});return r;}
+
+function exportDashboard(){
+  if(!isAdmin){showToast("Acesso restrito.","error");return;}
+  var h=generateFullHTML();
+  var b=new Blob([h],{type:"text/html;charset=utf-8"});
+  var u=URL.createObjectURL(b);var a=document.createElement("a");
+  a.href=u;a.download="dashboard_credito_empenhado_"+new Date().toISOString().slice(0,10)+".html";
+  document.body.appendChild(a);a.click();document.body.removeChild(a);URL.revokeObjectURL(u);
+  showToast("Dashboard exportado com sucesso!","success");
+}
+function copyForGitHub(){
+  if(!isAdmin){showToast("Acesso restrito.","error");return;}
+  var h=generateFullHTML();
+  if(navigator.clipboard&&navigator.clipboard.writeText){
+    navigator.clipboard.writeText(h).then(function(){showToast("HTML copiado! Cole no reposit\u00f3rio GitHub.","success");}).catch(function(){fallbackCopy(h);});
+  }else{fallbackCopy(h);}
+}
+function fallbackCopy(txt){var ta=document.createElement("textarea");ta.value=txt;ta.style.cssText="position:fixed;left:-9999px";document.body.appendChild(ta);ta.select();document.execCommand("copy");document.body.removeChild(ta);showToast("HTML copiado para \u00e1rea de transfer\u00eancia!","success");}
+
+function generateFullHTML(){
+  var curB64=btoa(unescape(encodeURIComponent(JSON.stringify(DATA))));
+  var full=document.documentElement.outerHTML;
+  full=full.replace(/var DATA_B64="[^"]*"/,'var DATA_B64="'+curB64+'"');
+  var now=new Date();var ts=now.toLocaleDateString("pt-BR")+" "+now.toLocaleTimeString("pt-BR");
+  full=full.replace(/Data da última atualização: <span id="lastUpdate">[^<]*<\/span>/,'Data da \u00faltima atualiza\u00e7\u00e3o: <span id="lastUpdate">'+ts+"</span>");
+  return "<!DOCTYPE html>\n"+full;
+}
+
+// SIDEBAR
+function renderSidebar(filter){
+  var list=document.getElementById("piList");
+  var maxEmp=0;DATA.forEach(function(d){if(d.empenhado>maxEmp)maxEmp=d.empenhado;});
+  var fl=(filter||"").toLowerCase();
+  var html="";
+  DATA.forEach(function(d){
+    if(fl&&d.pi.toLowerCase().indexOf(fl)<0&&d.pi_desc.toLowerCase().indexOf(fl)<0)return;
+    var barW=maxEmp>0?((d.empenhado/maxEmp)*100):0;
+    var act=selectedPI===d.pi?"active":"";
+    html+="<div class=\"pi-item "+act+"\" onclick=\"selectPI('"+d.pi+"')\">";
+    html+="<div class=\"pi-left\"><div class=\"pi-code\">"+d.pi+"</div><div class=\"pi-desc\" title=\""+d.pi_desc+"\">"+d.pi_desc+"</div><div class=\"pi-bar\"><div class=\"pi-bar-fill\" style=\"width:"+barW+"%\"></div></div></div>";
+    html+="<div class=\"pi-right\"><div class=\"pi-value\">"+fmtShort(d.empenhado)+"</div><div class=\"pi-count\">"+d.empenhos.length+" emp.</div></div></div>";
+  });
+  list.innerHTML=html;
+}
+document.getElementById("searchPI").addEventListener("input",function(e){renderSidebar(e.target.value);});
+
+// OVERVIEW
+function renderOverview(){
+  var tR=0,tD=0,tE=0,tP=0,tL=0,tA=0;
+  DATA.forEach(function(d){tR+=d.recebido;tD+=d.disponivel;tE+=d.empenhado;tP+=d.pago;tL+=d.liquidado;tA+=d.a_liquidar;});
+  var topPIs=DATA.slice().sort(function(a,b){return b.empenhado-a.empenhado;}).filter(function(d){return d.empenhado>0;});
+  var tblR="";topPIs.forEach(function(d){tblR+="<tr class=\"clickable\" onclick=\"selectPI('"+d.pi+"')\"><td><span class=\"tag tag-blue\">"+d.pi+"</span></td><td>"+d.pi_desc+"</td><td class=\"right money\">"+fmt(d.disponivel)+"</td><td class=\"right money\">"+fmt(d.recebido)+"</td><td class=\"right money\">"+fmt(d.empenhado)+"</td></tr>";});
+  document.getElementById("content").innerHTML="<div class=\"animate-in\"><div class=\"kpi-row\"><div class=\"kpi primary\"><div class=\"kpi-label\">Recebido</div><div class=\"kpi-value\">"+fmtShort(tR)+"</div></div><div class=\"kpi gold\"><div class=\"kpi-label\">Dispon\u00edvel</div><div class=\"kpi-value\">"+fmtShort(tD)+"</div><div class=\"kpi-sub\">"+pct(tD,tR)+" do recebido</div></div><div class=\"kpi warning\"><div class=\"kpi-label\">Empenhado</div><div class=\"kpi-value\">"+fmtShort(tE)+"</div><div class=\"kpi-sub\">"+pct(tE,tR)+" do recebido</div></div><div class=\"kpi danger\"><div class=\"kpi-label\">A Liquidar</div><div class=\"kpi-value\">"+fmtShort(tA)+"</div><div class=\"kpi-sub\">"+pct(tA,tE)+" do empenhado</div></div><div class=\"kpi success\"><div class=\"kpi-label\">Pago</div><div class=\"kpi-value\">"+fmtShort(tP)+"</div><div class=\"kpi-sub\">"+pct(tP,tE)+" do empenhado</div></div></div><div class=\"charts-row\"><div class=\"chart-card\"><h3>Composi\u00e7\u00e3o Or\u00e7ament\u00e1ria</h3><div class=\"chart-container\"><canvas id=\"chartComp\"></canvas></div></div><div class=\"chart-card\"><h3>Top Planos Internos</h3><div class=\"chart-container\"><canvas id=\"chartTop\"></canvas></div></div></div><div class=\"section\"><div class=\"section-title\">Vis\u00e3o Geral por Plano Interno</div><div class=\"table-wrap\"><table><thead><tr><th>Plano Interno</th><th>Descri\u00e7\u00e3o PI</th><th class=\"right\">Dispon\u00edvel</th><th class=\"right\">Recebido</th><th class=\"right\">Empenhado</th></tr></thead><tbody>"+tblR+"</tbody></table></div></div></div>";
+  setTimeout(function(){
+    var c1=document.getElementById("chartComp");
+    if(c1)new Chart(c1,{type:"doughnut",data:{labels:["Pago","Liq. a Pagar","A Liquidar","Dispon\u00edvel"],datasets:[{data:[tP,tL-tP,tA,tD],backgroundColor:["#059669","#2563eb","#f59e0b","#d1d5db"],borderWidth:2,borderColor:"#fff"}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:"bottom",labels:{padding:16,font:{size:12,family:"DM Sans"}}}}}});
+    var c2=document.getElementById("chartTop");
+    if(c2){var t8=topPIs.slice(0,8);new Chart(c2,{type:"bar",data:{labels:t8.map(function(d){return d.pi.length>12?d.pi.substr(0,12)+"\u2026":d.pi;}),datasets:[{label:"Empenhado",data:t8.map(function(d){return d.empenhado;}),backgroundColor:"#1a4b8c",borderRadius:4},{label:"Pago",data:t8.map(function(d){return d.pago;}),backgroundColor:"#059669",borderRadius:4}]},options:{responsive:true,maintainAspectRatio:false,indexAxis:"y",scales:{x:{ticks:{callback:function(v){return fmtShort(v);},font:{size:11}},grid:{color:"#f0f0f0"}},y:{ticks:{font:{size:11,family:"monospace"}}}},plugins:{legend:{position:"top",labels:{font:{size:11,family:"DM Sans"}}}}}});}
+  },100);
+}
+function selectPI(pi){selectedPI=pi;currentPage=1;sortCol=null;renderSidebar(document.getElementById("searchPI").value);renderPIDetail(pi);}
+function sortTable(col){if(sortCol===col)sortAsc=!sortAsc;else{sortCol=col;sortAsc=true;}if(selectedPI)renderPIDetail(selectedPI);else renderOverview();}
+
+function renderPIDetail(pi){
+  var d=null;for(var i=0;i<DATA.length;i++){if(DATA[i].pi===pi){d=DATA[i];break;}}
+  if(!d)return;
+  var exP=d.recebido>0?((d.empenhado/d.recebido)*100):0;
+  var pgP=d.empenhado>0?((d.pago/d.empenhado)*100):0;
+  var lqP=d.empenhado>0?((d.liquidado/d.empenhado)*100):0;
+  var emps=d.empenhos.slice();
+  if(sortCol)emps.sort(function(a,b){var va=a[sortCol],vb=b[sortCol];if(typeof va==="string")return sortAsc?va.localeCompare(vb):vb.localeCompare(va);return sortAsc?(va-vb):(vb-va);});
+  var tP=Math.ceil(emps.length/PAGE_SIZE),st=(currentPage-1)*PAGE_SIZE,pe=emps.slice(st,st+PAGE_SIZE);
+  var ndH="";
+  if(d.nds.length>0){var nr="";d.nds.forEach(function(n){nr+="<tr><td><span class=\"tag tag-blue\">"+n.nd+"</span></td><td style=\"font-size:12px\">"+n.nd_desc+"</td><td>"+n.ptres+"</td><td style=\"font-size:12px\">"+n.acao+" - "+n.acao_desc+"</td><td class=\"right money\">"+fmt(n.recebido)+"</td><td class=\"right money\">"+fmt(n.disponivel)+"</td><td class=\"right money\">"+fmt(n.empenhado)+"</td></tr>";});
+  ndH="<div class=\"section\"><div class=\"section-title\">Naturezas de Despesa</div><div class=\"table-wrap\"><table><thead><tr><th>ND</th><th>Descri\u00e7\u00e3o</th><th>PTRES</th><th>A\u00e7\u00e3o</th><th class=\"right\">Recebido</th><th class=\"right\">Dispon\u00edvel</th><th class=\"right\">Empenhado</th></tr></thead><tbody>"+nr+"</tbody></table></div></div>";}
+  var eH="";
+  if(d.empenhos.length>0){var er="";pe.forEach(function(e){var np=e.ne.match(/NE(\d+)$/);var ns=np?np[1]:e.ne.slice(-6);er+="<tr class=\"clickable\" onclick=\"showEmpenhoModal('"+e.ne.replace(/'/g,"\\'")+"','"+d.pi+"')\"><td style=\"font-family:monospace;font-size:12px\">"+ns+"</td><td style=\"font-size:12px;max-width:250px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap\" title=\""+e.favorecido+"\">"+e.favorecido+"</td><td><span class=\"tag tag-blue\">"+e.nd+"</span></td><td class=\"right money\">"+fmt(e.empenhado)+"</td><td class=\"right money "+(e.liquidado>0?"text-green":"")+"\">"+fmt(e.liquidado)+"</td><td class=\"right money "+(e.pago>0?"text-green":"")+"\">"+fmt(e.pago)+"</td><td class=\"right money "+(e.a_liquidar>0?"text-orange":"")+"\">"+fmt(e.a_liquidar)+"</td></tr>";});
+  var pgH="";if(tP>1)pgH="<div class=\"pagination\"><div class=\"info\">"+(st+1)+" - "+Math.min(st+PAGE_SIZE,emps.length)+" de "+emps.length+"</div><div class=\"btns\"><button "+(currentPage<=1?"disabled":"")+" onclick=\"currentPage--;renderPIDetail('"+pi+"')\">‹</button><button "+(currentPage>=tP?"disabled":"")+" onclick=\"currentPage++;renderPIDetail('"+pi+"')\">›</button></div></div>";
+  eH="<div class=\"section\"><div class=\"section-title\">Empenhos ("+d.empenhos.length+")</div><div class=\"table-wrap\"><table><thead><tr><th onclick=\"sortTable('ne')\">NE</th><th onclick=\"sortTable('favorecido')\">Favorecido</th><th>ND</th><th class=\"right\" onclick=\"sortTable('empenhado')\">Empenhado</th><th class=\"right\" onclick=\"sortTable('liquidado')\">Liquidado</th><th class=\"right\" onclick=\"sortTable('pago')\">Pago</th><th class=\"right\" onclick=\"sortTable('a_liquidar')\">A Liquidar</th></tr></thead><tbody>"+er+"</tbody></table>"+pgH+"</div></div>";}
+  else{eH="<div style=\"text-align:center;padding:40px;color:var(--gray-400)\"><p>Nenhum empenho registrado para este PI em 2026.</p></div>";}
+  var cH="";if(d.empenhos.length>0)cH="<div class=\"charts-row\" style=\"margin-top:24px\"><div class=\"chart-card\"><h3>Distribui\u00e7\u00e3o por Situa\u00e7\u00e3o</h3><div class=\"chart-container\"><canvas id=\"chartPISit\"></canvas></div></div><div class=\"chart-card\"><h3>Maiores Favorecidos</h3><div class=\"chart-container\"><canvas id=\"chartPIFav\"></canvas></div></div></div>";
+  document.getElementById("content").innerHTML="<div class=\"animate-in\"><div style=\"margin-bottom:20px\"><a href=\"#\" onclick=\"event.preventDefault();selectedPI=null;sortCol=null;renderOverview();renderSidebar(document.getElementById('searchPI').value)\" style=\"font-size:13px;color:var(--blue-500);text-decoration:none;font-weight:500\">\u2190 Voltar ao Panorama Geral</a></div><div style=\"margin-bottom:20px\"><h2 style=\"font-size:20px;font-weight:700;color:var(--gray-900)\">"+d.pi+"</h2><p style=\"font-size:14px;color:var(--gray-500)\">"+d.pi_desc+"</p></div><div class=\"kpi-row\"><div class=\"kpi primary\"><div class=\"kpi-label\">Recebido</div><div class=\"kpi-value\">"+fmt(d.recebido)+"</div></div><div class=\"kpi gold\"><div class=\"kpi-label\">Dispon\u00edvel</div><div class=\"kpi-value\">"+fmt(d.disponivel)+"</div></div><div class=\"kpi warning\"><div class=\"kpi-label\">Empenhado</div><div class=\"kpi-value\">"+fmt(d.empenhado)+"</div><div class=\"kpi-sub\">"+exP.toFixed(1)+"% exec.</div></div><div class=\"kpi danger\"><div class=\"kpi-label\">A Liquidar</div><div class=\"kpi-value\">"+fmt(d.a_liquidar)+"</div></div><div class=\"kpi success\"><div class=\"kpi-label\">Pago</div><div class=\"kpi-value\">"+fmt(d.pago)+"</div><div class=\"kpi-sub\">"+pgP.toFixed(1)+"% do emp.</div></div></div><div style=\"margin-bottom:24px;display:grid;grid-template-columns:1fr 1fr;gap:12px\"><div><div style=\"font-size:12px;font-weight:600;color:var(--gray-500);margin-bottom:6px\">Execu\u00e7\u00e3o (Empenhado / Recebido)</div><div class=\"progress\" style=\"height:10px\"><div class=\"progress-fill\" style=\"width:"+Math.min(exP,100)+"%;background:var(--blue-600)\"></div></div><div style=\"font-size:11px;color:var(--gray-400);margin-top:4px\">"+exP.toFixed(1)+"%</div></div><div><div style=\"font-size:12px;font-weight:600;color:var(--gray-500);margin-bottom:6px\">Liquida\u00e7\u00e3o (Liquidado / Empenhado)</div><div class=\"progress\" style=\"height:10px\"><div class=\"progress-fill\" style=\"width:"+Math.min(lqP,100)+"%;background:var(--green-600)\"></div></div><div style=\"font-size:11px;color:var(--gray-400);margin-top:4px\">"+lqP.toFixed(1)+"%</div></div></div>"+ndH+eH+cH+"</div>";
+  if(d.empenhos.length>0)setTimeout(function(){
+    var c1=document.getElementById("chartPISit");
+    if(c1)new Chart(c1,{type:"doughnut",data:{labels:["Pago","Liq. a Pagar","A Liquidar"],datasets:[{data:[d.pago,d.liquidado-d.pago,d.a_liquidar],backgroundColor:["#059669","#2563eb","#f59e0b"],borderWidth:2,borderColor:"#fff"}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:"bottom",labels:{font:{size:11,family:"DM Sans"}}}}}});
+    var fm={};d.empenhos.forEach(function(e){if(!fm[e.favorecido])fm[e.favorecido]=0;fm[e.favorecido]+=e.empenhado;});
+    var fv=Object.entries(fm).sort(function(a,b){return b[1]-a[1];}).slice(0,6);
+    var c2=document.getElementById("chartPIFav");
+    if(c2)new Chart(c2,{type:"bar",data:{labels:fv.map(function(f){return f[0].length>25?f[0].substr(0,25)+"\u2026":f[0];}),datasets:[{label:"Empenhado",data:fv.map(function(f){return f[1];}),backgroundColor:"#1a4b8c",borderRadius:4}]},options:{responsive:true,maintainAspectRatio:false,indexAxis:"y",scales:{x:{ticks:{callback:function(v){return fmtShort(v);},font:{size:11}},grid:{color:"#f0f0f0"}},y:{ticks:{font:{size:10,family:"DM Sans"}}}},plugins:{legend:{display:false}}}});
+  },100);
+}
+
+function showEmpenhoModal(ne,pi){
+  var d=null;for(var i=0;i<DATA.length;i++){if(DATA[i].pi===pi){d=DATA[i];break;}}if(!d)return;
+  var e=null;for(var j=0;j<d.empenhos.length;j++){if(d.empenhos[j].ne===ne){e=d.empenhos[j];break;}}if(!e)return;
+  document.getElementById("modalTitle").textContent="Detalhe do Empenho";
+  var lt=e.pago+e.liquidado_a_pagar;
+  var cf=e.cnpj.replace(/(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})/,"$1.$2.$3/$4-$5");
+  var pP=e.empenhado>0?(e.pago/e.empenhado*100):0;
+  var lP=e.empenhado>0?((lt-e.pago)/e.empenhado*100):0;
+  var aP=e.empenhado>0?(e.a_liquidar/e.empenhado*100):0;
+  document.getElementById("modalBody").innerHTML="<div style=\"display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px\"><div><div style=\"font-size:11px;color:var(--gray-400);text-transform:uppercase;font-weight:600\">Nota de Empenho</div><div style=\"font-size:14px;font-weight:600;font-family:monospace;margin-top:4px\">"+e.ne+"</div></div><div><div style=\"font-size:11px;color:var(--gray-400);text-transform:uppercase;font-weight:600\">CNPJ</div><div style=\"font-size:14px;font-weight:500;margin-top:4px\">"+cf+"</div></div></div><div style=\"margin-bottom:20px\"><div style=\"font-size:11px;color:var(--gray-400);text-transform:uppercase;font-weight:600\">Favorecido</div><div style=\"font-size:16px;font-weight:700;margin-top:4px\">"+e.favorecido+"</div></div><div style=\"display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;margin-bottom:20px\"><div><div style=\"font-size:11px;color:var(--gray-400);text-transform:uppercase;font-weight:600\">Plano Interno</div><div style=\"margin-top:4px\"><span class=\"tag tag-blue\">"+e.pi+"</span></div><div style=\"font-size:12px;color:var(--gray-500);margin-top:2px\">"+e.pi_desc+"</div></div><div><div style=\"font-size:11px;color:var(--gray-400);text-transform:uppercase;font-weight:600\">Natureza Despesa</div><div style=\"margin-top:4px\"><span class=\"tag tag-blue\">"+e.nd+"</span></div><div style=\"font-size:12px;color:var(--gray-500);margin-top:2px\">"+e.nd_desc+"</div></div><div><div style=\"font-size:11px;color:var(--gray-400);text-transform:uppercase;font-weight:600\">PTRES</div><div style=\"font-size:14px;font-weight:500;margin-top:4px\">"+e.ptres+"</div></div></div><div style=\"display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px\"><div class=\"kpi warning\" style=\"padding:14px 16px\"><div class=\"kpi-label\" style=\"font-size:10px\">Empenhado</div><div class=\"kpi-value\" style=\"font-size:18px\">"+fmt(e.empenhado)+"</div></div><div class=\"kpi\" style=\"border-top:3px solid var(--blue-500);padding:14px 16px\"><div class=\"kpi-label\" style=\"font-size:10px\">Liquidado</div><div class=\"kpi-value\" style=\"font-size:18px\">"+fmt(lt)+"</div></div><div class=\"kpi success\" style=\"padding:14px 16px\"><div class=\"kpi-label\" style=\"font-size:10px\">Pago</div><div class=\"kpi-value\" style=\"font-size:18px\">"+fmt(e.pago)+"</div></div><div class=\"kpi danger\" style=\"padding:14px 16px\"><div class=\"kpi-label\" style=\"font-size:10px\">A Liquidar</div><div class=\"kpi-value\" style=\"font-size:18px\">"+fmt(e.a_liquidar)+"</div></div></div><div><div style=\"font-size:12px;font-weight:600;color:var(--gray-500);margin-bottom:6px\">Progresso de Execu\u00e7\u00e3o</div><div style=\"display:flex;height:24px;border-radius:6px;overflow:hidden;background:var(--gray-200)\">"+(e.empenhado>0?"<div style=\"width:"+pP+"%;background:var(--green-600)\" title=\"Pago\"></div><div style=\"width:"+lP+"%;background:var(--blue-500)\" title=\"Liq. a Pagar\"></div><div style=\"width:"+aP+"%;background:var(--orange-500)\" title=\"A Liquidar\"></div>":"")+"</div><div style=\"display:flex;gap:16px;margin-top:8px;font-size:11px;color:var(--gray-500)\"><span>\u25a0 Pago "+pP.toFixed(1)+"%</span><span style=\"color:var(--blue-500)\">\u25a0 Liq. a Pagar "+lP.toFixed(1)+"%</span><span style=\"color:var(--orange-500)\">\u25a0 A Liquidar "+aP.toFixed(1)+"%</span></div></div>";
+  document.getElementById("modalOverlay").classList.add("show");
+}
+function closeModal(){document.getElementById("modalOverlay").classList.remove("show");}
+document.getElementById("modalOverlay").addEventListener("click",function(e){if(e.target===document.getElementById("modalOverlay"))closeModal();});
+document.addEventListener("keydown",function(e){if(e.key==="Escape"){closeModal();closeImport();cancelLogin();}});
+renderSidebar();renderOverview();
+
+</script>
+
+</body></html>
