@@ -33,6 +33,39 @@ header{background:var(--navy);padding:0 24px;height:54px;display:flex;align-item
 .btn-imp{background:#1a56db;color:#fff;border:none;border-radius:6px;padding:6px 14px;font-size:12px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:6px;font-family:'Sora',sans-serif;transition:background .15s}
 .btn-imp:hover{background:#1e429f}
 .btn-imp svg{width:13px;height:13px}
+.btn-export{background:#057a55;color:#fff;border:none;border-radius:6px;padding:6px 14px;font-size:12px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:6px;font-family:'Sora',sans-serif;transition:background .15s}
+.btn-export:hover{background:#046c4e}
+.btn-export svg{width:13px;height:13px}
+.btn-export:disabled{background:#9ca3af;cursor:not-allowed}
+.btn-admin{background:transparent;color:#90c4f9;border:1px solid #2d5490;border-radius:6px;padding:5px 12px;font-size:11.5px;font-weight:500;cursor:pointer;display:flex;align-items:center;gap:5px;font-family:'Sora',sans-serif;transition:all .15s}
+.btn-admin:hover{background:#1e3a60;color:#fff}
+.btn-admin svg{width:12px;height:12px}
+.btn-admin.logged{background:#057a55;color:#fff;border-color:#057a55}
+.btn-admin.logged:hover{background:#dc2626;border-color:#dc2626}
+.admin-only{display:none}
+body.is-admin .admin-only{display:flex}
+.admin-badge{background:#057a55;color:#fff;border-radius:4px;padding:2px 8px;font-size:10px;font-weight:700;letter-spacing:.04em;display:none}
+body.is-admin .admin-badge{display:inline-block}
+.lock-input{width:100%;background:var(--white);border:1.5px solid var(--b2);border-radius:var(--rs);padding:10px 12px;font-size:13px;font-family:'Sora',sans-serif;outline:none;transition:border-color .12s;margin-bottom:10px}
+.lock-input:focus{border-color:var(--blue)}
+.lock-input.err{border-color:var(--red);background:var(--rbg)}
+.lock-msg{font-size:11.5px;color:var(--t3);margin-bottom:14px;line-height:1.5}
+.lock-err{font-size:11.5px;color:var(--red);font-weight:600;margin-top:6px;display:none}
+.lock-err.show{display:block}
+.exp-step{margin-bottom:14px;padding:12px 14px;background:var(--s2);border:1px solid var(--b);border-radius:var(--rs);font-size:11.5px;color:var(--t2);line-height:1.6}
+.exp-step strong{color:var(--t);font-weight:600}
+.exp-step .num{display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;background:var(--blue);color:#fff;border-radius:50%;font-size:10px;font-weight:700;margin-right:6px}
+.exp-step a{color:var(--blue);text-decoration:none;font-weight:600}
+.exp-step a:hover{text-decoration:underline}
+.exp-actions{display:flex;gap:8px;margin-top:8px;flex-wrap:wrap}
+.exp-btn-act{flex:1;min-width:140px;background:var(--white);border:1px solid var(--b2);color:var(--t);border-radius:var(--rs);padding:10px 14px;font-size:12px;cursor:pointer;font-family:'Sora',sans-serif;font-weight:600;transition:all .12s;display:flex;align-items:center;justify-content:center;gap:6px}
+.exp-btn-act:hover{border-color:var(--blue);color:var(--blue);background:var(--bl)}
+.exp-btn-act.primary{background:var(--blue);color:#fff;border-color:var(--blue)}
+.exp-btn-act.primary:hover{background:#1e429f;color:#fff}
+.exp-btn-act svg{width:14px;height:14px}
+.exp-feedback{font-size:11px;color:var(--green);font-weight:600;margin-top:8px;text-align:center;display:none}
+.exp-feedback.show{display:block}
+.exp-feedback.err{color:var(--red)}
 .app{display:flex;height:calc(100vh - 54px)}
 aside{width:240px;background:var(--white);border-right:1px solid var(--b);display:flex;flex-direction:column;overflow:hidden;flex-shrink:0}
 .slabel{padding:14px 14px 6px;font-size:9.5px;font-weight:700;color:var(--t4);text-transform:uppercase;letter-spacing:.1em}
@@ -136,6 +169,26 @@ canvas{max-height:300px}
 </head>
 <body>
 
+<!-- ADMIN LOGIN MODAL -->
+<div class="ov" id="adminOv">
+  <div class="modal" style="width:420px">
+    <div class="mh">
+      <div class="logo" style="width:28px;height:28px;font-size:10px;background:linear-gradient(135deg,#057a55,#0e9f6e)">🔒</div>
+      <h2>Acesso de Administrador</h2>
+      <button class="mc" onclick="closeAdmin()">×</button>
+    </div>
+    <div class="mb">
+      <p class="lock-msg">Insira a senha para habilitar as funções de <strong>importar planilha</strong> e <strong>publicar no GitHub</strong>. Sem login, o dashboard funciona apenas em modo leitura.</p>
+      <input type="password" class="lock-input" id="adminPwd" placeholder="Senha" onkeydown="if(event.key==='Enter')doLogin()" autocomplete="current-password">
+      <div class="lock-err" id="adminErr">Senha incorreta. Tente novamente.</div>
+    </div>
+    <div class="mf">
+      <button class="btn-cn" onclick="closeAdmin()">Cancelar</button>
+      <button class="btn-ok show" onclick="doLogin()">Entrar</button>
+    </div>
+  </div>
+</div>
+
 <div class="ov" id="impOv">
   <div class="modal">
     <div class="mh"><div class="logo" style="width:28px;height:28px;font-size:10px">FAB</div><h2>Importar Planilha</h2><button class="mc" onclick="closeImp()">×</button></div>
@@ -151,15 +204,67 @@ canvas{max-height:300px}
   </div>
 </div>
 
+<!-- EXPORT MODAL -->
+<div class="ov" id="expOv">
+  <div class="modal" style="width:580px">
+    <div class="mh">
+      <div class="logo" style="width:28px;height:28px;font-size:10px;background:linear-gradient(135deg,#057a55,#0e9f6e)">GH</div>
+      <h2>Publicar no GitHub</h2>
+      <button class="mc" onclick="closeExp()">×</button>
+    </div>
+    <div class="mb">
+      <p style="font-size:12px;color:var(--t2);margin-bottom:14px;line-height:1.6">
+        Este recurso gera um HTML completo com os <strong>dados atuais embutidos</strong>, pronto para publicar no GitHub Pages e atualizar o site sem precisar voltar ao chat.
+      </p>
+
+      <div class="exp-step">
+        <span class="num">1</span><strong>Gere o arquivo atualizado</strong><br>
+        Use uma das opções abaixo. O arquivo gerado conterá exatamente os dados que você está vendo agora no dashboard.
+        <div class="exp-actions">
+          <button class="exp-btn-act primary" onclick="downloadHTML()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            Baixar index.html
+          </button>
+          <button class="exp-btn-act" onclick="copyHTML()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+            Copiar código HTML
+          </button>
+        </div>
+        <div class="exp-feedback" id="expFb"></div>
+      </div>
+
+      <div class="exp-step">
+        <span class="num">2</span><strong>No seu repositório do GitHub:</strong><br>
+        Acesse o arquivo <code style="background:var(--b);padding:1px 6px;border-radius:3px;font-family:'JetBrains Mono',monospace;font-size:10.5px">index.html</code>, clique no ícone do lápis (✏️ Edit) e cole o conteúdo copiado, ou clique em <em>Add file → Upload files</em> e arraste o arquivo baixado.
+      </div>
+
+      <div class="exp-step">
+        <span class="num">3</span><strong>Confirme o commit</strong><br>
+        Role até o final da página e clique em <em>Commit changes</em>. O GitHub Pages atualiza o site em 1–3 minutos automaticamente.
+      </div>
+    </div>
+    <div class="mf"><button class="btn-cn" onclick="closeExp()">Fechar</button></div>
+  </div>
+</div>
+
 <header>
   <div class="logo">FAB</div>
   <div class="htitles"><h1>Restos a Pagar — GAP-GL</h1><p>Grupamento de Apoio do Galeão · Força Aérea Brasileira</p></div>
   <div class="hr">
     <span class="hbadge">2026</span>
+    <span class="admin-badge">🔓 ADMIN</span>
     <span id="dataInfo">carregando…</span>
-    <button class="btn-imp" onclick="openImp()">
+    <button class="btn-imp admin-only" onclick="openImp()">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
       Importar Planilha
+    </button>
+    <button class="btn-export admin-only" onclick="openExp()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg>
+      Publicar no GitHub
+    </button>
+    <button class="btn-admin" id="btnAdmin" onclick="toggleAdmin()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+      <span id="adminLabel">Admin</span>
     </button>
   </div>
 </header>
@@ -457,7 +562,7 @@ function renderAlertas(){
   grid.innerHTML=results.slice(0,48).map(function(r){return'<div class="scard '+r.type+'"><div class="som">'+r.u.substring(0,32)+'</div><div class="sct">'+r.cc+' — '+r.cn.substring(0,28)+'</div><div class="sval'+(r.type==='crit'?' red':'')+'">'+fmt(r.val)+'</div><div class="stag '+(r.type==='crit'?'red':'yel')+'">'+(r.type==='crit'?'▲ Saldo CRESCENDO':'= Saldo ESTAGNADO')+' · '+WIN+' meses</div></div>';}).join('');
 }
 
-function openImp(){document.getElementById('impOv').classList.add('show');pendingImp=null;var s=document.getElementById('ist');s.className='ist';s.textContent='';document.getElementById('btnOk').classList.remove('show');}
+function openImp(){if(!isAdmin())return;document.getElementById('impOv').classList.add('show');pendingImp=null;var s=document.getElementById('ist');s.className='ist';s.textContent='';document.getElementById('btnOk').classList.remove('show');}
 function closeImp(){document.getElementById('impOv').classList.remove('show');}
 var dzEl=document.getElementById('dz');
 dzEl.addEventListener('dragover',function(e){e.preventDefault();dzEl.classList.add('over');});
@@ -501,8 +606,144 @@ function parseSheet(rows){
 }
 function confirmImp(){if(!pendingImp)return;initData(pendingImp.records,pendingImp.contaNames);closeImp();}
 
+// ── EXPORT GITHUB ──
+function openExp(){if(!isAdmin())return;document.getElementById('expOv').classList.add('show');var fb=document.getElementById('expFb');fb.classList.remove('show','err');fb.textContent='';}
+function closeExp(){document.getElementById('expOv').classList.remove('show');}
+
+function buildExportHTML(){
+  // Gera string compactada+base64 dos dados atuais (RECORDS, CONTA_NAMES)
+  var json=JSON.stringify({records:RECORDS,conta_names:CONTA_NAMES});
+  var compressed=pako.deflate(json,{level:9});
+  // Convert Uint8Array to binary string then base64
+  var binStr='';for(var i=0;i<compressed.length;i++)binStr+=String.fromCharCode(compressed[i]);
+  var newB64=btoa(binStr);
+
+  // Pega HTML atual e substitui o DATA_B64 antigo pelo novo
+  var doc='<!DOCTYPE html>\n'+document.documentElement.outerHTML;
+  // Limpa estados visuais (ex: classes .show, .open, .active dinâmicas — exceto a default)
+  // Substitui a constante DATA_B64
+  doc=doc.replace(/const DATA_B64='[^']*'/, "const DATA_B64='"+newB64+"'");
+  doc=doc.replace(/var DATA_B64='[^']*'/, "var DATA_B64='"+newB64+"'");
+
+  // Remove modais abertos (.show) para o arquivo abrir limpo
+  doc=doc.replace(/class="ov show"/g,'class="ov"');
+
+  return doc;
+}
+
+function downloadHTML(){
+  try{
+    var html=buildExportHTML();
+    var blob=new Blob([html],{type:'text/html;charset=utf-8'});
+    var url=URL.createObjectURL(blob);
+    var a=document.createElement('a');
+    a.href=url;a.download='index.html';
+    document.body.appendChild(a);a.click();
+    document.body.removeChild(a);
+    setTimeout(function(){URL.revokeObjectURL(url);},100);
+    var fb=document.getElementById('expFb');
+    fb.classList.remove('err');fb.classList.add('show');
+    fb.textContent='✓ Arquivo index.html baixado · '+(html.length/1024).toFixed(0)+' KB';
+  }catch(e){
+    var fb=document.getElementById('expFb');
+    fb.classList.add('show','err');fb.textContent='Erro ao gerar: '+e.message;
+  }
+}
+
+async function copyHTML(){
+  var fb=document.getElementById('expFb');
+  try{
+    var html=buildExportHTML();
+    if(navigator.clipboard&&navigator.clipboard.writeText){
+      await navigator.clipboard.writeText(html);
+      fb.classList.remove('err');fb.classList.add('show');
+      fb.textContent='✓ HTML copiado para a área de transferência · '+(html.length/1024).toFixed(0)+' KB · agora cole no GitHub';
+    }else{
+      // Fallback: textarea
+      var ta=document.createElement('textarea');
+      ta.value=html;ta.style.position='fixed';ta.style.opacity='0';
+      document.body.appendChild(ta);ta.select();
+      var ok=document.execCommand('copy');
+      document.body.removeChild(ta);
+      fb.classList.remove('err');fb.classList.add('show');
+      fb.textContent=ok?'✓ HTML copiado · '+(html.length/1024).toFixed(0)+' KB':'⚠ Não foi possível copiar — use o botão Baixar';
+    }
+  }catch(e){
+    fb.classList.add('show','err');fb.textContent='Erro ao copiar: '+e.message+' — tente o botão Baixar';
+  }
+}
+
 // BOOT — dados embutidos
 initData(BUILTIN_RECORDS, BUILTIN_CONTAS);
+
+// ══════════════════════════════════════════
+// ADMIN AUTHENTICATION
+// ══════════════════════════════════════════
+// Hash SHA-256 da senha. Para trocar a senha, calcule o hash da nova
+// em: https://emn178.github.io/online-tools/sha256.html e substitua abaixo.
+var ADMIN_HASH='b0da1dec734c2ebf794977646e348e8f56143d7b0448ab558efc76238d4d13b6';
+var ADMIN_KEY='gapgl_admin_session';
+
+async function sha256(text){
+  var buf=new TextEncoder().encode(text);
+  var hash=await crypto.subtle.digest('SHA-256',buf);
+  return[...new Uint8Array(hash)].map(function(b){return b.toString(16).padStart(2,'0');}).join('');
+}
+
+function isAdmin(){
+  try{return localStorage.getItem(ADMIN_KEY)==='1';}catch(e){return false;}
+}
+
+function setAdminUI(on){
+  document.body.classList.toggle('is-admin',on);
+  var btn=document.getElementById('btnAdmin');
+  var label=document.getElementById('adminLabel');
+  if(on){btn.classList.add('logged');label.textContent='Sair Admin';}
+  else{btn.classList.remove('logged');label.textContent='Admin';}
+}
+
+function toggleAdmin(){
+  if(isAdmin()){
+    // Logout
+    try{localStorage.removeItem(ADMIN_KEY);}catch(e){}
+    setAdminUI(false);
+  }else{
+    // Open login modal
+    document.getElementById('adminOv').classList.add('show');
+    var inp=document.getElementById('adminPwd');
+    inp.value='';inp.classList.remove('err');
+    document.getElementById('adminErr').classList.remove('show');
+    setTimeout(function(){inp.focus();},50);
+  }
+}
+
+function closeAdmin(){
+  document.getElementById('adminOv').classList.remove('show');
+}
+
+async function doLogin(){
+  var inp=document.getElementById('adminPwd');
+  var err=document.getElementById('adminErr');
+  var pwd=inp.value;
+  if(!pwd){inp.classList.add('err');return;}
+  try{
+    var h=await sha256(pwd);
+    if(h===ADMIN_HASH){
+      try{localStorage.setItem(ADMIN_KEY,'1');}catch(e){}
+      setAdminUI(true);
+      closeAdmin();
+    }else{
+      inp.classList.add('err');
+      err.classList.add('show');
+      inp.value='';inp.focus();
+    }
+  }catch(e){
+    err.textContent='Erro: '+e.message;err.classList.add('show');
+  }
+}
+
+// Restore admin state on load
+setAdminUI(isAdmin());
 </script>
 </body>
 </html>
