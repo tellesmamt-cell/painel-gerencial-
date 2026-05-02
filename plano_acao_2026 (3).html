@@ -1,0 +1,1515 @@
+<!DOCTYPE html>
+<html lang="pt-BR"><head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Plano de Ação 2026 · GAP-GL</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&amp;family=DM+Mono:wght@400;500&amp;display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<style>
+  :root{
+    --sidebar:#2a3542;
+    --sidebar-active:#37bc9b;
+    --bg:#eef1f5;
+    --card:#ffffff;
+    --border:#e3e7eb;
+    --text:#2c3e50;
+    --muted:#7a868f;
+    --header:#43525c;
+    --teal:#37bc9b;
+    --red:#e9573f;
+    --blue:#4a89dc;
+    --orange:#f6bb42;
+    --dark:#434a54;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{
+    font-family:'DM Sans',sans-serif;
+    background:var(--bg);
+    color:var(--text);
+    font-size:13px;
+    line-height:1.5;
+    -webkit-font-smoothing:antialiased;
+  }
+
+  .app{display:flex;min-height:100vh}
+
+  /* SIDEBAR */
+  .sidebar{
+    width:230px;
+    background:var(--sidebar);
+    color:#a6adb4;
+    flex-shrink:0;
+    display:flex;flex-direction:column;
+  }
+  .brand{padding:22px 24px;font-size:17px;font-weight:700;color:#fff;letter-spacing:.5px}
+  .brand span{color:var(--sidebar-active)}
+  .nav-section{padding:14px 24px 8px;font-size:10px;letter-spacing:1.5px;color:#7a838c;font-weight:600}
+  .nav-list{list-style:none}
+  .nav-list li a{
+    display:flex;align-items:center;justify-content:space-between;
+    padding:11px 24px;
+    color:#a6adb4;text-decoration:none;font-size:13px;
+    border-left:3px solid transparent;
+    cursor:pointer;
+  }
+  .nav-list li a:hover{background:#232c37;color:#fff}
+  .nav-list li a.active{background:#232c37;color:#fff;border-left-color:var(--sidebar-active)}
+  .nav-list li a .pct{
+    font-size:10px;font-family:'DM Mono',monospace;
+    padding:2px 6px;border-radius:8px;
+    background:rgba(255,255,255,.08);
+  }
+  .nav-list li a.active .pct{background:rgba(55,188,155,.25);color:#a6e8d4}
+
+  /* MAIN */
+  .main{flex:1;display:flex;flex-direction:column;min-width:0}
+
+  .topbar{
+    background:#fff;padding:18px 32px;border-bottom:1px solid var(--border);
+    display:flex;justify-content:space-between;align-items:center;
+    flex-wrap:wrap;gap:12px;
+  }
+  .topbar h1{font-size:20px;font-weight:600;color:var(--header)}
+  .topbar .sub{font-size:12px;color:var(--muted);margin-top:2px}
+
+  .actions{display:flex;gap:8px}
+  .btn{
+    border:none;cursor:pointer;
+    font-family:inherit;font-size:12px;font-weight:600;
+    padding:9px 16px;border-radius:4px;
+    display:inline-flex;align-items:center;gap:6px;
+    transition:opacity .15s;
+  }
+  .btn:hover{opacity:.88}
+  .btn-primary{background:var(--teal);color:#fff}
+  .btn-secondary{background:var(--blue);color:#fff}
+  .btn-outline{background:#fff;color:var(--header);border:1px solid var(--border)}
+
+  .content{padding:24px 32px 40px;display:flex;flex-direction:column;gap:20px}
+
+  /* KPIs */
+  .kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
+  .kpi{
+    background:#fff;border:1px solid var(--border);border-radius:4px;
+    padding:18px 20px;border-left:4px solid var(--teal);
+  }
+  .kpi.red{border-left-color:var(--red)}
+  .kpi.blue{border-left-color:var(--blue)}
+  .kpi.dark{border-left-color:var(--dark)}
+  .kpi.orange{border-left-color:var(--orange)}
+  .kpi .label{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.8px;font-weight:600;margin-bottom:8px}
+  .kpi .value{font-size:22px;font-weight:700;font-family:'DM Mono',monospace;color:var(--header)}
+  .kpi .hint{font-size:11px;color:var(--muted);margin-top:4px}
+  .kpi .hint strong{color:var(--header);font-weight:600}
+
+  /* CARDS */
+  .row{display:grid;gap:20px}
+  .row-2{grid-template-columns:1.4fr 1fr}
+  .card{background:#fff;border:1px solid var(--border);border-radius:4px;overflow:hidden}
+  .card-head{padding:16px 20px;border-bottom:1px solid var(--border)}
+  .card-head h3{font-size:13px;font-weight:600;color:var(--header);text-transform:uppercase;letter-spacing:.7px}
+  .card-head .sub{font-size:11px;color:var(--muted);margin-top:3px;font-weight:400;text-transform:none;letter-spacing:0}
+  .card-body{padding:20px}
+  .chart-wrap{position:relative;height:280px}
+  .chart-wrap.tall{height:340px}
+
+  /* STATUS BARS */
+  .status-list{display:flex;flex-direction:column;gap:18px}
+  .status-row .st-top{display:flex;justify-content:space-between;font-size:12px;margin-bottom:6px}
+  .status-row .st-name{font-weight:600;color:var(--header);cursor:pointer}
+  .status-row .st-name:hover{color:var(--blue)}
+  .status-row .st-val{font-family:'DM Mono',monospace;color:var(--muted);font-size:11px}
+  .status-row .st-val strong{color:var(--header);font-weight:600}
+  .status-bar{height:10px;background:#f0f2f5;border-radius:5px;overflow:hidden}
+  .status-bar > div{height:100%;border-radius:5px;transition:width .8s}
+  .bar-good{background:var(--teal)}
+  .bar-warn{background:var(--orange)}
+  .bar-bad{background:var(--red)}
+
+  /* TABLE */
+  table.data{width:100%;border-collapse:collapse;font-size:12.5px}
+  table.data thead th{
+    background:#fafbfc;text-align:left;padding:12px 18px;
+    font-size:11px;font-weight:600;color:var(--header);
+    text-transform:uppercase;letter-spacing:.5px;
+    border-bottom:1px solid var(--border);
+  }
+  table.data tbody td{padding:13px 18px;border-bottom:1px solid #f0f2f5}
+  table.data tbody tr:hover{background:#fafbfc}
+  table.data tbody tr:last-child td{border-bottom:none}
+  table.data .num{text-align:right;font-family:'DM Mono',monospace}
+  table.data .code{font-family:'DM Mono',monospace;color:var(--blue);font-size:11.5px}
+
+  .pill{display:inline-block;padding:3px 10px;font-size:10px;font-weight:600;border-radius:11px;letter-spacing:.4px;text-transform:uppercase}
+  .pill.good{background:#e1f5ee;color:#1f9276}
+  .pill.bad{background:#fbe2dc;color:#b53d27}
+  .pill.warn{background:#fef3e0;color:#a37512}
+  .pill.info{background:#e1ecf8;color:#2a6bbd}
+
+  /* PI DETAIL */
+  .pi-header{
+    background:#fff;border:1px solid var(--border);border-radius:4px;
+    padding:22px 24px;
+    border-left:4px solid var(--teal);
+  }
+  .pi-header.red{border-left-color:var(--red)}
+  .pi-header.blue{border-left-color:var(--blue)}
+  .pi-header.orange{border-left-color:var(--orange)}
+  .pi-header.purple{border-left-color:#967adc}
+  .pi-header .pi-code{font-family:'DM Mono',monospace;font-size:12px;color:var(--muted);font-weight:500;text-transform:uppercase;letter-spacing:1px}
+  .pi-header h2{font-size:22px;color:var(--header);margin:4px 0 10px;font-weight:600}
+  .pi-header .pi-meta{display:flex;gap:24px;flex-wrap:wrap;font-size:12px;color:var(--muted)}
+  .pi-header .pi-meta strong{color:var(--header);font-weight:600}
+
+  /* INFO GRID */
+  .info-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:0}
+  .info-item{padding:14px 20px;border-bottom:1px solid #f0f2f5;border-right:1px solid #f0f2f5}
+  .info-item:nth-child(2n){border-right:none}
+  .info-item .ik{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.6px;font-weight:600;margin-bottom:4px}
+  .info-item .iv{font-size:12.5px;color:var(--header);font-weight:500}
+  .info-item .iv.mono{font-family:'DM Mono',monospace;color:var(--blue)}
+
+  /* PAGES */
+  .page{display:none}
+  .page.active{display:flex;flex-direction:column;gap:20px}
+
+  .toast{
+    position:fixed;bottom:24px;right:24px;
+    background:var(--dark);color:#fff;
+    padding:14px 20px;border-radius:4px;font-size:13px;font-weight:500;
+    box-shadow:0 8px 22px rgba(0,0,0,.18);
+    transform:translateY(80px);opacity:0;transition:all .3s;z-index:1000;
+  }
+  .toast.show{transform:translateY(0);opacity:1}
+  .toast.success{background:var(--teal)}
+  .toast.error{background:var(--red)}
+
+  @media (max-width:1080px){
+    .kpis{grid-template-columns:1fr 1fr}
+    .row-2{grid-template-columns:1fr}
+    .info-grid{grid-template-columns:1fr}
+    .info-item{border-right:none}
+  }
+  @media (max-width:760px){
+    .sidebar{display:none}
+    .content{padding:16px}
+    .topbar{padding:16px}
+  }
+  @media print{
+    .sidebar,.actions,.toast{display:none !important}
+    body{background:#fff}
+    .card,.kpi{break-inside:avoid;box-shadow:none}
+  }
+</style>
+</head>
+<body>
+<div class="app">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="brand">[ <span>gap-gl</span> ]</div>
+    <div class="nav-section">PLANO DE AÇÃO 2026</div>
+    <ul class="nav-list" id="navList">
+      <li><a class="" data-page="home">Visão Geral</a></li>
+    <li><a data-page="VIDA" class="">Vida Vegetativa<span class="pct">28%</span></a></li><li><a data-page="IMOVEIS" class="active">Manut/Cons Imóveis<span class="pct">28%</span></a></li><li><a data-page="CONTRATOS">Contratos Continuados<span class="pct">58%</span></a></li><li><a data-page="SERVPUB">Serviços Públicos<span class="pct">25%</span></a></li><li><a data-page="SISHT">SISHT<span class="pct">40%</span></a></li></ul>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main">
+
+    <header class="topbar">
+      <div>
+        <h1 id="pageTitle">Manut/Cons Imóveis</h1>
+        <div class="sub" id="pageSubtitle">SF063100109 · MANUT/CONS BENS IMOVEIS - SEFA</div>
+      </div>
+      <div class="actions">
+        <button class="btn btn-outline" onclick="window.print()">Imprimir</button>
+        <button class="btn btn-secondary" onclick="exportData()">Exportar</button>
+        <button class="btn btn-primary" onclick="copyHTMLForGitHub()">Copiar HTML</button>
+      </div>
+    </header>
+
+    <div class="content">
+
+      <!-- ============ PÁGINA: VISÃO GERAL ============ -->
+      <div class="page" id="page-home">
+
+        <div class="kpis">
+          <div class="kpi teal">
+            <div class="label">Plano Total</div>
+            <div class="value" id="kpi-total">R$ 14,28M</div>
+            <div class="hint"><strong id="kpi-pi-count">5</strong> Planos Internos</div>
+          </div>
+          <div class="kpi red">
+            <div class="label">Descentralizado</div>
+            <div class="value" id="kpi-decent">R$ 4,18M</div>
+            <div class="hint"><strong id="kpi-decent-pct">29,3%</strong> do plano</div>
+          </div>
+          <div class="kpi blue">
+            <div class="label">Falta Descentralizar</div>
+            <div class="value" id="kpi-falta">R$ 10,1M</div>
+            <div class="hint"><strong id="kpi-falta-pct">70,7%</strong> pendente</div>
+          </div>
+          <div class="kpi dark">
+            <div class="label">Saldo NE214</div>
+            <div class="value" id="kpi-ne214">R$ 83,8K</div>
+            <div class="hint">Vida Vegetativa</div>
+          </div>
+        </div>
+
+        <div class="row row-2">
+          <div class="card">
+            <div class="card-head">
+              <h3>Execução por Plano Interno</h3>
+              <div class="sub">Descentralizado × Falta Descentralizar (R$)</div>
+            </div>
+            <div class="card-body">
+              <div class="chart-wrap"><canvas id="chartBars" width="828" height="350" style="display: block; box-sizing: border-box; height: 280px; width: 662px;"></canvas></div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-head">
+              <h3>% Executado</h3>
+              <div class="sub">Clique no PI para ver detalhes</div>
+            </div>
+            <div class="card-body">
+              <div class="status-list" id="statusList">
+      <div class="status-row">
+        <div class="st-top">
+          <span class="st-name" onclick="navigate('CONTRATOS')">Contratos Continuados</span>
+          <span class="st-val"><strong>58,3%</strong> · R$ 890,1K / R$ 1,53M</span>
+        </div>
+        <div class="status-bar"><div class="bar-good" style="width:58.333333333333336%"></div></div>
+      </div>
+    
+      <div class="status-row">
+        <div class="st-top">
+          <span class="st-name" onclick="navigate('SISHT')">SISHT</span>
+          <span class="st-val"><strong>39,7%</strong> · R$ 143,1K / R$ 360,2K</span>
+        </div>
+        <div class="status-bar"><div class="bar-warn" style="width:39.7180802282154%"></div></div>
+      </div>
+    
+      <div class="status-row">
+        <div class="st-top">
+          <span class="st-name" onclick="navigate('IMOVEIS')">Manut/Cons Imóveis</span>
+          <span class="st-val"><strong>27,8%</strong> · R$ 97,1K / R$ 349,7K</span>
+        </div>
+        <div class="status-bar"><div class="bar-warn" style="width:27.777777142334266%"></div></div>
+      </div>
+    
+      <div class="status-row">
+        <div class="st-top">
+          <span class="st-name" onclick="navigate('VIDA')">Vida Vegetativa</span>
+          <span class="st-val"><strong>27,8%</strong> · R$ 168,9K / R$ 608,5K</span>
+        </div>
+        <div class="status-bar"><div class="bar-warn" style="width:27.75937228839631%"></div></div>
+      </div>
+    
+      <div class="status-row">
+        <div class="st-top">
+          <span class="st-name" onclick="navigate('SERVPUB')">Serviços Públicos</span>
+          <span class="st-val"><strong>25,2%</strong> · R$ 2,88M / R$ 11,43M</span>
+        </div>
+        <div class="status-bar"><div class="bar-warn" style="width:25.1960617831126%"></div></div>
+      </div>
+    </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-head">
+            <h3>Resumo por Plano Interno</h3>
+            <div class="sub">Visão consolidada · Clique na linha para detalhamento</div>
+          </div>
+          <div style="overflow-x:auto">
+            <table class="data" id="overviewTable">
+              <thead>
+                <tr>
+                  <th>Plano Interno</th>
+                  <th>Código</th>
+                  <th class="num">Plano de Ação</th>
+                  <th class="num">Descentralizado</th>
+                  <th class="num">Falta Descentralizar</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody id="overviewBody"><tr style="cursor:pointer" onclick="navigate('VIDA')">
+      <td><strong>Vida Vegetativa</strong></td>
+      <td class="code">SF063100100</td>
+      <td class="num">R$ 608.496,00</td>
+      <td class="num" style="color:#1f9276;font-weight:600">R$ 168.914,67</td>
+      <td class="num" style="color:#b53d27;font-weight:600">R$ 439.581,33</td>
+      <td><span class="pill warn">PARCIAL · 27,8%</span></td>
+    </tr><tr style="cursor:pointer" onclick="navigate('IMOVEIS')">
+      <td><strong>Manut/Cons Imóveis</strong></td>
+      <td class="code">SF063100109</td>
+      <td class="num">R$ 349.712,00</td>
+      <td class="num" style="color:#1f9276;font-weight:600">R$ 97.142,22</td>
+      <td class="num" style="color:#b53d27;font-weight:600">R$ 252.569,78</td>
+      <td><span class="pill warn">PARCIAL · 27,8%</span></td>
+    </tr><tr style="cursor:pointer" onclick="navigate('CONTRATOS')">
+      <td><strong>Contratos Continuados</strong></td>
+      <td class="code">SF063100600</td>
+      <td class="num">R$ 1.525.854,00</td>
+      <td class="num" style="color:#1f9276;font-weight:600">R$ 890.081,50</td>
+      <td class="num" style="color:#b53d27;font-weight:600">R$ 635.772,50</td>
+      <td><span class="pill good">EM EXECUÇÃO · 58,3%</span></td>
+    </tr><tr style="cursor:pointer" onclick="navigate('SERVPUB')">
+      <td><strong>Serviços Públicos</strong></td>
+      <td class="code">SF063100200</td>
+      <td class="num">R$ 11.433.804,00</td>
+      <td class="num" style="color:#1f9276;font-weight:600">R$ 2.880.868,32</td>
+      <td class="num" style="color:#b53d27;font-weight:600">R$ 8.552.935,68</td>
+      <td><span class="pill warn">PARCIAL · 25,2%</span></td>
+    </tr><tr style="cursor:pointer" onclick="navigate('SISHT')">
+      <td><strong>SISHT</strong></td>
+      <td class="code">SF066700104</td>
+      <td class="num">R$ 360.235,11</td>
+      <td class="num" style="color:#1f9276;font-weight:600">R$ 143.078,47</td>
+      <td class="num" style="color:#b53d27;font-weight:600">R$ 217.156,64</td>
+      <td><span class="pill warn">PARCIAL · 39,7%</span></td>
+    </tr></tbody>
+            </table>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- ============ PÁGINAS POR PI (geradas dinamicamente) ============ -->
+      <div id="piPages">
+  <div class="page" id="page-VIDA">
+
+    <div class="pi-header teal">
+      <div class="pi-code">SF063100100</div>
+      <h2>VIDA VEGETATIVA - SEFA</h2>
+      <div class="pi-meta">
+        <span><strong>Ano:</strong> 2026</span>
+        <span><strong>UG Destino:</strong> GAP-GL</span>
+        <span><strong>Ações Orçamentárias:</strong> 1</span>
+        <span><strong>Natureza Despesa:</strong> 3.3.90.39</span>
+      </div>
+    </div>
+
+    <div class="kpis">
+      <div class="kpi teal">
+        <div class="label">Plano de Ação</div>
+        <div class="value">R$ 608.496,00</div>
+        <div class="hint">Valor total alocado</div>
+      </div>
+      <div class="kpi teal">
+        <div class="label">Descentralizado</div>
+        <div class="value">R$ 168.914,67</div>
+        <div class="hint"><strong>27,8%</strong> executado</div>
+      </div>
+      <div class="kpi red">
+        <div class="label">Falta Descentralizar</div>
+        <div class="value">R$ 439.581,33</div>
+        <div class="hint"><strong>72,2%</strong> pendente</div>
+      </div>
+      <div class="kpi dark">
+        <div class="label">Saldo Guardado (NE214)</div>
+        <div class="value">R$ 83.757,87</div>
+        <div class="hint">Reservado</div>
+      </div>
+    </div>
+
+    <div class="row row-2">
+      <div class="card">
+        <div class="card-head">
+          <h3>Composição do Plano</h3>
+          <div class="sub">Descentralizado vs. Falta descentralizar</div>
+        </div>
+        <div class="card-body">
+          <div class="chart-wrap"><canvas id="chartPI-VIDA" height="350" style="display: block; box-sizing: border-box; height: 280px; width: 662px;" width="828"></canvas></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-head">
+          <h3>Classificação Orçamentária</h3>
+          <div class="sub">Dados de referência do PI</div>
+        </div>
+        <div class="info-grid">
+          <div class="info-item">
+            <div class="ik">Plano Interno</div>
+            <div class="iv mono">SF063100100</div>
+          </div>
+          <div class="info-item">
+            <div class="ik">Fonte de Recurso</div>
+            <div class="iv mono">1.050.000140</div>
+          </div>
+          <div class="info-item">
+            <div class="ik">Natureza de Despesa</div>
+            <div class="iv mono">3.3.90.39</div>
+          </div>
+          <div class="info-item">
+            <div class="ik">Resultado Primário</div>
+            <div class="iv">2</div>
+          </div>
+          <div class="info-item">
+            <div class="ik">Função / Sub-Função</div>
+            <div class="iv">05 - Defesa Nacional<br><span style="color:var(--muted);font-size:11px">122 - Administração Geral</span></div>
+          </div>
+          <div class="info-item">
+            <div class="ik">Programa Orçamentário</div>
+            <div class="iv">0032<br><span style="color:var(--muted);font-size:11px">Programa de Gestão e Manutenção do Poder Executivo</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-head">
+        <h3>Ações Orçamentárias do PI</h3>
+        <div class="sub">1 ação registrada</div>
+      </div>
+      <div style="overflow-x:auto">
+        <table class="data">
+          <thead>
+            <tr>
+              <th>ODS</th>
+              <th>Ação</th>
+              <th>Descrição da Ação</th>
+              <th>Fonte</th>
+              <th>ND</th>
+              <th class="num">Valor PA</th>
+            </tr>
+          </thead>
+          <tbody>
+    <tr>
+      <td><strong>EMAER</strong></td>
+      <td class="code">2000</td>
+      <td>Administração da Unidade</td>
+      <td><span class="pill info">1.050.000140</span></td>
+      <td class="code">3.3.90.39</td>
+      <td class="num"><strong>R$ 608.496,00</strong></td>
+    </tr></tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+  <div class="page active" id="page-IMOVEIS">
+
+    <div class="pi-header blue">
+      <div class="pi-code">SF063100109</div>
+      <h2>MANUT/CONS BENS IMOVEIS - SEFA</h2>
+      <div class="pi-meta">
+        <span><strong>Ano:</strong> 2026</span>
+        <span><strong>UG Destino:</strong> GAP-GL</span>
+        <span><strong>Ações Orçamentárias:</strong> 1</span>
+        <span><strong>Natureza Despesa:</strong> 3.3.90.39</span>
+      </div>
+    </div>
+
+    <div class="kpis">
+      <div class="kpi blue">
+        <div class="label">Plano de Ação</div>
+        <div class="value">R$ 349.712,00</div>
+        <div class="hint">Valor total alocado</div>
+      </div>
+      <div class="kpi teal">
+        <div class="label">Descentralizado</div>
+        <div class="value">R$ 97.142,22</div>
+        <div class="hint"><strong>27,8%</strong> executado</div>
+      </div>
+      <div class="kpi red">
+        <div class="label">Falta Descentralizar</div>
+        <div class="value">R$ 252.569,78</div>
+        <div class="hint"><strong>72,2%</strong> pendente</div>
+      </div>
+      <div class="kpi dark">
+        <div class="label">Saldo Guardado (NE214)</div>
+        <div class="value">R$ 0,00</div>
+        <div class="hint">Sem saldo guardado</div>
+      </div>
+    </div>
+
+    <div class="row row-2">
+      <div class="card">
+        <div class="card-head">
+          <h3>Composição do Plano</h3>
+          <div class="sub">Descentralizado vs. Falta descentralizar</div>
+        </div>
+        <div class="card-body">
+          <div class="chart-wrap"><canvas id="chartPI-IMOVEIS" height="350" style="display: block; box-sizing: border-box; height: 280px; width: 662px;" width="828"></canvas></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-head">
+          <h3>Classificação Orçamentária</h3>
+          <div class="sub">Dados de referência do PI</div>
+        </div>
+        <div class="info-grid">
+          <div class="info-item">
+            <div class="ik">Plano Interno</div>
+            <div class="iv mono">SF063100109</div>
+          </div>
+          <div class="info-item">
+            <div class="ik">Fonte de Recurso</div>
+            <div class="iv mono">1.050.000140</div>
+          </div>
+          <div class="info-item">
+            <div class="ik">Natureza de Despesa</div>
+            <div class="iv mono">3.3.90.39</div>
+          </div>
+          <div class="info-item">
+            <div class="ik">Resultado Primário</div>
+            <div class="iv">2</div>
+          </div>
+          <div class="info-item">
+            <div class="ik">Função / Sub-Função</div>
+            <div class="iv">05 - Defesa Nacional<br><span style="color:var(--muted);font-size:11px">122 - Administração Geral</span></div>
+          </div>
+          <div class="info-item">
+            <div class="ik">Programa Orçamentário</div>
+            <div class="iv">0032<br><span style="color:var(--muted);font-size:11px">Programa de Gestão e Manutenção do Poder Executivo</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-head">
+        <h3>Ações Orçamentárias do PI</h3>
+        <div class="sub">1 ação registrada</div>
+      </div>
+      <div style="overflow-x:auto">
+        <table class="data">
+          <thead>
+            <tr>
+              <th>ODS</th>
+              <th>Ação</th>
+              <th>Descrição da Ação</th>
+              <th>Fonte</th>
+              <th>ND</th>
+              <th class="num">Valor PA</th>
+            </tr>
+          </thead>
+          <tbody>
+    <tr>
+      <td><strong>EMAER</strong></td>
+      <td class="code">2000</td>
+      <td>Administração da Unidade</td>
+      <td><span class="pill info">1.050.000140</span></td>
+      <td class="code">3.3.90.39</td>
+      <td class="num"><strong>R$ 349.712,00</strong></td>
+    </tr></tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+  <div class="page" id="page-CONTRATOS">
+
+    <div class="pi-header orange">
+      <div class="pi-code">SF063100600</div>
+      <h2>CONTRATOS CONTINUADOS - SEFA</h2>
+      <div class="pi-meta">
+        <span><strong>Ano:</strong> 2026</span>
+        <span><strong>UG Destino:</strong> GAP-GL</span>
+        <span><strong>Ações Orçamentárias:</strong> 1</span>
+        <span><strong>Natureza Despesa:</strong> 3.3.90.39</span>
+      </div>
+    </div>
+
+    <div class="kpis">
+      <div class="kpi orange">
+        <div class="label">Plano de Ação</div>
+        <div class="value">R$ 1.525.854,00</div>
+        <div class="hint">Valor total alocado</div>
+      </div>
+      <div class="kpi teal">
+        <div class="label">Descentralizado</div>
+        <div class="value">R$ 890.081,50</div>
+        <div class="hint"><strong>58,3%</strong> executado</div>
+      </div>
+      <div class="kpi red">
+        <div class="label">Falta Descentralizar</div>
+        <div class="value">R$ 635.772,50</div>
+        <div class="hint"><strong>41,7%</strong> pendente</div>
+      </div>
+      <div class="kpi dark">
+        <div class="label">Saldo Guardado (NE214)</div>
+        <div class="value">R$ 0,00</div>
+        <div class="hint">Sem saldo guardado</div>
+      </div>
+    </div>
+
+    <div class="row row-2">
+      <div class="card">
+        <div class="card-head">
+          <h3>Composição do Plano</h3>
+          <div class="sub">Descentralizado vs. Falta descentralizar</div>
+        </div>
+        <div class="card-body">
+          <div class="chart-wrap"><canvas id="chartPI-CONTRATOS" height="0" style="display: block; box-sizing: border-box; height: 0px; width: 0px;" width="0"></canvas></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-head">
+          <h3>Classificação Orçamentária</h3>
+          <div class="sub">Dados de referência do PI</div>
+        </div>
+        <div class="info-grid">
+          <div class="info-item">
+            <div class="ik">Plano Interno</div>
+            <div class="iv mono">SF063100600</div>
+          </div>
+          <div class="info-item">
+            <div class="ik">Fonte de Recurso</div>
+            <div class="iv mono">1.050.000140</div>
+          </div>
+          <div class="info-item">
+            <div class="ik">Natureza de Despesa</div>
+            <div class="iv mono">3.3.90.39</div>
+          </div>
+          <div class="info-item">
+            <div class="ik">Resultado Primário</div>
+            <div class="iv">2</div>
+          </div>
+          <div class="info-item">
+            <div class="ik">Função / Sub-Função</div>
+            <div class="iv">05 - Defesa Nacional<br><span style="color:var(--muted);font-size:11px">122 - Administração Geral</span></div>
+          </div>
+          <div class="info-item">
+            <div class="ik">Programa Orçamentário</div>
+            <div class="iv">0032<br><span style="color:var(--muted);font-size:11px">Programa de Gestão e Manutenção do Poder Executivo</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-head">
+        <h3>Ações Orçamentárias do PI</h3>
+        <div class="sub">1 ação registrada</div>
+      </div>
+      <div style="overflow-x:auto">
+        <table class="data">
+          <thead>
+            <tr>
+              <th>ODS</th>
+              <th>Ação</th>
+              <th>Descrição da Ação</th>
+              <th>Fonte</th>
+              <th>ND</th>
+              <th class="num">Valor PA</th>
+            </tr>
+          </thead>
+          <tbody>
+    <tr>
+      <td><strong>EMAER</strong></td>
+      <td class="code">2000</td>
+      <td>Administração da Unidade</td>
+      <td><span class="pill info">1.050.000140</span></td>
+      <td class="code">3.3.90.39</td>
+      <td class="num"><strong>R$ 1.525.854,00</strong></td>
+    </tr></tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+  <div class="page" id="page-SERVPUB">
+
+    <div class="pi-header red">
+      <div class="pi-code">SF063100200</div>
+      <h2>SERVICOS PUBLICOS - SEFA</h2>
+      <div class="pi-meta">
+        <span><strong>Ano:</strong> 2026</span>
+        <span><strong>UG Destino:</strong> GAP-GL</span>
+        <span><strong>Ações Orçamentárias:</strong> 3</span>
+        <span><strong>Natureza Despesa:</strong> 3.3.90.39</span>
+      </div>
+    </div>
+
+    <div class="kpis">
+      <div class="kpi red">
+        <div class="label">Plano de Ação</div>
+        <div class="value">R$ 11.433.804,00</div>
+        <div class="hint">Valor total alocado</div>
+      </div>
+      <div class="kpi teal">
+        <div class="label">Descentralizado</div>
+        <div class="value">R$ 2.880.868,32</div>
+        <div class="hint"><strong>25,2%</strong> executado</div>
+      </div>
+      <div class="kpi red">
+        <div class="label">Falta Descentralizar</div>
+        <div class="value">R$ 8.552.935,68</div>
+        <div class="hint"><strong>74,8%</strong> pendente</div>
+      </div>
+      <div class="kpi dark">
+        <div class="label">Saldo Guardado (NE214)</div>
+        <div class="value">R$ 0,00</div>
+        <div class="hint">Sem saldo guardado</div>
+      </div>
+    </div>
+
+    <div class="row row-2">
+      <div class="card">
+        <div class="card-head">
+          <h3>Composição do Plano</h3>
+          <div class="sub">Descentralizado vs. Falta descentralizar</div>
+        </div>
+        <div class="card-body">
+          <div class="chart-wrap"><canvas id="chartPI-SERVPUB" height="0" style="display: block; box-sizing: border-box; height: 0px; width: 0px;" width="0"></canvas></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-head">
+          <h3>Classificação Orçamentária</h3>
+          <div class="sub">Dados de referência do PI</div>
+        </div>
+        <div class="info-grid">
+          <div class="info-item">
+            <div class="ik">Plano Interno</div>
+            <div class="iv mono">SF063100200</div>
+          </div>
+          <div class="info-item">
+            <div class="ik">Fonte de Recurso</div>
+            <div class="iv mono">1.052.000140</div>
+          </div>
+          <div class="info-item">
+            <div class="ik">Natureza de Despesa</div>
+            <div class="iv mono">3.3.90.39</div>
+          </div>
+          <div class="info-item">
+            <div class="ik">Resultado Primário</div>
+            <div class="iv">1</div>
+          </div>
+          <div class="info-item">
+            <div class="ik">Função / Sub-Função</div>
+            <div class="iv">05 - Defesa Nacional<br><span style="color:var(--muted);font-size:11px">151 - Defesa Aérea</span></div>
+          </div>
+          <div class="info-item">
+            <div class="ik">Programa Orçamentário</div>
+            <div class="iv">6112<br><span style="color:var(--muted);font-size:11px">Defesa Nacional</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-head">
+        <h3>Ações Orçamentárias do PI</h3>
+        <div class="sub">3 ações registradas</div>
+      </div>
+      <div style="overflow-x:auto">
+        <table class="data">
+          <thead>
+            <tr>
+              <th>ODS</th>
+              <th>Ação</th>
+              <th>Descrição da Ação</th>
+              <th>Fonte</th>
+              <th>ND</th>
+              <th class="num">Valor PA</th>
+            </tr>
+          </thead>
+          <tbody>
+    <tr>
+      <td><strong>DECEA</strong></td>
+      <td class="code">20XV</td>
+      <td>Operação do Sistema de Controle do Espaço Aéreo Brasileiro - SISCEAB</td>
+      <td><span class="pill info">1.052.000140</span></td>
+      <td class="code">3.3.90.39</td>
+      <td class="num"><strong>R$ 2.500.000,00</strong></td>
+    </tr>
+    <tr>
+      <td><strong>EMAER</strong></td>
+      <td class="code">2000</td>
+      <td>Administração da Unidade</td>
+      <td><span class="pill info">1.050.000140</span></td>
+      <td class="code">3.3.90.39</td>
+      <td class="num"><strong>R$ 6.140.000,00</strong></td>
+    </tr>
+    <tr>
+      <td><strong>SEFA</strong></td>
+      <td class="code">212B</td>
+      <td>Benefícios Obrigatórios aos Servidores Civis, Empregados, Militares e seus Dependentes</td>
+      <td><span class="pill info">1.000.000000</span></td>
+      <td class="code">3.3.90.39</td>
+      <td class="num"><strong>R$ 2.793.804,00</strong></td>
+    </tr></tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+  <div class="page" id="page-SISHT">
+
+    <div class="pi-header purple">
+      <div class="pi-code">SF066700104</div>
+      <h2>SISHT - SEFA</h2>
+      <div class="pi-meta">
+        <span><strong>Ano:</strong> 2026</span>
+        <span><strong>UG Destino:</strong> GAP-GL</span>
+        <span><strong>Ações Orçamentárias:</strong> 1</span>
+        <span><strong>Natureza Despesa:</strong> 3.3.90.39</span>
+      </div>
+    </div>
+
+    <div class="kpis">
+      <div class="kpi teal">
+        <div class="label">Plano de Ação</div>
+        <div class="value">R$ 360.235,11</div>
+        <div class="hint">Valor total alocado</div>
+      </div>
+      <div class="kpi teal">
+        <div class="label">Descentralizado</div>
+        <div class="value">R$ 143.078,47</div>
+        <div class="hint"><strong>39,7%</strong> executado</div>
+      </div>
+      <div class="kpi red">
+        <div class="label">Falta Descentralizar</div>
+        <div class="value">R$ 217.156,64</div>
+        <div class="hint"><strong>60,3%</strong> pendente</div>
+      </div>
+      <div class="kpi dark">
+        <div class="label">Saldo Guardado (NE214)</div>
+        <div class="value">R$ 0,00</div>
+        <div class="hint">Sem saldo guardado</div>
+      </div>
+    </div>
+
+    <div class="row row-2">
+      <div class="card">
+        <div class="card-head">
+          <h3>Composição do Plano</h3>
+          <div class="sub">Descentralizado vs. Falta descentralizar</div>
+        </div>
+        <div class="card-body">
+          <div class="chart-wrap"><canvas id="chartPI-SISHT" height="0" style="display: block; box-sizing: border-box; height: 0px; width: 0px;" width="0"></canvas></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-head">
+          <h3>Classificação Orçamentária</h3>
+          <div class="sub">Dados de referência do PI</div>
+        </div>
+        <div class="info-grid">
+          <div class="info-item">
+            <div class="ik">Plano Interno</div>
+            <div class="iv mono">SF066700104</div>
+          </div>
+          <div class="info-item">
+            <div class="ik">Fonte de Recurso</div>
+            <div class="iv mono">1.050.000140</div>
+          </div>
+          <div class="info-item">
+            <div class="ik">Natureza de Despesa</div>
+            <div class="iv mono">3.3.90.39</div>
+          </div>
+          <div class="info-item">
+            <div class="ik">Resultado Primário</div>
+            <div class="iv">2</div>
+          </div>
+          <div class="info-item">
+            <div class="ik">Função / Sub-Função</div>
+            <div class="iv">05 - Defesa Nacional<br><span style="color:var(--muted);font-size:11px">122 - Administração Geral</span></div>
+          </div>
+          <div class="info-item">
+            <div class="ik">Programa Orçamentário</div>
+            <div class="iv">0032<br><span style="color:var(--muted);font-size:11px">Programa de Gestão e Manutenção do Poder Executivo</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-head">
+        <h3>Ações Orçamentárias do PI</h3>
+        <div class="sub">1 ação registrada</div>
+      </div>
+      <div style="overflow-x:auto">
+        <table class="data">
+          <thead>
+            <tr>
+              <th>ODS</th>
+              <th>Ação</th>
+              <th>Descrição da Ação</th>
+              <th>Fonte</th>
+              <th>ND</th>
+              <th class="num">Valor PA</th>
+            </tr>
+          </thead>
+          <tbody>
+    <tr>
+      <td><strong>EMAER</strong></td>
+      <td class="code">2000</td>
+      <td>Administração da Unidade</td>
+      <td><span class="pill info">1.050.000140</span></td>
+      <td class="code">3.3.90.39</td>
+      <td class="num"><strong>R$ 360.235,11</strong></td>
+    </tr></tbody>
+        </table>
+      </div>
+    </div>
+
+  </div></div>
+
+    </div>
+  </main>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* =========================================================
+   DADOS — Plano de Ação 2026 (GAP-GL)
+   Fonte: Relatorio_Plano_de_Ação_-_2026.xlsx
+   ========================================================= */
+
+// PIs (Planos Internos) com situação consolidada
+const PIs = [
+  {
+    id:"VIDA",
+    codigo:"SF063100100",
+    nome:"VIDA VEGETATIVA - SEFA",
+    nomeCurto:"Vida Vegetativa",
+    cor:"teal",
+    planoAcao:608496,
+    decentralizado:168914.67,
+    faltaDecentralizar:439581.33,
+    saldoGuardado:83757.87,
+    acoes:[
+      {ods:"EMAER",odsDesc:"Estado-Maior da Aeronáutica",
+       acao:"2000",acaoDesc:"Administração da Unidade",
+       po:"0002",poDesc:"Manutenção Geral",
+       fonte:"1.050.000140",fonteDesc:"Recursos Próprios Livres da UO",
+       nd:"3.3.90.39",resultado:"2",
+       funcao:"05",funcaoDesc:"Defesa Nacional",
+       subFuncao:"122",subFuncaoDesc:"Administração Geral",
+       programa:"0032",programaDesc:"Programa de Gestão e Manutenção do Poder Executivo",
+       valor:608496}
+    ]
+  },
+  {
+    id:"IMOVEIS",
+    codigo:"SF063100109",
+    nome:"MANUT/CONS BENS IMOVEIS - SEFA",
+    nomeCurto:"Manut/Cons Imóveis",
+    cor:"blue",
+    planoAcao:349712,
+    decentralizado:97142.22,
+    faltaDecentralizar:252569.78,
+    saldoGuardado:0,
+    acoes:[
+      {ods:"EMAER",odsDesc:"Estado-Maior da Aeronáutica",
+       acao:"2000",acaoDesc:"Administração da Unidade",
+       po:"0002",poDesc:"Manutenção Geral",
+       fonte:"1.050.000140",fonteDesc:"Recursos Próprios Livres da UO",
+       nd:"3.3.90.39",resultado:"2",
+       funcao:"05",funcaoDesc:"Defesa Nacional",
+       subFuncao:"122",subFuncaoDesc:"Administração Geral",
+       programa:"0032",programaDesc:"Programa de Gestão e Manutenção do Poder Executivo",
+       valor:349712}
+    ]
+  },
+  {
+    id:"CONTRATOS",
+    codigo:"SF063100600",
+    nome:"CONTRATOS CONTINUADOS - SEFA",
+    nomeCurto:"Contratos Continuados",
+    cor:"orange",
+    planoAcao:1525854,
+    decentralizado:890081.50,
+    faltaDecentralizar:635772.50,
+    saldoGuardado:0,
+    acoes:[
+      {ods:"EMAER",odsDesc:"Estado-Maior da Aeronáutica",
+       acao:"2000",acaoDesc:"Administração da Unidade",
+       po:"0002",poDesc:"Manutenção Geral",
+       fonte:"1.050.000140",fonteDesc:"Recursos Próprios Livres da UO",
+       nd:"3.3.90.39",resultado:"2",
+       funcao:"05",funcaoDesc:"Defesa Nacional",
+       subFuncao:"122",subFuncaoDesc:"Administração Geral",
+       programa:"0032",programaDesc:"Programa de Gestão e Manutenção do Poder Executivo",
+       valor:1525854}
+    ]
+  },
+  {
+    id:"SERVPUB",
+    codigo:"SF063100200",
+    nome:"SERVICOS PUBLICOS - SEFA",
+    nomeCurto:"Serviços Públicos",
+    cor:"red",
+    planoAcao:11433804,
+    decentralizado:2880868.32,
+    faltaDecentralizar:8552935.68,
+    saldoGuardado:0,
+    acoes:[
+      {ods:"DECEA",odsDesc:"Departamento de Controle do Espaço Aéreo",
+       acao:"20XV",acaoDesc:"Operação do Sistema de Controle do Espaço Aéreo Brasileiro - SISCEAB",
+       po:"0002",poDesc:"Operação e Manutenção de Equipamentos e Sistemas do Controle do Espaço Aéreo Brasileiro",
+       fonte:"1.052.000140",fonteDesc:"Recursos Livres da UO - Fundo Aeronáutico",
+       nd:"3.3.90.39",resultado:"1",
+       funcao:"05",funcaoDesc:"Defesa Nacional",
+       subFuncao:"151",subFuncaoDesc:"Defesa Aérea",
+       programa:"6112",programaDesc:"Defesa Nacional",
+       valor:2500000,
+       piCodigo:"SF0631RC200",piNome:"REC CUSTOS - SERVICOS PUBLICOS"},
+      {ods:"EMAER",odsDesc:"Estado-Maior da Aeronáutica",
+       acao:"2000",acaoDesc:"Administração da Unidade",
+       po:"0002",poDesc:"Manutenção Geral",
+       fonte:"1.050.000140",fonteDesc:"Recursos Próprios Livres da UO",
+       nd:"3.3.90.39",resultado:"2",
+       funcao:"05",funcaoDesc:"Defesa Nacional",
+       subFuncao:"122",subFuncaoDesc:"Administração Geral",
+       programa:"0032",programaDesc:"Programa de Gestão e Manutenção do Poder Executivo",
+       valor:6140000},
+      {ods:"SEFA",odsDesc:"Secretaria de Economia, Finanças e Adm. da Aeronáutica",
+       acao:"212B",acaoDesc:"Benefícios Obrigatórios aos Servidores Civis, Empregados, Militares e seus Dependentes",
+       po:"0006",poDesc:"Alimentação de Militares Ativos em Rancho",
+       fonte:"1.000.000000",fonteDesc:"Recursos Livres da União",
+       nd:"3.3.90.39",resultado:"1",
+       funcao:"05",funcaoDesc:"Defesa Nacional",
+       subFuncao:"331",subFuncaoDesc:"Proteção e Benefícios ao Trabalhador",
+       programa:"0032",programaDesc:"Programa de Gestão e Manutenção do Poder Executivo",
+       valor:2793804}
+    ]
+  },
+  {
+    id:"SISHT",
+    codigo:"SF066700104",
+    nome:"SISHT - SEFA",
+    nomeCurto:"SISHT",
+    cor:"purple",
+    planoAcao:360235.11,
+    decentralizado:143078.47,
+    faltaDecentralizar:217156.64,
+    saldoGuardado:0,
+    acoes:[
+      {ods:"EMAER",odsDesc:"Estado-Maior da Aeronáutica",
+       acao:"2000",acaoDesc:"Administração da Unidade",
+       po:"0002",poDesc:"Manutenção Geral",
+       fonte:"1.050.000140",fonteDesc:"Recursos Próprios Livres da UO",
+       nd:"3.3.90.39",resultado:"2",
+       funcao:"05",funcaoDesc:"Defesa Nacional",
+       subFuncao:"122",subFuncaoDesc:"Administração Geral",
+       programa:"0032",programaDesc:"Programa de Gestão e Manutenção do Poder Executivo",
+       valor:360235.11}
+    ]
+  }
+];
+
+const COR_HEX = {teal:"#37bc9b",blue:"#4a89dc",orange:"#f6bb42",red:"#e9573f",purple:"#967adc"};
+
+/* =========================================================
+   UTIL
+   ========================================================= */
+const fmtBRL = v => "R$ " + Number(v||0).toLocaleString("pt-BR",{minimumFractionDigits:2,maximumFractionDigits:2});
+const fmtBRLshort = v => {
+  v = Number(v||0);
+  if(Math.abs(v)>=1e6) return "R$ " + (v/1e6).toLocaleString("pt-BR",{minimumFractionDigits:1,maximumFractionDigits:2}) + "M";
+  if(Math.abs(v)>=1e3) return "R$ " + (v/1e3).toLocaleString("pt-BR",{minimumFractionDigits:1,maximumFractionDigits:1}) + "K";
+  return "R$ " + v.toLocaleString("pt-BR",{maximumFractionDigits:0});
+};
+const fmtPct = (v,d=1) => Number(v||0).toLocaleString("pt-BR",{minimumFractionDigits:d,maximumFractionDigits:d}) + "%";
+
+const TOTAIS = (() => {
+  const totalPA = PIs.reduce((s,p)=>s+p.planoAcao,0);
+  const totalDec = PIs.reduce((s,p)=>s+p.decentralizado,0);
+  const totalFalta = PIs.reduce((s,p)=>s+p.faltaDecentralizar,0);
+  const totalNE214 = PIs.reduce((s,p)=>s+p.saldoGuardado,0);
+  return {totalPA,totalDec,totalFalta,totalNE214};
+})();
+
+/* =========================================================
+   SIDEBAR — geração dinâmica
+   ========================================================= */
+function buildSidebar(){
+  const nav = document.getElementById("navList");
+  PIs.forEach(p=>{
+    const pct = (p.decentralizado/p.planoAcao*100).toFixed(0);
+    const li = document.createElement("li");
+    li.innerHTML = `<a data-page="${p.id}">${p.nomeCurto}<span class="pct">${pct}%</span></a>`;
+    nav.appendChild(li);
+  });
+}
+
+/* =========================================================
+   VISÃO GERAL
+   ========================================================= */
+function renderHomeKPIs(){
+  document.getElementById("kpi-total").textContent      = fmtBRLshort(TOTAIS.totalPA);
+  document.getElementById("kpi-decent").textContent     = fmtBRLshort(TOTAIS.totalDec);
+  document.getElementById("kpi-falta").textContent      = fmtBRLshort(TOTAIS.totalFalta);
+  document.getElementById("kpi-ne214").textContent      = fmtBRLshort(TOTAIS.totalNE214);
+  document.getElementById("kpi-decent-pct").textContent = fmtPct(TOTAIS.totalDec/TOTAIS.totalPA*100,1);
+  document.getElementById("kpi-falta-pct").textContent  = fmtPct(TOTAIS.totalFalta/TOTAIS.totalPA*100,1);
+  document.getElementById("kpi-pi-count").textContent   = PIs.length;
+}
+
+function renderHomeStatus(){
+  const wrap = document.getElementById("statusList");
+  wrap.innerHTML = "";
+  const sorted = [...PIs].sort((a,b)=>(b.decentralizado/b.planoAcao)-(a.decentralizado/a.planoAcao));
+  sorted.forEach(p=>{
+    const pct = p.decentralizado/p.planoAcao*100;
+    const cls = pct>=50 ? "bar-good" : pct>=25 ? "bar-warn" : "bar-bad";
+    wrap.insertAdjacentHTML("beforeend",`
+      <div class="status-row">
+        <div class="st-top">
+          <span class="st-name" onclick="navigate('${p.id}')">${p.nomeCurto}</span>
+          <span class="st-val"><strong>${fmtPct(pct,1)}</strong> · ${fmtBRLshort(p.decentralizado)} / ${fmtBRLshort(p.planoAcao)}</span>
+        </div>
+        <div class="status-bar"><div class="${cls}" style="width:${Math.min(pct,100)}%"></div></div>
+      </div>
+    `);
+  });
+}
+
+let chartHomeBars;
+function renderHomeChart(){
+  const labels = PIs.map(p=>p.nomeCurto);
+  const dec    = PIs.map(p=>p.decentralizado);
+  const falta  = PIs.map(p=>p.faltaDecentralizar);
+
+  if(chartHomeBars) chartHomeBars.destroy();
+  const ctx = document.getElementById("chartBars").getContext("2d");
+  chartHomeBars = new Chart(ctx,{
+    type:"bar",
+    data:{
+      labels,
+      datasets:[
+        {label:"Descentralizado", data:dec,   backgroundColor:"#37bc9b", borderRadius:3, barThickness:18},
+        {label:"Falta Descentralizar", data:falta, backgroundColor:"#e9573f", borderRadius:3, barThickness:18}
+      ]
+    },
+    options:{
+      responsive:true, maintainAspectRatio:false,
+      indexAxis:"y",
+      plugins:{
+        legend:{position:"top",align:"end",labels:{boxWidth:10,font:{size:11,family:"DM Sans"},color:"#43525c",padding:14}},
+        tooltip:{
+          backgroundColor:"#2a3542",titleColor:"#fff",bodyColor:"#cdd6df",
+          padding:10,cornerRadius:4,
+          callbacks:{label:c=>`${c.dataset.label}: ${fmtBRL(c.parsed.x)}`}
+        }
+      },
+      scales:{
+        x:{stacked:true, grid:{color:"#f0f2f5"}, ticks:{color:"#7a868f",font:{size:10,family:"DM Sans"},callback:v=>fmtBRLshort(v)}},
+        y:{stacked:true, grid:{display:false}, ticks:{color:"#43525c",font:{size:11,family:"DM Sans",weight:"500"}}}
+      },
+      onClick:(e,els)=>{
+        if(els.length>0){ navigate(PIs[els[0].index].id); }
+      }
+    }
+  });
+}
+
+function renderOverviewTable(){
+  const tbody = document.getElementById("overviewBody");
+  tbody.innerHTML = PIs.map(p=>{
+    const pct = p.decentralizado/p.planoAcao*100;
+    const cls = pct>=50 ? "good" : pct>=25 ? "warn" : "bad";
+    const txt = pct>=50 ? "EM EXECUÇÃO" : pct>=25 ? "PARCIAL" : "INICIAL";
+    return `<tr style="cursor:pointer" onclick="navigate('${p.id}')">
+      <td><strong>${p.nomeCurto}</strong></td>
+      <td class="code">${p.codigo}</td>
+      <td class="num">${fmtBRL(p.planoAcao)}</td>
+      <td class="num" style="color:#1f9276;font-weight:600">${fmtBRL(p.decentralizado)}</td>
+      <td class="num" style="color:#b53d27;font-weight:600">${fmtBRL(p.faltaDecentralizar)}</td>
+      <td><span class="pill ${cls}">${txt} · ${fmtPct(pct,1)}</span></td>
+    </tr>`;
+  }).join("");
+}
+
+/* =========================================================
+   PÁGINAS POR PI
+   ========================================================= */
+function buildPIPages(){
+  const wrap = document.getElementById("piPages");
+  wrap.innerHTML = PIs.map(p=>buildPIPageHTML(p)).join("");
+}
+
+function buildPIPageHTML(p){
+  const pct = p.decentralizado/p.planoAcao*100;
+  const pctFalta = p.faltaDecentralizar/p.planoAcao*100;
+
+  // Tabela de ações orçamentárias do PI
+  const acoesHTML = p.acoes.map(a=>{
+    const isSubPI = a.piCodigo && a.piCodigo !== p.codigo;
+    return `
+    <tr>
+      <td><strong>${a.ods}</strong></td>
+      <td class="code">${a.acao}</td>
+      <td>${a.acaoDesc}</td>
+      <td><span class="pill info">${a.fonte}</span></td>
+      <td class="code">${a.nd}</td>
+      <td class="num"><strong>${fmtBRL(a.valor)}</strong></td>
+    </tr>`;
+  }).join("");
+
+  // Detalhes consolidados (primeira ação como referência)
+  const a0 = p.acoes[0];
+
+  return `
+  <div class="page" id="page-${p.id}">
+
+    <div class="pi-header ${p.cor}">
+      <div class="pi-code">${p.codigo}</div>
+      <h2>${p.nome}</h2>
+      <div class="pi-meta">
+        <span><strong>Ano:</strong> 2026</span>
+        <span><strong>UG Destino:</strong> GAP-GL</span>
+        <span><strong>Ações Orçamentárias:</strong> ${p.acoes.length}</span>
+        <span><strong>Natureza Despesa:</strong> ${a0.nd}</span>
+      </div>
+    </div>
+
+    <div class="kpis">
+      <div class="kpi ${p.cor === 'red' ? 'red' : p.cor === 'orange' ? 'orange' : p.cor === 'blue' ? 'blue' : 'teal'}">
+        <div class="label">Plano de Ação</div>
+        <div class="value">${fmtBRL(p.planoAcao)}</div>
+        <div class="hint">Valor total alocado</div>
+      </div>
+      <div class="kpi teal">
+        <div class="label">Descentralizado</div>
+        <div class="value">${fmtBRL(p.decentralizado)}</div>
+        <div class="hint"><strong>${fmtPct(pct,1)}</strong> executado</div>
+      </div>
+      <div class="kpi red">
+        <div class="label">Falta Descentralizar</div>
+        <div class="value">${fmtBRL(p.faltaDecentralizar)}</div>
+        <div class="hint"><strong>${fmtPct(pctFalta,1)}</strong> pendente</div>
+      </div>
+      <div class="kpi dark">
+        <div class="label">Saldo Guardado (NE214)</div>
+        <div class="value">${fmtBRL(p.saldoGuardado)}</div>
+        <div class="hint">${p.saldoGuardado>0?"Reservado":"Sem saldo guardado"}</div>
+      </div>
+    </div>
+
+    <div class="row row-2">
+      <div class="card">
+        <div class="card-head">
+          <h3>Composição do Plano</h3>
+          <div class="sub">Descentralizado vs. Falta descentralizar</div>
+        </div>
+        <div class="card-body">
+          <div class="chart-wrap"><canvas id="chartPI-${p.id}"></canvas></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-head">
+          <h3>Classificação Orçamentária</h3>
+          <div class="sub">Dados de referência do PI</div>
+        </div>
+        <div class="info-grid">
+          <div class="info-item">
+            <div class="ik">Plano Interno</div>
+            <div class="iv mono">${p.codigo}</div>
+          </div>
+          <div class="info-item">
+            <div class="ik">Fonte de Recurso</div>
+            <div class="iv mono">${a0.fonte}</div>
+          </div>
+          <div class="info-item">
+            <div class="ik">Natureza de Despesa</div>
+            <div class="iv mono">${a0.nd}</div>
+          </div>
+          <div class="info-item">
+            <div class="ik">Resultado Primário</div>
+            <div class="iv">${a0.resultado}</div>
+          </div>
+          <div class="info-item">
+            <div class="ik">Função / Sub-Função</div>
+            <div class="iv">${a0.funcao} - ${a0.funcaoDesc}<br><span style="color:var(--muted);font-size:11px">${a0.subFuncao} - ${a0.subFuncaoDesc}</span></div>
+          </div>
+          <div class="info-item">
+            <div class="ik">Programa Orçamentário</div>
+            <div class="iv">${a0.programa}<br><span style="color:var(--muted);font-size:11px">${a0.programaDesc}</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-head">
+        <h3>Ações Orçamentárias do PI</h3>
+        <div class="sub">${p.acoes.length} ${p.acoes.length===1?"ação registrada":"ações registradas"}</div>
+      </div>
+      <div style="overflow-x:auto">
+        <table class="data">
+          <thead>
+            <tr>
+              <th>ODS</th>
+              <th>Ação</th>
+              <th>Descrição da Ação</th>
+              <th>Fonte</th>
+              <th>ND</th>
+              <th class="num">Valor PA</th>
+            </tr>
+          </thead>
+          <tbody>${acoesHTML}</tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>`;
+}
+
+function renderPICharts(){
+  PIs.forEach(p=>{
+    const canvas = document.getElementById(`chartPI-${p.id}`);
+    if(!canvas) return;
+    const ctx = canvas.getContext("2d");
+    new Chart(ctx,{
+      type:"doughnut",
+      data:{
+        labels:["Descentralizado","Falta Descentralizar"],
+        datasets:[{
+          data:[p.decentralizado, p.faltaDecentralizar],
+          backgroundColor:["#37bc9b","#e9573f"],
+          borderWidth:3, borderColor:"#fff"
+        }]
+      },
+      options:{
+        responsive:true, maintainAspectRatio:false,
+        cutout:"62%",
+        plugins:{
+          legend:{position:"bottom",labels:{boxWidth:10,font:{size:11,family:"DM Sans"},color:"#43525c",padding:14}},
+          tooltip:{
+            backgroundColor:"#2a3542",titleColor:"#fff",bodyColor:"#cdd6df",
+            padding:10,cornerRadius:4,
+            callbacks:{label:c=>`${c.label}: ${fmtBRL(c.parsed)} (${fmtPct(c.parsed/p.planoAcao*100,1)})`}
+          }
+        }
+      }
+    });
+  });
+}
+
+/* =========================================================
+   NAVEGAÇÃO
+   ========================================================= */
+function navigate(pageId){
+  // Atualiza páginas
+  document.querySelectorAll(".page").forEach(p=>p.classList.remove("active"));
+  const target = document.getElementById(`page-${pageId}`);
+  if(target) target.classList.add("active");
+
+  // Atualiza sidebar
+  document.querySelectorAll(".nav-list a").forEach(a=>a.classList.remove("active"));
+  const link = document.querySelector(`.nav-list a[data-page="${pageId}"]`);
+  if(link) link.classList.add("active");
+
+  // Atualiza título
+  if(pageId === "home"){
+    document.getElementById("pageTitle").textContent = "Plano de Ação 2026";
+    document.getElementById("pageSubtitle").textContent = "GAP-GL · Acompanhamento de descentralização orçamentária";
+  } else {
+    const p = PIs.find(x=>x.id===pageId);
+    if(p){
+      document.getElementById("pageTitle").textContent = p.nomeCurto;
+      document.getElementById("pageSubtitle").textContent = `${p.codigo} · ${p.nome}`;
+    }
+  }
+
+  window.scrollTo({top:0,behavior:"smooth"});
+}
+
+/* =========================================================
+   COPY HTML / EXPORT
+   ========================================================= */
+function showToast(msg,type="success"){
+  const t = document.getElementById("toast");
+  t.textContent = msg;
+  t.className = "toast show " + type;
+  clearTimeout(window._toastTimer);
+  window._toastTimer = setTimeout(()=>t.classList.remove("show"),2800);
+}
+
+function copyHTMLForGitHub(){
+  const fullHTML = "<!DOCTYPE html>\n" + document.documentElement.outerHTML;
+  if(navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(fullHTML)
+      .then(()=>showToast(`HTML copiado (${(fullHTML.length/1024).toFixed(1)} KB) — cole no GitHub`,"success"))
+      .catch(()=>fallbackCopy(fullHTML));
+  } else fallbackCopy(fullHTML);
+}
+function fallbackCopy(text){
+  const ta = document.createElement("textarea");
+  ta.value = text; ta.style.position="fixed"; ta.style.left="-9999px";
+  document.body.appendChild(ta); ta.select();
+  try{ document.execCommand("copy"); showToast(`HTML copiado (${(text.length/1024).toFixed(1)} KB)`,"success"); }
+  catch(e){ showToast("Não foi possível copiar — use Exportar","error"); }
+  document.body.removeChild(ta);
+}
+
+function exportData(){
+  const opt = prompt("Como deseja exportar?\n\n1 = HTML (.html)\n2 = Dados em CSV\n3 = Dados em JSON\n\nDigite 1, 2 ou 3:","1");
+  if(!opt) return;
+  if(opt==="1"){
+    download(new Blob(["<!DOCTYPE html>\n"+document.documentElement.outerHTML],{type:"text/html"}),"plano_acao_2026.html");
+    showToast("HTML exportado","success");
+  } else if(opt==="2"){
+    const headers = ["PI","Codigo","Plano de Acao","Descentralizado","Falta Descentralizar","Saldo NE214","% Executado"];
+    const lines = [headers.join(";")];
+    PIs.forEach(p=>{
+      const pct = (p.decentralizado/p.planoAcao*100).toFixed(2);
+      lines.push(['"'+p.nome+'"',p.codigo,p.planoAcao,p.decentralizado,p.faltaDecentralizar,p.saldoGuardado,pct].join(";"));
+    });
+    // Adiciona detalhes das ações
+    lines.push("");
+    lines.push("ACOES ORCAMENTARIAS");
+    lines.push(["PI","ODS","Acao","Descricao","Fonte","ND","Valor"].join(";"));
+    PIs.forEach(p=>{
+      p.acoes.forEach(a=>{
+        lines.push([p.codigo,a.ods,a.acao,'"'+a.acaoDesc.replace(/"/g,'""')+'"',a.fonte,a.nd,a.valor].join(";"));
+      });
+    });
+    download(new Blob(["\uFEFF"+lines.join("\r\n")],{type:"text/csv;charset=utf-8"}),"plano_acao_2026.csv");
+    showToast("CSV exportado","success");
+  } else if(opt==="3"){
+    download(new Blob([JSON.stringify({totais:TOTAIS,PIs},null,2)],{type:"application/json"}),"plano_acao_2026.json");
+    showToast("JSON exportado","success");
+  } else showToast("Opção inválida","error");
+}
+function download(blob,filename){
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href=url; a.download=filename;
+  document.body.appendChild(a); a.click();
+  document.body.removeChild(a);
+  setTimeout(()=>URL.revokeObjectURL(url),1000);
+}
+
+/* =========================================================
+   INIT
+   ========================================================= */
+document.addEventListener("DOMContentLoaded",()=>{
+  buildSidebar();
+  renderHomeKPIs();
+  renderHomeStatus();
+  renderHomeChart();
+  renderOverviewTable();
+  buildPIPages();
+  renderPICharts();
+
+  // Click handler universal para sidebar
+  document.querySelectorAll(".nav-list a").forEach(a=>{
+    a.addEventListener("click",e=>{
+      e.preventDefault();
+      navigate(a.dataset.page);
+    });
+  });
+});
+</script>
+
+
+</body></html>
