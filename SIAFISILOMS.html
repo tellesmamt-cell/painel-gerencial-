@@ -378,6 +378,81 @@
   .badge-up { background: #fdecea; color: #c0392b; }
   .badge-down { background: #e8f6f3; color: #16a085; }
   .badge-eq { background: #eaf0f4; color: #7b8a9a; }
+  .badge-crit {
+    background: #fff3cd; color: #856404;
+    border: 1px solid #ffe89a;
+    margin-left: 4px;
+  }
+
+  /* Padrão de tendência ▲▲▲ na tabela */
+  .trend-pattern {
+    font-family: 'Roboto', monospace;
+    font-size: 13px;
+    letter-spacing: 2px;
+    display: inline-block;
+    padding: 2px 6px;
+    border-radius: 3px;
+    background: #f5f8fa;
+    color: #95a5a6;
+    cursor: help;
+  }
+  .trend-pattern .up { color: #c0392b; font-weight: 700; }
+  .trend-pattern .flat { color: #bdc3c7; }
+  .trend-pattern.alert { background: #fff3cd; }
+  .pct-jan { font-family: 'Roboto', monospace; font-weight: 600; font-variant-numeric: tabular-nums; }
+  .pct-jan.danger { color: #c0392b; }
+  .pct-jan.warn { color: #e67e22; }
+  .pct-jan.safe { color: #16a085; }
+  .pct-jan.muted { color: #95a5a6; }
+
+  /* Info icon nos KPIs */
+  .kpi-info {
+    display: inline-block;
+    margin-left: 4px;
+    width: 14px; height: 14px;
+    line-height: 14px; text-align: center;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.25);
+    font-size: 10px;
+    cursor: help;
+    font-weight: 700;
+    vertical-align: middle;
+  }
+  .kpi-info:hover { background: rgba(255,255,255,0.45); }
+
+  /* Painel explicativo do critério crítico */
+  .crit-rule-box {
+    display: none;
+    position: fixed;
+    z-index: 5000;
+    background: #2c3e50;
+    color: #fff;
+    padding: 14px 16px;
+    border-radius: 6px;
+    font-size: 12px;
+    line-height: 1.55;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+    max-width: 340px;
+    border-left: 3px solid #f39c12;
+  }
+  .crit-rule-box.show { display: block; }
+  .crit-rule-box .title {
+    font-weight: 700; text-transform: uppercase;
+    letter-spacing: 0.5px; font-size: 11px;
+    color: #f39c12; margin-bottom: 8px;
+  }
+  .crit-rule-box ul { margin: 6px 0 6px 16px; padding: 0; }
+  .crit-rule-box li { margin-bottom: 4px; }
+  .crit-rule-box code {
+    background: rgba(255,255,255,0.1);
+    padding: 1px 5px; border-radius: 3px;
+    font-family: 'Roboto', monospace; font-size: 11px;
+  }
+  .crit-rule-box .foot {
+    margin-top: 8px; padding-top: 8px;
+    border-top: 1px solid rgba(255,255,255,0.15);
+    font-size: 11px; color: #bdc3c7;
+  }
 
   .table-controls {
     display: flex;
@@ -660,11 +735,14 @@
         </div>
       </div>
       <div class="col col-3">
-        <div class="kpi-card kpi-yellow">
-          <div class="kpi-label">Contas Críticas</div>
-          <div class="kpi-value" id="kpi-criticas">14</div>
+        <div class="kpi-card kpi-yellow" id="kpi-criticas-card" title="Critério: subiu em ≥2 dos 3 últimos meses E crescimento &gt; 10% vs Janeiro" style="cursor: help;">
+          <div class="kpi-label">
+            Contas Críticas
+            <span class="kpi-info" id="kpi-criticas-info">ⓘ</span>
+          </div>
+          <div class="kpi-value" id="kpi-criticas">9</div>
           <div class="ico-bg">⚠</div>
-          <div class="kpi-sub"><span>Diferença aumentou</span><b id="kpi-saneadas">19 saneadas</b></div>
+          <div class="kpi-sub"><span id="kpi-criticas-rule">Tendência ↑ + crescimento &gt; 10%</span><b id="kpi-saneadas">19 saneadas</b></div>
         </div>
       </div>
     </div>
@@ -743,9 +821,9 @@
               <div class="panel-sub">Clique nos cabeçalhos para ordenar — passe o mouse sobre as células mensais para comparar com o mês anterior e com Janeiro</div>
             </div>
             <div class="actions">
-              <button id="btn-all" class="active">Todas</button>
-              <button id="btn-up" class="">Aumentaram</button>
-              <button id="btn-down" class="">Reduziram</button>
+              <button id="btn-all" class="">Todas</button>
+              <button id="btn-up">Aumentaram</button>
+              <button id="btn-down" class="active">Reduziram</button>
               <button id="btn-crit" class="">Críticas</button>
             </div>
           </div>
@@ -755,6 +833,7 @@
               Status: <span class="badge badge-up">Aumentou</span>
               <span class="badge badge-down">Reduziu</span>
               <span class="badge badge-eq">Estável</span>
+              <span class="badge badge-crit" id="legendCrit" style="cursor:help;" title="Clique para ver o critério">⚠ Crítica</span>
             </div>
           </div>
           <div class="table-wrap">
@@ -768,17 +847,19 @@
                   <th data-sort="mar_dif" class="num">Dif. Mar <span class="sort-arrow">▲▼</span></th>
                   <th data-sort="abr_dif" class="num">Dif. Abr <span class="sort-arrow">▲▼</span></th>
                   <th data-sort="variacao" class="num">Δ Abr-Jan <span class="sort-arrow">▲▼</span></th>
+                  <th data-sort="aumentos3m" title="Aumentos consecutivos: ▲ = mês cresceu vs anterior (Jan→Fev, Fev→Mar, Mar→Abr)">Tendência <span class="sort-arrow">▲▼</span></th>
+                  <th data-sort="pct_jan" class="num">Δ% vs Jan <span class="sort-arrow">▲▼</span></th>
                   <th data-sort="status">Status <span class="sort-arrow">▲▼</span></th>
                 </tr>
               </thead>
-              <tbody id="tableBody"><tr><td><span class="conta-code">1.2.3.1.1.01.08</span></td><td>MÁQUINAS E EQUIPAMENTOS GRÁFICOS</td><td class="num has-tip pos" data-tip="%7B%22mes%22%3A%22Janeiro%22%2C%22valor%22%3A17727.42%2C%22prevLabel%22%3Anull%2C%22prevVal%22%3Anull%2C%22deltaPrev%22%3Anull%2C%22deltaPrevAbs%22%3Anull%2C%22deltaJan%22%3A0%2C%22deltaJanAbs%22%3A0%2C%22descricao%22%3A%22M%C3%81QUINAS%20E%20EQUIPAMENTOS%20GR%C3%81FICOS%22%2C%22conta%22%3A%221.2.3.1.1.01.08%22%2C%22isFirstMonth%22%3Atrue%7D">R$ 17.727,42</td><td class="num has-tip pos" data-tip="%7B%22mes%22%3A%22Fevereiro%22%2C%22valor%22%3A17852.149999999994%2C%22prevLabel%22%3A%22Janeiro%22%2C%22prevVal%22%3A17727.42%2C%22deltaPrev%22%3A124.72999999999593%2C%22deltaPrevAbs%22%3A124.72999999999593%2C%22deltaJan%22%3A124.72999999999593%2C%22deltaJanAbs%22%3A124.72999999999593%2C%22descricao%22%3A%22M%C3%81QUINAS%20E%20EQUIPAMENTOS%20GR%C3%81FICOS%22%2C%22conta%22%3A%221.2.3.1.1.01.08%22%2C%22isFirstMonth%22%3Afalse%7D">R$ 17.852,15</td><td class="num has-tip pos" data-tip="%7B%22mes%22%3A%22Mar%C3%A7o%22%2C%22valor%22%3A17727.42%2C%22prevLabel%22%3A%22Fevereiro%22%2C%22prevVal%22%3A17852.149999999994%2C%22deltaPrev%22%3A-124.72999999999593%2C%22deltaPrevAbs%22%3A-124.72999999999593%2C%22deltaJan%22%3A0%2C%22deltaJanAbs%22%3A0%2C%22descricao%22%3A%22M%C3%81QUINAS%20E%20EQUIPAMENTOS%20GR%C3%81FICOS%22%2C%22conta%22%3A%221.2.3.1.1.01.08%22%2C%22isFirstMonth%22%3Afalse%7D">R$ 17.727,42</td><td class="num has-tip pos" data-tip="%7B%22mes%22%3A%22Abril%22%2C%22valor%22%3A17966.940000000002%2C%22prevLabel%22%3A%22Mar%C3%A7o%22%2C%22prevVal%22%3A17727.42%2C%22deltaPrev%22%3A239.52000000000407%2C%22deltaPrevAbs%22%3A239.52000000000407%2C%22deltaJan%22%3A239.52000000000407%2C%22deltaJanAbs%22%3A239.52000000000407%2C%22descricao%22%3A%22M%C3%81QUINAS%20E%20EQUIPAMENTOS%20GR%C3%81FICOS%22%2C%22conta%22%3A%221.2.3.1.1.01.08%22%2C%22isFirstMonth%22%3Afalse%7D">R$ 17.966,94</td><td class="num pos">R$ 239,52</td><td><span class="badge badge-up">↑ Aumentou</span></td></tr><tr><td><span class="conta-code">1.2.3.1.1.04.04</span></td><td>INSTRUMENTOS MUSICAIS E ARTÍSTICOS</td><td class="num has-tip pos" data-tip="%7B%22mes%22%3A%22Janeiro%22%2C%22valor%22%3A3315.75%2C%22prevLabel%22%3Anull%2C%22prevVal%22%3Anull%2C%22deltaPrev%22%3Anull%2C%22deltaPrevAbs%22%3Anull%2C%22deltaJan%22%3A0%2C%22deltaJanAbs%22%3A0%2C%22descricao%22%3A%22INSTRUMENTOS%20MUSICAIS%20E%20ART%C3%8DSTICOS%22%2C%22conta%22%3A%221.2.3.1.1.04.04%22%2C%22isFirstMonth%22%3Atrue%7D">R$ 3.315,75</td><td class="num has-tip pos" data-tip="%7B%22mes%22%3A%22Fevereiro%22%2C%22valor%22%3A3315.75%2C%22prevLabel%22%3A%22Janeiro%22%2C%22prevVal%22%3A3315.75%2C%22deltaPrev%22%3A0%2C%22deltaPrevAbs%22%3A0%2C%22deltaJan%22%3A0%2C%22deltaJanAbs%22%3A0%2C%22descricao%22%3A%22INSTRUMENTOS%20MUSICAIS%20E%20ART%C3%8DSTICOS%22%2C%22conta%22%3A%221.2.3.1.1.04.04%22%2C%22isFirstMonth%22%3Afalse%7D">R$ 3.315,75</td><td class="num has-tip pos" data-tip="%7B%22mes%22%3A%22Mar%C3%A7o%22%2C%22valor%22%3A3315.75%2C%22prevLabel%22%3A%22Fevereiro%22%2C%22prevVal%22%3A3315.75%2C%22deltaPrev%22%3A0%2C%22deltaPrevAbs%22%3A0%2C%22deltaJan%22%3A0%2C%22deltaJanAbs%22%3A0%2C%22descricao%22%3A%22INSTRUMENTOS%20MUSICAIS%20E%20ART%C3%8DSTICOS%22%2C%22conta%22%3A%221.2.3.1.1.04.04%22%2C%22isFirstMonth%22%3Afalse%7D">R$ 3.315,75</td><td class="num has-tip pos" data-tip="%7B%22mes%22%3A%22Abril%22%2C%22valor%22%3A3315.75%2C%22prevLabel%22%3A%22Mar%C3%A7o%22%2C%22prevVal%22%3A3315.75%2C%22deltaPrev%22%3A0%2C%22deltaPrevAbs%22%3A0%2C%22deltaJan%22%3A0%2C%22deltaJanAbs%22%3A0%2C%22descricao%22%3A%22INSTRUMENTOS%20MUSICAIS%20E%20ART%C3%8DSTICOS%22%2C%22conta%22%3A%221.2.3.1.1.04.04%22%2C%22isFirstMonth%22%3Afalse%7D">R$ 3.315,75</td><td class="num ">R$ 0,00</td><td><span class="badge badge-eq">≈ Estável</span></td></tr><tr><td><span class="conta-code">1.2.3.1.1.04.02</span></td><td>COLEÇÕES E MATERIAIS BIBLIOGRÁFICOS</td><td class="num has-tip pos" data-tip="%7B%22mes%22%3A%22Janeiro%22%2C%22valor%22%3A193.01999999999998%2C%22prevLabel%22%3Anull%2C%22prevVal%22%3Anull%2C%22deltaPrev%22%3Anull%2C%22deltaPrevAbs%22%3Anull%2C%22deltaJan%22%3A0%2C%22deltaJanAbs%22%3A0%2C%22descricao%22%3A%22COLE%C3%87%C3%95ES%20E%20MATERIAIS%20BIBLIOGR%C3%81FICOS%22%2C%22conta%22%3A%221.2.3.1.1.04.02%22%2C%22isFirstMonth%22%3Atrue%7D">R$ 193,02</td><td class="num has-tip pos" data-tip="%7B%22mes%22%3A%22Fevereiro%22%2C%22valor%22%3A193.01999999999998%2C%22prevLabel%22%3A%22Janeiro%22%2C%22prevVal%22%3A193.01999999999998%2C%22deltaPrev%22%3A0%2C%22deltaPrevAbs%22%3A0%2C%22deltaJan%22%3A0%2C%22deltaJanAbs%22%3A0%2C%22descricao%22%3A%22COLE%C3%87%C3%95ES%20E%20MATERIAIS%20BIBLIOGR%C3%81FICOS%22%2C%22conta%22%3A%221.2.3.1.1.04.02%22%2C%22isFirstMonth%22%3Afalse%7D">R$ 193,02</td><td class="num has-tip pos" data-tip="%7B%22mes%22%3A%22Mar%C3%A7o%22%2C%22valor%22%3A193.01999999999998%2C%22prevLabel%22%3A%22Fevereiro%22%2C%22prevVal%22%3A193.01999999999998%2C%22deltaPrev%22%3A0%2C%22deltaPrevAbs%22%3A0%2C%22deltaJan%22%3A0%2C%22deltaJanAbs%22%3A0%2C%22descricao%22%3A%22COLE%C3%87%C3%95ES%20E%20MATERIAIS%20BIBLIOGR%C3%81FICOS%22%2C%22conta%22%3A%221.2.3.1.1.04.02%22%2C%22isFirstMonth%22%3Afalse%7D">R$ 193,02</td><td class="num has-tip pos" data-tip="%7B%22mes%22%3A%22Abril%22%2C%22valor%22%3A193.01999999999998%2C%22prevLabel%22%3A%22Mar%C3%A7o%22%2C%22prevVal%22%3A193.01999999999998%2C%22deltaPrev%22%3A0%2C%22deltaPrevAbs%22%3A0%2C%22deltaJan%22%3A0%2C%22deltaJanAbs%22%3A0%2C%22descricao%22%3A%22COLE%C3%87%C3%95ES%20E%20MATERIAIS%20BIBLIOGR%C3%81FICOS%22%2C%22conta%22%3A%221.2.3.1.1.04.02%22%2C%22isFirstMonth%22%3Afalse%7D">R$ 193,02</td><td class="num ">R$ 0,00</td><td><span class="badge badge-eq">≈ Estável</span></td></tr><tr><td><span class="conta-code">1.2.3.1.1.04.07</span></td><td>MÁQUINAS E EQUIPAMENTOS PARA FINS DIDÁTICOS</td><td class="num has-tip pos" data-tip="%7B%22mes%22%3A%22Janeiro%22%2C%22valor%22%3A12847.770000000004%2C%22prevLabel%22%3Anull%2C%22prevVal%22%3Anull%2C%22deltaPrev%22%3Anull%2C%22deltaPrevAbs%22%3Anull%2C%22deltaJan%22%3A0%2C%22deltaJanAbs%22%3A0%2C%22descricao%22%3A%22M%C3%81QUINAS%20E%20EQUIPAMENTOS%20PARA%20FINS%20DID%C3%81TICOS%22%2C%22conta%22%3A%221.2.3.1.1.04.07%22%2C%22isFirstMonth%22%3Atrue%7D">R$ 12.847,77</td><td class="num has-tip neg" data-tip="%7B%22mes%22%3A%22Fevereiro%22%2C%22valor%22%3A-152.22999999998137%2C%22prevLabel%22%3A%22Janeiro%22%2C%22prevVal%22%3A12847.770000000004%2C%22deltaPrev%22%3A-12999.999999999985%2C%22deltaPrevAbs%22%3A-12695.540000000023%2C%22deltaJan%22%3A-12999.999999999985%2C%22deltaJanAbs%22%3A-12695.540000000023%2C%22descricao%22%3A%22M%C3%81QUINAS%20E%20EQUIPAMENTOS%20PARA%20FINS%20DID%C3%81TICOS%22%2C%22conta%22%3A%221.2.3.1.1.04.07%22%2C%22isFirstMonth%22%3Afalse%7D">-R$ 152,23</td><td class="num has-tip neg" data-tip="%7B%22mes%22%3A%22Mar%C3%A7o%22%2C%22valor%22%3A-152.22999999998137%2C%22prevLabel%22%3A%22Fevereiro%22%2C%22prevVal%22%3A-152.22999999998137%2C%22deltaPrev%22%3A0%2C%22deltaPrevAbs%22%3A0%2C%22deltaJan%22%3A-12999.999999999985%2C%22deltaJanAbs%22%3A-12695.540000000023%2C%22descricao%22%3A%22M%C3%81QUINAS%20E%20EQUIPAMENTOS%20PARA%20FINS%20DID%C3%81TICOS%22%2C%22conta%22%3A%221.2.3.1.1.04.07%22%2C%22isFirstMonth%22%3Afalse%7D">-R$ 152,23</td><td class="num has-tip neg" data-tip="%7B%22mes%22%3A%22Abril%22%2C%22valor%22%3A-152.22999999998137%2C%22prevLabel%22%3A%22Mar%C3%A7o%22%2C%22prevVal%22%3A-152.22999999998137%2C%22deltaPrev%22%3A0%2C%22deltaPrevAbs%22%3A0%2C%22deltaJan%22%3A-12999.999999999985%2C%22deltaJanAbs%22%3A-12695.540000000023%2C%22descricao%22%3A%22M%C3%81QUINAS%20E%20EQUIPAMENTOS%20PARA%20FINS%20DID%C3%81TICOS%22%2C%22conta%22%3A%221.2.3.1.1.04.07%22%2C%22isFirstMonth%22%3Afalse%7D">-R$ 152,23</td><td class="num neg">-R$ 13.000,00</td><td><span class="badge badge-down">↓ Reduziu</span></td></tr><tr><td><span class="conta-code">1.2.3.1.1.99.99</span></td><td>OUTROS BENS MÓVEIS</td><td class="num has-tip neg" data-tip="%7B%22mes%22%3A%22Janeiro%22%2C%22valor%22%3A-240304.8600000001%2C%22prevLabel%22%3Anull%2C%22prevVal%22%3Anull%2C%22deltaPrev%22%3Anull%2C%22deltaPrevAbs%22%3Anull%2C%22deltaJan%22%3A0%2C%22deltaJanAbs%22%3A0%2C%22descricao%22%3A%22OUTROS%20BENS%20M%C3%93VEIS%22%2C%22conta%22%3A%221.2.3.1.1.99.99%22%2C%22isFirstMonth%22%3Atrue%7D">-R$ 240.304,86</td><td class="num has-tip neg" data-tip="%7B%22mes%22%3A%22Fevereiro%22%2C%22valor%22%3A-239326.06999999995%2C%22prevLabel%22%3A%22Janeiro%22%2C%22prevVal%22%3A-240304.8600000001%2C%22deltaPrev%22%3A978.7900000001537%2C%22deltaPrevAbs%22%3A-978.7900000001537%2C%22deltaJan%22%3A978.7900000001537%2C%22deltaJanAbs%22%3A-978.7900000001537%2C%22descricao%22%3A%22OUTROS%20BENS%20M%C3%93VEIS%22%2C%22conta%22%3A%221.2.3.1.1.99.99%22%2C%22isFirstMonth%22%3Afalse%7D">-R$ 239.326,07</td><td class="num has-tip " data-tip="%7B%22mes%22%3A%22Mar%C3%A7o%22%2C%22valor%22%3A0%2C%22prevLabel%22%3A%22Fevereiro%22%2C%22prevVal%22%3A-239326.06999999995%2C%22deltaPrev%22%3A239326.06999999995%2C%22deltaPrevAbs%22%3A-239326.06999999995%2C%22deltaJan%22%3A240304.8600000001%2C%22deltaJanAbs%22%3A-240304.8600000001%2C%22descricao%22%3A%22OUTROS%20BENS%20M%C3%93VEIS%22%2C%22conta%22%3A%221.2.3.1.1.99.99%22%2C%22isFirstMonth%22%3Afalse%7D">R$ 0,00</td><td class="num has-tip " data-tip="%7B%22mes%22%3A%22Abril%22%2C%22valor%22%3A0%2C%22prevLabel%22%3A%22Mar%C3%A7o%22%2C%22prevVal%22%3A0%2C%22deltaPrev%22%3A0%2C%22deltaPrevAbs%22%3A0%2C%22deltaJan%22%3A240304.8600000001%2C%22deltaJanAbs%22%3A-240304.8600000001%2C%22descricao%22%3A%22OUTROS%20BENS%20M%C3%93VEIS%22%2C%22conta%22%3A%221.2.3.1.1.99.99%22%2C%22isFirstMonth%22%3Afalse%7D">R$ 0,00</td><td class="num pos">R$ 240.304,86</td><td><span class="badge badge-down">↓ Reduziu</span></td></tr></tbody>
+              <tbody id="tableBody"><tr><td><span class="conta-code">1.2.3.1.1.05.05</span></td><td>AERONAVES</td><td class="num has-tip pos" data-tip="%7B%22mes%22%3A%22Janeiro%22%2C%22valor%22%3A385486248.39%2C%22prevLabel%22%3Anull%2C%22prevVal%22%3Anull%2C%22deltaPrev%22%3Anull%2C%22deltaPrevAbs%22%3Anull%2C%22deltaJan%22%3A0%2C%22deltaJanAbs%22%3A0%2C%22descricao%22%3A%22AERONAVES%22%2C%22conta%22%3A%221.2.3.1.1.05.05%22%2C%22isFirstMonth%22%3Atrue%7D">R$ 385.486.248,39</td><td class="num has-tip pos" data-tip="%7B%22mes%22%3A%22Fevereiro%22%2C%22valor%22%3A385486248.39%2C%22prevLabel%22%3A%22Janeiro%22%2C%22prevVal%22%3A385486248.39%2C%22deltaPrev%22%3A0%2C%22deltaPrevAbs%22%3A0%2C%22deltaJan%22%3A0%2C%22deltaJanAbs%22%3A0%2C%22descricao%22%3A%22AERONAVES%22%2C%22conta%22%3A%221.2.3.1.1.05.05%22%2C%22isFirstMonth%22%3Afalse%7D">R$ 385.486.248,39</td><td class="num has-tip pos" data-tip="%7B%22mes%22%3A%22Mar%C3%A7o%22%2C%22valor%22%3A385486248.39%2C%22prevLabel%22%3A%22Fevereiro%22%2C%22prevVal%22%3A385486248.39%2C%22deltaPrev%22%3A0%2C%22deltaPrevAbs%22%3A0%2C%22deltaJan%22%3A0%2C%22deltaJanAbs%22%3A0%2C%22descricao%22%3A%22AERONAVES%22%2C%22conta%22%3A%221.2.3.1.1.05.05%22%2C%22isFirstMonth%22%3Afalse%7D">R$ 385.486.248,39</td><td class="num has-tip pos" data-tip="%7B%22mes%22%3A%22Abril%22%2C%22valor%22%3A378738078.23%2C%22prevLabel%22%3A%22Mar%C3%A7o%22%2C%22prevVal%22%3A385486248.39%2C%22deltaPrev%22%3A-6748170.159999967%2C%22deltaPrevAbs%22%3A-6748170.159999967%2C%22deltaJan%22%3A-6748170.159999967%2C%22deltaJanAbs%22%3A-6748170.159999967%2C%22descricao%22%3A%22AERONAVES%22%2C%22conta%22%3A%221.2.3.1.1.05.05%22%2C%22isFirstMonth%22%3Afalse%7D">R$ 378.738.078,23</td><td class="num neg">-R$ 6.748.170,16</td><td><span class="trend-pattern" title="Jan→Fev: não subiu | Fev→Mar: não subiu | Mar→Abr: não subiu (0 de 3)"><span class="flat">·</span><span class="flat">·</span><span class="flat">·</span></span></td><td class="num"><span class="pct-jan safe">-1,8%</span></td><td><span class="badge badge-down">↓ Reduziu</span></td></tr><tr><td><span class="conta-code">1.2.3.1.1.08.04</span></td><td>BENS MÓVEIS EM REPARO</td><td class="num has-tip pos" data-tip="%7B%22mes%22%3A%22Janeiro%22%2C%22valor%22%3A88269281.45%2C%22prevLabel%22%3Anull%2C%22prevVal%22%3Anull%2C%22deltaPrev%22%3Anull%2C%22deltaPrevAbs%22%3Anull%2C%22deltaJan%22%3A0%2C%22deltaJanAbs%22%3A0%2C%22descricao%22%3A%22BENS%20M%C3%93VEIS%20EM%20REPARO%22%2C%22conta%22%3A%221.2.3.1.1.08.04%22%2C%22isFirstMonth%22%3Atrue%7D">R$ 88.269.281,45</td><td class="num has-tip pos" data-tip="%7B%22mes%22%3A%22Fevereiro%22%2C%22valor%22%3A87433538.73%2C%22prevLabel%22%3A%22Janeiro%22%2C%22prevVal%22%3A88269281.45%2C%22deltaPrev%22%3A-835742.7199999988%2C%22deltaPrevAbs%22%3A-835742.7199999988%2C%22deltaJan%22%3A-835742.7199999988%2C%22deltaJanAbs%22%3A-835742.7199999988%2C%22descricao%22%3A%22BENS%20M%C3%93VEIS%20EM%20REPARO%22%2C%22conta%22%3A%221.2.3.1.1.08.04%22%2C%22isFirstMonth%22%3Afalse%7D">R$ 87.433.538,73</td><td class="num has-tip pos" data-tip="%7B%22mes%22%3A%22Mar%C3%A7o%22%2C%22valor%22%3A87076535.35%2C%22prevLabel%22%3A%22Fevereiro%22%2C%22prevVal%22%3A87433538.73%2C%22deltaPrev%22%3A-357003.38000001013%2C%22deltaPrevAbs%22%3A-357003.38000001013%2C%22deltaJan%22%3A-1192746.100000009%2C%22deltaJanAbs%22%3A-1192746.100000009%2C%22descricao%22%3A%22BENS%20M%C3%93VEIS%20EM%20REPARO%22%2C%22conta%22%3A%221.2.3.1.1.08.04%22%2C%22isFirstMonth%22%3Afalse%7D">R$ 87.076.535,35</td><td class="num has-tip pos" data-tip="%7B%22mes%22%3A%22Abril%22%2C%22valor%22%3A87313640.03%2C%22prevLabel%22%3A%22Mar%C3%A7o%22%2C%22prevVal%22%3A87076535.35%2C%22deltaPrev%22%3A237104.68000000715%2C%22deltaPrevAbs%22%3A237104.68000000715%2C%22deltaJan%22%3A-955641.4200000018%2C%22deltaJanAbs%22%3A-955641.4200000018%2C%22descricao%22%3A%22BENS%20M%C3%93VEIS%20EM%20REPARO%22%2C%22conta%22%3A%221.2.3.1.1.08.04%22%2C%22isFirstMonth%22%3Afalse%7D">R$ 87.313.640,03</td><td class="num neg">-R$ 955.641,42</td><td><span class="trend-pattern" title="Jan→Fev: não subiu | Fev→Mar: não subiu | Mar→Abr: subiu (1 de 3)"><span class="flat">·</span><span class="flat">·</span><span class="up">▲</span></span></td><td class="num"><span class="pct-jan safe">-1,1%</span></td><td><span class="badge badge-down">↓ Reduziu</span></td></tr><tr><td><span class="conta-code">1.2.3.1.1.01.14</span></td><td>EQUIPAMENTOS, PEÇAS E ACESSÓRIOS AERONÁUTICOS</td><td class="num has-tip pos" data-tip="%7B%22mes%22%3A%22Janeiro%22%2C%22valor%22%3A25969835.169999998%2C%22prevLabel%22%3Anull%2C%22prevVal%22%3Anull%2C%22deltaPrev%22%3Anull%2C%22deltaPrevAbs%22%3Anull%2C%22deltaJan%22%3A0%2C%22deltaJanAbs%22%3A0%2C%22descricao%22%3A%22EQUIPAMENTOS%2C%20PE%C3%87AS%20E%20ACESS%C3%93RIOS%20AERON%C3%81UTICOS%22%2C%22conta%22%3A%221.2.3.1.1.01.14%22%2C%22isFirstMonth%22%3Atrue%7D">R$ 25.969.835,17</td><td class="num has-tip pos" data-tip="%7B%22mes%22%3A%22Fevereiro%22%2C%22valor%22%3A25969835.169999998%2C%22prevLabel%22%3A%22Janeiro%22%2C%22prevVal%22%3A25969835.169999998%2C%22deltaPrev%22%3A0%2C%22deltaPrevAbs%22%3A0%2C%22deltaJan%22%3A0%2C%22deltaJanAbs%22%3A0%2C%22descricao%22%3A%22EQUIPAMENTOS%2C%20PE%C3%87AS%20E%20ACESS%C3%93RIOS%20AERON%C3%81UTICOS%22%2C%22conta%22%3A%221.2.3.1.1.01.14%22%2C%22isFirstMonth%22%3Afalse%7D">R$ 25.969.835,17</td><td class="num has-tip pos" data-tip="%7B%22mes%22%3A%22Mar%C3%A7o%22%2C%22valor%22%3A25969835.169999998%2C%22prevLabel%22%3A%22Fevereiro%22%2C%22prevVal%22%3A25969835.169999998%2C%22deltaPrev%22%3A0%2C%22deltaPrevAbs%22%3A0%2C%22deltaJan%22%3A0%2C%22deltaJanAbs%22%3A0%2C%22descricao%22%3A%22EQUIPAMENTOS%2C%20PE%C3%87AS%20E%20ACESS%C3%93RIOS%20AERON%C3%81UTICOS%22%2C%22conta%22%3A%221.2.3.1.1.01.14%22%2C%22isFirstMonth%22%3Afalse%7D">R$ 25.969.835,17</td><td class="num has-tip pos" data-tip="%7B%22mes%22%3A%22Abril%22%2C%22valor%22%3A24924468.65%2C%22prevLabel%22%3A%22Mar%C3%A7o%22%2C%22prevVal%22%3A25969835.169999998%2C%22deltaPrev%22%3A-1045366.5199999996%2C%22deltaPrevAbs%22%3A-1045366.5199999996%2C%22deltaJan%22%3A-1045366.5199999996%2C%22deltaJanAbs%22%3A-1045366.5199999996%2C%22descricao%22%3A%22EQUIPAMENTOS%2C%20PE%C3%87AS%20E%20ACESS%C3%93RIOS%20AERON%C3%81UTICOS%22%2C%22conta%22%3A%221.2.3.1.1.01.14%22%2C%22isFirstMonth%22%3Afalse%7D">R$ 24.924.468,65</td><td class="num neg">-R$ 1.045.366,52</td><td><span class="trend-pattern" title="Jan→Fev: não subiu | Fev→Mar: não subiu | Mar→Abr: não subiu (0 de 3)"><span class="flat">·</span><span class="flat">·</span><span class="flat">·</span></span></td><td class="num"><span class="pct-jan safe">-4,0%</span></td><td><span class="badge badge-down">↓ Reduziu</span></td></tr><tr><td><span class="conta-code">1.2.3.1.1.05.03</span></td><td>VEÍCULOS DE TRAÇÃO MECÂNICA</td><td class="num has-tip neg" data-tip="%7B%22mes%22%3A%22Janeiro%22%2C%22valor%22%3A-25786812.62%2C%22prevLabel%22%3Anull%2C%22prevVal%22%3Anull%2C%22deltaPrev%22%3Anull%2C%22deltaPrevAbs%22%3Anull%2C%22deltaJan%22%3A0%2C%22deltaJanAbs%22%3A0%2C%22descricao%22%3A%22VE%C3%8DCULOS%20DE%20TRA%C3%87%C3%83O%20MEC%C3%82NICA%22%2C%22conta%22%3A%221.2.3.1.1.05.03%22%2C%22isFirstMonth%22%3Atrue%7D">-R$ 25.786.812,62</td><td class="num has-tip neg" data-tip="%7B%22mes%22%3A%22Fevereiro%22%2C%22valor%22%3A-25112068.330000002%2C%22prevLabel%22%3A%22Janeiro%22%2C%22prevVal%22%3A-25786812.62%2C%22deltaPrev%22%3A674744.2899999991%2C%22deltaPrevAbs%22%3A-674744.2899999991%2C%22deltaJan%22%3A674744.2899999991%2C%22deltaJanAbs%22%3A-674744.2899999991%2C%22descricao%22%3A%22VE%C3%8DCULOS%20DE%20TRA%C3%87%C3%83O%20MEC%C3%82NICA%22%2C%22conta%22%3A%221.2.3.1.1.05.03%22%2C%22isFirstMonth%22%3Afalse%7D">-R$ 25.112.068,33</td><td class="num has-tip neg" data-tip="%7B%22mes%22%3A%22Mar%C3%A7o%22%2C%22valor%22%3A-23725156.700000003%2C%22prevLabel%22%3A%22Fevereiro%22%2C%22prevVal%22%3A-25112068.330000002%2C%22deltaPrev%22%3A1386911.629999999%2C%22deltaPrevAbs%22%3A-1386911.629999999%2C%22deltaJan%22%3A2061655.919999998%2C%22deltaJanAbs%22%3A-2061655.919999998%2C%22descricao%22%3A%22VE%C3%8DCULOS%20DE%20TRA%C3%87%C3%83O%20MEC%C3%82NICA%22%2C%22conta%22%3A%221.2.3.1.1.05.03%22%2C%22isFirstMonth%22%3Afalse%7D">-R$ 23.725.156,70</td><td class="num has-tip neg" data-tip="%7B%22mes%22%3A%22Abril%22%2C%22valor%22%3A-23802112.59%2C%22prevLabel%22%3A%22Mar%C3%A7o%22%2C%22prevVal%22%3A-23725156.700000003%2C%22deltaPrev%22%3A-76955.88999999687%2C%22deltaPrevAbs%22%3A76955.88999999687%2C%22deltaJan%22%3A1984700.0300000012%2C%22deltaJanAbs%22%3A-1984700.0300000012%2C%22descricao%22%3A%22VE%C3%8DCULOS%20DE%20TRA%C3%87%C3%83O%20MEC%C3%82NICA%22%2C%22conta%22%3A%221.2.3.1.1.05.03%22%2C%22isFirstMonth%22%3Afalse%7D">-R$ 23.802.112,59</td><td class="num pos">R$ 1.984.700,03</td><td><span class="trend-pattern" title="Jan→Fev: não subiu | Fev→Mar: não subiu | Mar→Abr: subiu (1 de 3)"><span class="flat">·</span><span class="flat">·</span><span class="up">▲</span></span></td><td class="num"><span class="pct-jan safe">-7,7%</span></td><td><span class="badge badge-down">↓ Reduziu</span></td></tr><tr><td><span class="conta-code">1.2.3.1.1.02.01</span></td><td>EQUIPAMENTOS DE PROCESSAMENTO DE DADOS</td><td class="num has-tip neg" data-tip="%7B%22mes%22%3A%22Janeiro%22%2C%22valor%22%3A-19534030.5%2C%22prevLabel%22%3Anull%2C%22prevVal%22%3Anull%2C%22deltaPrev%22%3Anull%2C%22deltaPrevAbs%22%3Anull%2C%22deltaJan%22%3A0%2C%22deltaJanAbs%22%3A0%2C%22descricao%22%3A%22EQUIPAMENTOS%20DE%20PROCESSAMENTO%20DE%20DADOS%22%2C%22conta%22%3A%221.2.3.1.1.02.01%22%2C%22isFirstMonth%22%3Atrue%7D">-R$ 19.534.030,50</td><td class="num has-tip neg" data-tip="%7B%22mes%22%3A%22Fevereiro%22%2C%22valor%22%3A-19977607.35%2C%22prevLabel%22%3A%22Janeiro%22%2C%22prevVal%22%3A-19534030.5%2C%22deltaPrev%22%3A-443576.8500000015%2C%22deltaPrevAbs%22%3A443576.8500000015%2C%22deltaJan%22%3A-443576.8500000015%2C%22deltaJanAbs%22%3A443576.8500000015%2C%22descricao%22%3A%22EQUIPAMENTOS%20DE%20PROCESSAMENTO%20DE%20DADOS%22%2C%22conta%22%3A%221.2.3.1.1.02.01%22%2C%22isFirstMonth%22%3Afalse%7D">-R$ 19.977.607,35</td><td class="num has-tip neg" data-tip="%7B%22mes%22%3A%22Mar%C3%A7o%22%2C%22valor%22%3A-18962197.289999995%2C%22prevLabel%22%3A%22Fevereiro%22%2C%22prevVal%22%3A-19977607.35%2C%22deltaPrev%22%3A1015410.0600000061%2C%22deltaPrevAbs%22%3A-1015410.0600000061%2C%22deltaJan%22%3A571833.2100000046%2C%22deltaJanAbs%22%3A-571833.2100000046%2C%22descricao%22%3A%22EQUIPAMENTOS%20DE%20PROCESSAMENTO%20DE%20DADOS%22%2C%22conta%22%3A%221.2.3.1.1.02.01%22%2C%22isFirstMonth%22%3Afalse%7D">-R$ 18.962.197,29</td><td class="num has-tip neg" data-tip="%7B%22mes%22%3A%22Abril%22%2C%22valor%22%3A-18621846.94%2C%22prevLabel%22%3A%22Mar%C3%A7o%22%2C%22prevVal%22%3A-18962197.289999995%2C%22deltaPrev%22%3A340350.34999999404%2C%22deltaPrevAbs%22%3A-340350.34999999404%2C%22deltaJan%22%3A912183.5599999987%2C%22deltaJanAbs%22%3A-912183.5599999987%2C%22descricao%22%3A%22EQUIPAMENTOS%20DE%20PROCESSAMENTO%20DE%20DADOS%22%2C%22conta%22%3A%221.2.3.1.1.02.01%22%2C%22isFirstMonth%22%3Afalse%7D">-R$ 18.621.846,94</td><td class="num pos">R$ 912.183,56</td><td><span class="trend-pattern" title="Jan→Fev: subiu | Fev→Mar: não subiu | Mar→Abr: não subiu (1 de 3)"><span class="up">▲</span><span class="flat">·</span><span class="flat">·</span></span></td><td class="num"><span class="pct-jan safe">-4,7%</span></td><td><span class="badge badge-down">↓ Reduziu</span></td></tr><tr><td><span class="conta-code">1.2.3.1.1.07.02</span></td><td>IMPORTACOES EM ANDAMENTO - BENS MOVEIS</td><td class="num has-tip pos" data-tip="%7B%22mes%22%3A%22Janeiro%22%2C%22valor%22%3A12241717.52%2C%22prevLabel%22%3Anull%2C%22prevVal%22%3Anull%2C%22deltaPrev%22%3Anull%2C%22deltaPrevAbs%22%3Anull%2C%22deltaJan%22%3A0%2C%22deltaJanAbs%22%3A0%2C%22descricao%22%3A%22IMPORTACOES%20EM%20ANDAMENTO%20-%20BENS%20MOVEIS%22%2C%22conta%22%3A%221.2.3.1.1.07.02%22%2C%22isFirstMonth%22%3Atrue%7D">R$ 12.241.717,52</td><td class="num has-tip pos" data-tip="%7B%22mes%22%3A%22Fevereiro%22%2C%22valor%22%3A12241717.52%2C%22prevLabel%22%3A%22Janeiro%22%2C%22prevVal%22%3A12241717.52%2C%22deltaPrev%22%3A0%2C%22deltaPrevAbs%22%3A0%2C%22deltaJan%22%3A0%2C%22deltaJanAbs%22%3A0%2C%22descricao%22%3A%22IMPORTACOES%20EM%20ANDAMENTO%20-%20BENS%20MOVEIS%22%2C%22conta%22%3A%221.2.3.1.1.07.02%22%2C%22isFirstMonth%22%3Afalse%7D">R$ 12.241.717,52</td><td class="num has-tip pos" data-tip="%7B%22mes%22%3A%22Mar%C3%A7o%22%2C%22valor%22%3A12251459.45%2C%22prevLabel%22%3A%22Fevereiro%22%2C%22prevVal%22%3A12241717.52%2C%22deltaPrev%22%3A9741.929999999702%2C%22deltaPrevAbs%22%3A9741.929999999702%2C%22deltaJan%22%3A9741.929999999702%2C%22deltaJanAbs%22%3A9741.929999999702%2C%22descricao%22%3A%22IMPORTACOES%20EM%20ANDAMENTO%20-%20BENS%20MOVEIS%22%2C%22conta%22%3A%221.2.3.1.1.07.02%22%2C%22isFirstMonth%22%3Afalse%7D">R$ 12.251.459,45</td><td class="num has-tip pos" data-tip="%7B%22mes%22%3A%22Abril%22%2C%22valor%22%3A11635190.65%2C%22prevLabel%22%3A%22Mar%C3%A7o%22%2C%22prevVal%22%3A12251459.45%2C%22deltaPrev%22%3A-616268.7999999989%2C%22deltaPrevAbs%22%3A-616268.7999999989%2C%22deltaJan%22%3A-606526.8699999992%2C%22deltaJanAbs%22%3A-606526.8699999992%2C%22descricao%22%3A%22IMPORTACOES%20EM%20ANDAMENTO%20-%20BENS%20MOVEIS%22%2C%22conta%22%3A%221.2.3.1.1.07.02%22%2C%22isFirstMonth%22%3Afalse%7D">R$ 11.635.190,65</td><td class="num neg">-R$ 606.526,87</td><td><span class="trend-pattern" title="Jan→Fev: não subiu | Fev→Mar: subiu | Mar→Abr: não subiu (1 de 3)"><span class="flat">·</span><span class="up">▲</span><span class="flat">·</span></span></td><td class="num"><span class="pct-jan safe">-5,0%</span></td><td><span class="badge badge-down">↓ Reduziu</span></td></tr><tr><td><span class="conta-code">1.2.3.1.1.99.01</span></td><td>BENS MÓVEIS A ALIENAR</td><td class="num has-tip pos" data-tip="%7B%22mes%22%3A%22Janeiro%22%2C%22valor%22%3A10516585.8%2C%22prevLabel%22%3Anull%2C%22prevVal%22%3Anull%2C%22deltaPrev%22%3Anull%2C%22deltaPrevAbs%22%3Anull%2C%22deltaJan%22%3A0%2C%22deltaJanAbs%22%3A0%2C%22descricao%22%3A%22BENS%20M%C3%93VEIS%20A%20ALIENAR%22%2C%22conta%22%3A%221.2.3.1.1.99.01%22%2C%22isFirstMonth%22%3Atrue%7D">R$ 10.516.585,80</td><td class="num has-tip pos" data-tip="%7B%22mes%22%3A%22Fevereiro%22%2C%22valor%22%3A9679609.27%2C%22prevLabel%22%3A%22Janeiro%22%2C%22prevVal%22%3A10516585.8%2C%22deltaPrev%22%3A-836976.5300000012%2C%22deltaPrevAbs%22%3A-836976.5300000012%2C%22deltaJan%22%3A-836976.5300000012%2C%22deltaJanAbs%22%3A-836976.5300000012%2C%22descricao%22%3A%22BENS%20M%C3%93VEIS%20A%20ALIENAR%22%2C%22conta%22%3A%221.2.3.1.1.99.01%22%2C%22isFirstMonth%22%3Afalse%7D">R$ 9.679.609,27</td><td class="num has-tip pos" data-tip="%7B%22mes%22%3A%22Mar%C3%A7o%22%2C%22valor%22%3A8308903.75%2C%22prevLabel%22%3A%22Fevereiro%22%2C%22prevVal%22%3A9679609.27%2C%22deltaPrev%22%3A-1370705.5199999996%2C%22deltaPrevAbs%22%3A-1370705.5199999996%2C%22deltaJan%22%3A-2207682.0500000007%2C%22deltaJanAbs%22%3A-2207682.0500000007%2C%22descricao%22%3A%22BENS%20M%C3%93VEIS%20A%20ALIENAR%22%2C%22conta%22%3A%221.2.3.1.1.99.01%22%2C%22isFirstMonth%22%3Afalse%7D">R$ 8.308.903,75</td><td class="num has-tip pos" data-tip="%7B%22mes%22%3A%22Abril%22%2C%22valor%22%3A8015732.379999999%2C%22prevLabel%22%3A%22Mar%C3%A7o%22%2C%22prevVal%22%3A8308903.75%2C%22deltaPrev%22%3A-293171.37000000104%2C%22deltaPrevAbs%22%3A-293171.37000000104%2C%22deltaJan%22%3A-2500853.420000002%2C%22deltaJanAbs%22%3A-2500853.420000002%2C%22descricao%22%3A%22BENS%20M%C3%93VEIS%20A%20ALIENAR%22%2C%22conta%22%3A%221.2.3.1.1.99.01%22%2C%22isFirstMonth%22%3Afalse%7D">R$ 8.015.732,38</td><td class="num neg">-R$ 2.500.853,42</td><td><span class="trend-pattern" title="Jan→Fev: não subiu | Fev→Mar: não subiu | Mar→Abr: não subiu (0 de 3)"><span class="flat">·</span><span class="flat">·</span><span class="flat">·</span></span></td><td class="num"><span class="pct-jan safe">-23,8%</span></td><td><span class="badge badge-down">↓ Reduziu</span></td></tr><tr><td><span class="conta-code">1.2.3.1.1.03.03</span></td><td>MOBILIÁRIO EM GERAL</td><td class="num has-tip neg" data-tip="%7B%22mes%22%3A%22Janeiro%22%2C%22valor%22%3A-2520621.5%2C%22prevLabel%22%3Anull%2C%22prevVal%22%3Anull%2C%22deltaPrev%22%3Anull%2C%22deltaPrevAbs%22%3Anull%2C%22deltaJan%22%3A0%2C%22deltaJanAbs%22%3A0%2C%22descricao%22%3A%22MOBILI%C3%81RIO%20EM%20GERAL%22%2C%22conta%22%3A%221.2.3.1.1.03.03%22%2C%22isFirstMonth%22%3Atrue%7D">-R$ 2.520.621,50</td><td class="num has-tip neg" data-tip="%7B%22mes%22%3A%22Fevereiro%22%2C%22valor%22%3A-2561921.58%2C%22prevLabel%22%3A%22Janeiro%22%2C%22prevVal%22%3A-2520621.5%2C%22deltaPrev%22%3A-41300.080000000075%2C%22deltaPrevAbs%22%3A41300.080000000075%2C%22deltaJan%22%3A-41300.080000000075%2C%22deltaJanAbs%22%3A41300.080000000075%2C%22descricao%22%3A%22MOBILI%C3%81RIO%20EM%20GERAL%22%2C%22conta%22%3A%221.2.3.1.1.03.03%22%2C%22isFirstMonth%22%3Afalse%7D">-R$ 2.561.921,58</td><td class="num has-tip neg" data-tip="%7B%22mes%22%3A%22Mar%C3%A7o%22%2C%22valor%22%3A-2497174.119999999%2C%22prevLabel%22%3A%22Fevereiro%22%2C%22prevVal%22%3A-2561921.58%2C%22deltaPrev%22%3A64747.460000000894%2C%22deltaPrevAbs%22%3A-64747.460000000894%2C%22deltaJan%22%3A23447.38000000082%2C%22deltaJanAbs%22%3A-23447.38000000082%2C%22descricao%22%3A%22MOBILI%C3%81RIO%20EM%20GERAL%22%2C%22conta%22%3A%221.2.3.1.1.03.03%22%2C%22isFirstMonth%22%3Afalse%7D">-R$ 2.497.174,12</td><td class="num has-tip neg" data-tip="%7B%22mes%22%3A%22Abril%22%2C%22valor%22%3A-2496065.8099999987%2C%22prevLabel%22%3A%22Mar%C3%A7o%22%2C%22prevVal%22%3A-2497174.119999999%2C%22deltaPrev%22%3A1108.3100000005215%2C%22deltaPrevAbs%22%3A-1108.3100000005215%2C%22deltaJan%22%3A24555.69000000134%2C%22deltaJanAbs%22%3A-24555.69000000134%2C%22descricao%22%3A%22MOBILI%C3%81RIO%20EM%20GERAL%22%2C%22conta%22%3A%221.2.3.1.1.03.03%22%2C%22isFirstMonth%22%3Afalse%7D">-R$ 2.496.065,81</td><td class="num pos">R$ 24.555,69</td><td><span class="trend-pattern" title="Jan→Fev: subiu | Fev→Mar: não subiu | Mar→Abr: não subiu (1 de 3)"><span class="up">▲</span><span class="flat">·</span><span class="flat">·</span></span></td><td class="num"><span class="pct-jan safe">-1,0%</span></td><td><span class="badge badge-down">↓ Reduziu</span></td></tr><tr><td><span class="conta-code">1.2.3.1.1.01.03</span></td><td>EQUIPAM/UTENSILIOS MEDICOS,ODONTO,LAB E HOSP</td><td class="num has-tip neg" data-tip="%7B%22mes%22%3A%22Janeiro%22%2C%22valor%22%3A-2002139.459999999%2C%22prevLabel%22%3Anull%2C%22prevVal%22%3Anull%2C%22deltaPrev%22%3Anull%2C%22deltaPrevAbs%22%3Anull%2C%22deltaJan%22%3A0%2C%22deltaJanAbs%22%3A0%2C%22descricao%22%3A%22EQUIPAM%2FUTENSILIOS%20MEDICOS%2CODONTO%2CLAB%20E%20HOSP%22%2C%22conta%22%3A%221.2.3.1.1.01.03%22%2C%22isFirstMonth%22%3Atrue%7D">-R$ 2.002.139,46</td><td class="num has-tip neg" data-tip="%7B%22mes%22%3A%22Fevereiro%22%2C%22valor%22%3A-2047756.5899999999%2C%22prevLabel%22%3A%22Janeiro%22%2C%22prevVal%22%3A-2002139.459999999%2C%22deltaPrev%22%3A-45617.13000000082%2C%22deltaPrevAbs%22%3A45617.13000000082%2C%22deltaJan%22%3A-45617.13000000082%2C%22deltaJanAbs%22%3A45617.13000000082%2C%22descricao%22%3A%22EQUIPAM%2FUTENSILIOS%20MEDICOS%2CODONTO%2CLAB%20E%20HOSP%22%2C%22conta%22%3A%221.2.3.1.1.01.03%22%2C%22isFirstMonth%22%3Afalse%7D">-R$ 2.047.756,59</td><td class="num has-tip neg" data-tip="%7B%22mes%22%3A%22Mar%C3%A7o%22%2C%22valor%22%3A-1963862.5999999996%2C%22prevLabel%22%3A%22Fevereiro%22%2C%22prevVal%22%3A-2047756.5899999999%2C%22deltaPrev%22%3A83893.99000000022%2C%22deltaPrevAbs%22%3A-83893.99000000022%2C%22deltaJan%22%3A38276.859999999404%2C%22deltaJanAbs%22%3A-38276.859999999404%2C%22descricao%22%3A%22EQUIPAM%2FUTENSILIOS%20MEDICOS%2CODONTO%2CLAB%20E%20HOSP%22%2C%22conta%22%3A%221.2.3.1.1.01.03%22%2C%22isFirstMonth%22%3Afalse%7D">-R$ 1.963.862,60</td><td class="num has-tip neg" data-tip="%7B%22mes%22%3A%22Abril%22%2C%22valor%22%3A-1917928.1199999992%2C%22prevLabel%22%3A%22Mar%C3%A7o%22%2C%22prevVal%22%3A-1963862.5999999996%2C%22deltaPrev%22%3A45934.48000000045%2C%22deltaPrevAbs%22%3A-45934.48000000045%2C%22deltaJan%22%3A84211.33999999985%2C%22deltaJanAbs%22%3A-84211.33999999985%2C%22descricao%22%3A%22EQUIPAM%2FUTENSILIOS%20MEDICOS%2CODONTO%2CLAB%20E%20HOSP%22%2C%22conta%22%3A%221.2.3.1.1.01.03%22%2C%22isFirstMonth%22%3Afalse%7D">-R$ 1.917.928,12</td><td class="num pos">R$ 84.211,34</td><td><span class="trend-pattern" title="Jan→Fev: subiu | Fev→Mar: não subiu | Mar→Abr: não subiu (1 de 3)"><span class="up">▲</span><span class="flat">·</span><span class="flat">·</span></span></td><td class="num"><span class="pct-jan safe">-4,2%</span></td><td><span class="badge badge-down">↓ Reduziu</span></td></tr><tr><td><span class="conta-code">1.2.3.1.1.03.02</span></td><td>MÁQUINAS, INSTALAÇÕES E UTENSÍLIOS DE ESCRITÓRIO</td><td class="num has-tip pos" data-tip="%7B%22mes%22%3A%22Janeiro%22%2C%22valor%22%3A1019812.7%2C%22prevLabel%22%3Anull%2C%22prevVal%22%3Anull%2C%22deltaPrev%22%3Anull%2C%22deltaPrevAbs%22%3Anull%2C%22deltaJan%22%3A0%2C%22deltaJanAbs%22%3A0%2C%22descricao%22%3A%22M%C3%81QUINAS%2C%20INSTALA%C3%87%C3%95ES%20E%20UTENS%C3%8DLIOS%20DE%20ESCRIT%C3%93RIO%22%2C%22conta%22%3A%221.2.3.1.1.03.02%22%2C%22isFirstMonth%22%3Atrue%7D">R$ 1.019.812,70</td><td class="num has-tip pos" data-tip="%7B%22mes%22%3A%22Fevereiro%22%2C%22valor%22%3A1013891.22%2C%22prevLabel%22%3A%22Janeiro%22%2C%22prevVal%22%3A1019812.7%2C%22deltaPrev%22%3A-5921.479999999981%2C%22deltaPrevAbs%22%3A-5921.479999999981%2C%22deltaJan%22%3A-5921.479999999981%2C%22deltaJanAbs%22%3A-5921.479999999981%2C%22descricao%22%3A%22M%C3%81QUINAS%2C%20INSTALA%C3%87%C3%95ES%20E%20UTENS%C3%8DLIOS%20DE%20ESCRIT%C3%93RIO%22%2C%22conta%22%3A%221.2.3.1.1.03.02%22%2C%22isFirstMonth%22%3Afalse%7D">R$ 1.013.891,22</td><td class="num has-tip pos" data-tip="%7B%22mes%22%3A%22Mar%C3%A7o%22%2C%22valor%22%3A1011642.6200000001%2C%22prevLabel%22%3A%22Fevereiro%22%2C%22prevVal%22%3A1013891.22%2C%22deltaPrev%22%3A-2248.5999999998603%2C%22deltaPrevAbs%22%3A-2248.5999999998603%2C%22deltaJan%22%3A-8170.079999999842%2C%22deltaJanAbs%22%3A-8170.079999999842%2C%22descricao%22%3A%22M%C3%81QUINAS%2C%20INSTALA%C3%87%C3%95ES%20E%20UTENS%C3%8DLIOS%20DE%20ESCRIT%C3%93RIO%22%2C%22conta%22%3A%221.2.3.1.1.03.02%22%2C%22isFirstMonth%22%3Afalse%7D">R$ 1.011.642,62</td><td class="num has-tip pos" data-tip="%7B%22mes%22%3A%22Abril%22%2C%22valor%22%3A1013777.06%2C%22prevLabel%22%3A%22Mar%C3%A7o%22%2C%22prevVal%22%3A1011642.6200000001%2C%22deltaPrev%22%3A2134.439999999944%2C%22deltaPrevAbs%22%3A2134.439999999944%2C%22deltaJan%22%3A-6035.639999999898%2C%22deltaJanAbs%22%3A-6035.639999999898%2C%22descricao%22%3A%22M%C3%81QUINAS%2C%20INSTALA%C3%87%C3%95ES%20E%20UTENS%C3%8DLIOS%20DE%20ESCRIT%C3%93RIO%22%2C%22conta%22%3A%221.2.3.1.1.03.02%22%2C%22isFirstMonth%22%3Afalse%7D">R$ 1.013.777,06</td><td class="num neg">-R$ 6.035,64</td><td><span class="trend-pattern" title="Jan→Fev: não subiu | Fev→Mar: não subiu | Mar→Abr: subiu (1 de 3)"><span class="flat">·</span><span class="flat">·</span><span class="up">▲</span></span></td><td class="num"><span class="pct-jan safe">-0,6%</span></td><td><span class="badge badge-down">↓ Reduziu</span></td></tr><tr><td><span class="conta-code">1.2.3.1.1.01.24</span></td><td>MÁQUINAS E EQUIPAMENTOS ELETRO-ELETRÔN1COS</td><td class="num has-tip neg" data-tip="%7B%22mes%22%3A%22Janeiro%22%2C%22valor%22%3A-1269139.12%2C%22prevLabel%22%3Anull%2C%22prevVal%22%3Anull%2C%22deltaPrev%22%3Anull%2C%22deltaPrevAbs%22%3Anull%2C%22deltaJan%22%3A0%2C%22deltaJanAbs%22%3A0%2C%22descricao%22%3A%22M%C3%81QUINAS%20E%20EQUIPAMENTOS%20ELETRO-ELETR%C3%94N1COS%22%2C%22conta%22%3A%221.2.3.1.1.01.24%22%2C%22isFirstMonth%22%3Atrue%7D">-R$ 1.269.139,12</td><td class="num has-tip neg" data-tip="%7B%22mes%22%3A%22Fevereiro%22%2C%22valor%22%3A-1080300%2C%22prevLabel%22%3A%22Janeiro%22%2C%22prevVal%22%3A-1269139.12%2C%22deltaPrev%22%3A188839.1200000001%2C%22deltaPrevAbs%22%3A-188839.1200000001%2C%22deltaJan%22%3A188839.1200000001%2C%22deltaJanAbs%22%3A-188839.1200000001%2C%22descricao%22%3A%22M%C3%81QUINAS%20E%20EQUIPAMENTOS%20ELETRO-ELETR%C3%94N1COS%22%2C%22conta%22%3A%221.2.3.1.1.01.24%22%2C%22isFirstMonth%22%3Afalse%7D">-R$ 1.080.300,00</td><td class="num has-tip neg" data-tip="%7B%22mes%22%3A%22Mar%C3%A7o%22%2C%22valor%22%3A-976191.8%2C%22prevLabel%22%3A%22Fevereiro%22%2C%22prevVal%22%3A-1080300%2C%22deltaPrev%22%3A104108.19999999995%2C%22deltaPrevAbs%22%3A-104108.19999999995%2C%22deltaJan%22%3A292947.32000000007%2C%22deltaJanAbs%22%3A-292947.32000000007%2C%22descricao%22%3A%22M%C3%81QUINAS%20E%20EQUIPAMENTOS%20ELETRO-ELETR%C3%94N1COS%22%2C%22conta%22%3A%221.2.3.1.1.01.24%22%2C%22isFirstMonth%22%3Afalse%7D">-R$ 976.191,80</td><td class="num has-tip neg" data-tip="%7B%22mes%22%3A%22Abril%22%2C%22valor%22%3A-976191.8%2C%22prevLabel%22%3A%22Mar%C3%A7o%22%2C%22prevVal%22%3A-976191.8%2C%22deltaPrev%22%3A0%2C%22deltaPrevAbs%22%3A0%2C%22deltaJan%22%3A292947.32000000007%2C%22deltaJanAbs%22%3A-292947.32000000007%2C%22descricao%22%3A%22M%C3%81QUINAS%20E%20EQUIPAMENTOS%20ELETRO-ELETR%C3%94N1COS%22%2C%22conta%22%3A%221.2.3.1.1.01.24%22%2C%22isFirstMonth%22%3Afalse%7D">-R$ 976.191,80</td><td class="num pos">R$ 292.947,32</td><td><span class="trend-pattern" title="Jan→Fev: não subiu | Fev→Mar: não subiu | Mar→Abr: não subiu (0 de 3)"><span class="flat">·</span><span class="flat">·</span><span class="flat">·</span></span></td><td class="num"><span class="pct-jan safe">-23,1%</span></td><td><span class="badge badge-down">↓ Reduziu</span></td></tr><tr><td><span class="conta-code">1.2.3.1.1.01.02</span></td><td>APARELHOS E EQUIPAMENTOS DE COMUNICACAO</td><td class="num has-tip neg" data-tip="%7B%22mes%22%3A%22Janeiro%22%2C%22valor%22%3A-829269.76%2C%22prevLabel%22%3Anull%2C%22prevVal%22%3Anull%2C%22deltaPrev%22%3Anull%2C%22deltaPrevAbs%22%3Anull%2C%22deltaJan%22%3A0%2C%22deltaJanAbs%22%3A0%2C%22descricao%22%3A%22APARELHOS%20E%20EQUIPAMENTOS%20DE%20COMUNICACAO%22%2C%22conta%22%3A%221.2.3.1.1.01.02%22%2C%22isFirstMonth%22%3Atrue%7D">-R$ 829.269,76</td><td class="num has-tip neg" data-tip="%7B%22mes%22%3A%22Fevereiro%22%2C%22valor%22%3A-800377.46%2C%22prevLabel%22%3A%22Janeiro%22%2C%22prevVal%22%3A-829269.76%2C%22deltaPrev%22%3A28892.300000000047%2C%22deltaPrevAbs%22%3A-28892.300000000047%2C%22deltaJan%22%3A28892.300000000047%2C%22deltaJanAbs%22%3A-28892.300000000047%2C%22descricao%22%3A%22APARELHOS%20E%20EQUIPAMENTOS%20DE%20COMUNICACAO%22%2C%22conta%22%3A%221.2.3.1.1.01.02%22%2C%22isFirstMonth%22%3Afalse%7D">-R$ 800.377,46</td><td class="num has-tip neg" data-tip="%7B%22mes%22%3A%22Mar%C3%A7o%22%2C%22valor%22%3A-801702.1500000001%2C%22prevLabel%22%3A%22Fevereiro%22%2C%22prevVal%22%3A-800377.46%2C%22deltaPrev%22%3A-1324.690000000177%2C%22deltaPrevAbs%22%3A1324.690000000177%2C%22deltaJan%22%3A27567.60999999987%2C%22deltaJanAbs%22%3A-27567.60999999987%2C%22descricao%22%3A%22APARELHOS%20E%20EQUIPAMENTOS%20DE%20COMUNICACAO%22%2C%22conta%22%3A%221.2.3.1.1.01.02%22%2C%22isFirstMonth%22%3Afalse%7D">-R$ 801.702,15</td><td class="num has-tip neg" data-tip="%7B%22mes%22%3A%22Abril%22%2C%22valor%22%3A-799946.5700000001%2C%22prevLabel%22%3A%22Mar%C3%A7o%22%2C%22prevVal%22%3A-801702.1500000001%2C%22deltaPrev%22%3A1755.5800000000745%2C%22deltaPrevAbs%22%3A-1755.5800000000745%2C%22deltaJan%22%3A29323.189999999944%2C%22deltaJanAbs%22%3A-29323.189999999944%2C%22descricao%22%3A%22APARELHOS%20E%20EQUIPAMENTOS%20DE%20COMUNICACAO%22%2C%22conta%22%3A%221.2.3.1.1.01.02%22%2C%22isFirstMonth%22%3Afalse%7D">-R$ 799.946,57</td><td class="num pos">R$ 29.323,19</td><td><span class="trend-pattern" title="Jan→Fev: não subiu | Fev→Mar: subiu | Mar→Abr: não subiu (1 de 3)"><span class="flat">·</span><span class="up">▲</span><span class="flat">·</span></span></td><td class="num"><span class="pct-jan safe">-3,5%</span></td><td><span class="badge badge-down">↓ Reduziu</span></td></tr></tbody>
             </table>
           </div>
           <div class="pagination">
-            <span id="pagInfo">Mostrando 37–41 de 41 contas</span>
+            <span id="pagInfo">Mostrando 1–12 de 19 contas</span>
             <div>
-              <button id="pagPrev">‹ Anterior</button>
-              <button id="pagNext" disabled="">Próxima ›</button>
+              <button id="pagPrev" disabled="">‹ Anterior</button>
+              <button id="pagNext">Próxima ›</button>
             </div>
           </div>
         </div>
@@ -787,7 +868,7 @@
 
     <div class="footer-info">
       GAP-GL • Grupamento de Apoio do Galeão • Comissão de Contabilidade —
-      <span id="genStamp">Gerado em 02/05/2026, 20:52:24</span>
+      <span id="genStamp">Gerado em 03/05/2026, 15:31:36</span>
     </div>
   </div>
 </div>
@@ -814,7 +895,24 @@
 <div class="toast" id="toast"></div>
 
 <!-- Tooltip da tabela detalhada -->
-<div id="cellTooltip" class="" style="top: 284.75px; left: 818.794px;"><div class="tip-title">Fevereiro / 2026 — Diferença</div><div class="tip-row"><span class="lbl">Diferença SIAFI − SILOMS</span><span class="val neg">-R$ 152,23</span></div><div class="tip-divider"></div><div class="tip-row"><span class="lbl" style="color:#1abc9c;font-weight:700;text-transform:uppercase;font-size:10.5px;">vs Janeiro</span><span></span></div><div class="tip-row"><span class="lbl">Δ Nominal</span><span class="val pos">− R$ 13.000,00</span></div><div class="tip-row"><span class="lbl">Δ em Módulo</span><span class="val pos">− R$ 12.695,54</span></div><div class="tip-foot">↓ Discrepância reduziu vs Janeiro (saneamento)</div></div>
+<div id="cellTooltip"></div>
+
+<!-- Painel explicativo do critério "Conta Crítica" -->
+<div class="crit-rule-box" id="critRuleBox" style="top: 280.463px; left: 1180px;">
+  <div class="title">⚠ Critério de Conta Crítica</div>
+  Uma conta é classificada como <b>crítica</b> quando atende <u>simultaneamente</u> os dois testes:
+  <ul>
+    <li><b>1. Tendência de alta:</b> a diferença em módulo aumentou em <b>pelo menos 2 dos 3 últimos meses</b><br>
+      <code style="font-size:10.5px;">|Fev|&gt;|Jan|, |Mar|&gt;|Fev|, |Abr|&gt;|Mar|</code> — pelo menos 2 verdadeiros<br>
+      <span style="color:#bdc3c7;font-size:11px;">→ captura padrão de deterioração consistente, não eventos isolados</span></li>
+    <li><b>2. Crescimento material:</b> <code>(|Abr| − |Jan|) / |Jan| &gt; 10%</code><br>
+      <span style="color:#bdc3c7;font-size:11px;">→ o crescimento da discrepância é relevante face ao saldo inicial do ano</span></li>
+  </ul>
+  <div class="foot">
+    Contas que pioraram apenas em um único mês ou cresceram pouco (≤10%) não entram.
+    A tabela mostra o padrão visual <code>▲··</code> para você conferir cada conta.
+  </div>
+</div>
 
 <script>
 /* ============================================================
@@ -882,6 +980,23 @@ function enrich(rows) {
     if (Math.abs(variacao_abs) < 0.01) status = 'eq';
     else if (variacao_abs > 0) status = 'up';   // dif aumentou
     else status = 'down';                        // dif reduziu (saneamento)
+
+    // Indicadores de tendência mês a mês (em módulo)
+    const sJan = Math.abs(r.jan_dif), sFev = Math.abs(r.fev_dif);
+    const sMar = Math.abs(r.mar_dif), sAbr = Math.abs(r.abr_dif);
+    const up_fev = sFev > sJan + 0.005;
+    const up_mar = sMar > sFev + 0.005;
+    const up_abr = sAbr > sMar + 0.005;
+    const aumentos3m = (up_fev?1:0) + (up_mar?1:0) + (up_abr?1:0);
+
+    // Crescimento % vs Janeiro (em módulo)
+    let pct_jan;
+    if (sJan < 0.01) pct_jan = sAbr > 0 ? Infinity : 0;
+    else pct_jan = ((sAbr - sJan) / sJan) * 100;
+
+    // Padrão visual (▲ = subiu vs anterior, · = não subiu)
+    const padrao = (up_fev?'▲':'·') + (up_mar?'▲':'·') + (up_abr?'▲':'·');
+
     return {
       ...r,
       variacao,
@@ -889,11 +1004,31 @@ function enrich(rows) {
       abr_dif_abs: Math.abs(r.abr_dif),
       jan_dif_abs: Math.abs(r.jan_dif),
       status,
+      up_fev, up_mar, up_abr,
+      aumentos3m,
+      pct_jan,
+      padrao,
     };
   });
 }
 
 const DATA = enrich(RAW_DATA);
+
+/* ============================================================
+   CRITÉRIO "CONTA CRÍTICA" — definição única
+   Uma conta é crítica se atende SIMULTANEAMENTE:
+     1) TENDÊNCIA: subiu em diferença em PELO MENOS 2 dos 3
+        últimos meses (Jan→Fev, Fev→Mar, Mar→Abr).
+        "Subiu" = |dif. mês| > |dif. mês anterior|
+     2) MAGNITUDE: crescimento > 10% no período
+        (|Dif. Abril| − |Dif. Janeiro|) / |Dif. Janeiro| > 10%
+   ============================================================ */
+const CRESCIMENTO_MIN_PCT = 10;        // 10% vs Janeiro
+const MIN_AUMENTOS_3M = 2;             // pelo menos 2 dos 3 últimos meses
+
+function isCritica(d) {
+  return d.aumentos3m >= MIN_AUMENTOS_3M && d.pct_jan > CRESCIMENTO_MIN_PCT;
+}
 
 const totals = {
   jan: DATA.reduce((s,d)=>s+d.jan_dif,0),
@@ -924,7 +1059,7 @@ function renderKPIs() {
   document.getElementById('kpi-abs-abr').textContent = fmtBRLshort(totals.abr_abs);
   document.getElementById('kpi-abs-vs-jan').textContent = fmtPct(variacaoPctAbs,2);
 
-  const criticas = DATA.filter(d => d.status === 'up' && Math.abs(d.variacao_abs) > 1000).length;
+  const criticas = DATA.filter(isCritica).length;
   const saneadas = DATA.filter(d => d.status === 'down').length;
   document.getElementById('kpi-criticas').textContent = criticas;
   document.getElementById('kpi-saneadas').textContent = saneadas + ' saneadas';
@@ -1108,8 +1243,7 @@ function applyFilters(rows) {
   if (state.filter === 'up') r = r.filter(d => d.status === 'up');
   else if (state.filter === 'down') r = r.filter(d => d.status === 'down');
   else if (state.filter === 'crit') {
-    const top10 = [...DATA].sort((a,b)=>b.abr_dif_abs - a.abr_dif_abs).slice(0,10).map(d=>d.conta);
-    r = r.filter(d => top10.includes(d.conta));
+    r = r.filter(isCritica);
   }
   if (state.search) {
     const q = state.search.toLowerCase();
@@ -1123,6 +1257,11 @@ function applySort(rows) {
   return [...rows].sort((a,b) => {
     let va = a[k], vb = b[k];
     if (typeof va === 'string') return va.localeCompare(vb) * dir;
+    // Tratar Infinity (contas novas no período - pct_jan)
+    if (va === Infinity) va = Number.MAX_SAFE_INTEGER;
+    if (vb === Infinity) vb = Number.MAX_SAFE_INTEGER;
+    if (va === -Infinity) va = -Number.MAX_SAFE_INTEGER;
+    if (vb === -Infinity) vb = -Number.MAX_SAFE_INTEGER;
     return ((va||0) - (vb||0)) * dir;
   });
 }
@@ -1153,10 +1292,43 @@ function renderTable() {
     if (d.status === 'up') badge = '<span class="badge badge-up">↑ Aumentou</span>';
     else if (d.status === 'down') badge = '<span class="badge badge-down">↓ Reduziu</span>';
     else badge = '<span class="badge badge-eq">≈ Estável</span>';
+    if (isCritica(d)) badge += '<span class="badge badge-crit">⚠ Crítica</span>';
 
     function cellNum(v) {
       const cls = v < 0 ? 'neg' : (v > 0 ? 'pos' : '');
       return '<td class="num ' + cls + '">' + fmtBRL(v) + '</td>';
+    }
+
+    // Padrão visual de tendência (▲▲▲)
+    function cellPattern(d) {
+      const isAlert = d.aumentos3m >= MIN_AUMENTOS_3M;
+      const cls = 'trend-pattern' + (isAlert ? ' alert' : '');
+      const tipText = 'Jan→Fev: ' + (d.up_fev ? 'subiu' : 'não subiu') +
+                    ' | Fev→Mar: ' + (d.up_mar ? 'subiu' : 'não subiu') +
+                    ' | Mar→Abr: ' + (d.up_abr ? 'subiu' : 'não subiu') +
+                    ' (' + d.aumentos3m + ' de 3)';
+      const html = '<span class="' + cls + '" title="' + tipText + '">' +
+        (d.up_fev ? '<span class="up">▲</span>' : '<span class="flat">·</span>') +
+        (d.up_mar ? '<span class="up">▲</span>' : '<span class="flat">·</span>') +
+        (d.up_abr ? '<span class="up">▲</span>' : '<span class="flat">·</span>') +
+        '</span>';
+      return '<td>' + html + '</td>';
+    }
+
+    // Crescimento % vs Janeiro
+    function cellPctJan(d) {
+      let cls = 'muted', txt;
+      if (d.pct_jan === Infinity) { cls = 'danger'; txt = 'NOVA'; }
+      else if (Math.abs(d.pct_jan) < 0.05) { cls = 'muted'; txt = '0,0%'; }
+      else {
+        const v = d.pct_jan;
+        if (v > CRESCIMENTO_MIN_PCT) cls = 'danger';
+        else if (v > 0) cls = 'warn';
+        else cls = 'safe';
+        const sign = v > 0 ? '+' : '';
+        txt = sign + v.toFixed(1).replace('.', ',') + '%';
+      }
+      return '<td class="num"><span class="pct-jan ' + cls + '">' + txt + '</span></td>';
     }
 
     // Célula mensal com tooltip: passa metadados via data-* (escapados)
@@ -1196,6 +1368,8 @@ function renderTable() {
       cellMonth(monthMeta[2]) +
       cellMonth(monthMeta[3]) +
       cellNum(d.variacao) +
+      cellPattern(d) +
+      cellPctJan(d) +
       '<td>' + badge + '</td>';
     tbody.appendChild(tr);
   });
@@ -1397,6 +1571,47 @@ function bindEvents() {
       if (t) t.scrollIntoView({ behavior: 'smooth', block: 'start' });
     };
   });
+
+  // Painel explicativo do critério "Conta Crítica"
+  function toggleCritRule(anchor) {
+    const box = document.getElementById('critRuleBox');
+    if (box.classList.contains('show')) {
+      box.classList.remove('show');
+      return;
+    }
+    const r = anchor.getBoundingClientRect();
+    box.style.top = (r.bottom + 8) + 'px';
+    let left = r.left;
+    box.classList.add('show');
+    const bw = box.offsetWidth;
+    if (left + bw > window.innerWidth - 16) left = window.innerWidth - bw - 16;
+    if (left < 16) left = 16;
+    box.style.left = left + 'px';
+  }
+  function hideCritRule() {
+    document.getElementById('critRuleBox').classList.remove('show');
+  }
+  const infoIco = document.getElementById('kpi-criticas-info');
+  const critCard = document.getElementById('kpi-criticas-card');
+  const legendCrit = document.getElementById('legendCrit');
+  const btnCrit = document.getElementById('btn-crit');
+
+  if (infoIco) infoIco.onclick = e => { e.stopPropagation(); toggleCritRule(infoIco); };
+  if (legendCrit) legendCrit.onclick = e => { e.stopPropagation(); toggleCritRule(legendCrit); };
+  // Hover no card também
+  if (critCard) {
+    critCard.style.cursor = 'help';
+    critCard.addEventListener('mouseenter', () => { if (!document.getElementById('critRuleBox').classList.contains('show')) toggleCritRule(critCard); });
+    critCard.addEventListener('mouseleave', hideCritRule);
+  }
+  // Esconde ao clicar fora
+  document.addEventListener('click', e => {
+    const box = document.getElementById('critRuleBox');
+    if (!box.contains(e.target) && e.target !== infoIco && e.target !== legendCrit) {
+      hideCritRule();
+    }
+  });
+  window.addEventListener('scroll', hideCritRule, true);
 }
 
 /* ============================================================
