@@ -224,7 +224,7 @@ function card(d){
                   throw new Error('Não foi possível carregar data/dados.json');
           }
           const dados=await resposta.json();
-          const registros=dados.data||[];
+          const registros=(dados.data||[]).map(item=>({...item,nf:item.nf||item.notaFiscal||item.nfBusca||'',notaFiscal:item.nf||item.notaFiscal||item.nfBusca||'',NF:item.nf||item.notaFiscal||item.nfBusca||''}));
           window.dadosDaPlanilha=registros;
           window.ordensBancarias=registros;
           window.dadosOB=registros;
