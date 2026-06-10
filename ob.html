@@ -174,6 +174,16 @@ function buscar(){
   const termo=el('q').value.trim().toLowerCase();
   if(!termo){ el('res').innerHTML=''; el('stat').textContent=''; return; }
   const achados=DADOS.filter(d=>String(d[campo]||'').toLowerCase().includes(termo));
+  if(campo==='nf'||campo==='notaFiscal'||campo==='Nota Fiscal'){
+    const termoNF=String(termo||'').replace(/\D/g,'');
+    achados.sort((a,b)=>{
+      const nfA=String(a.nf||a.notaFiscal||a.NF||'').replace(/\D/g,'');
+      const nfB=String(b.nf||b.notaFiscal||b.NF||'').replace(/\D/g,'');
+      const scoreA=nfA===termoNF?0:nfA.endsWith(termoNF)?1:nfA.includes(termoNF)?2:3;
+      const scoreB=nfB===termoNF?0:nfB.endsWith(termoNF)?1:nfB.includes(termoNF)?2:3;
+      return scoreA-scoreB;
+    });
+  }
   el('stat').textContent=achados.length+' resultado(s) encontrado(s)';
   if(achados.length===0){ el('res').innerHTML='<div class="vazio"><h3>Nada encontrado</h3><p>Nenhuma ordem bancaria corresponde a essa busca.</p></div>'; return; }
   achados.sort((a,b)=>String(b.emissao||'').localeCompare(String(a.emissao||'')));
