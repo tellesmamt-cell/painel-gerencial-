@@ -325,4 +325,247 @@ function card(d){
   carregarDadosAutomaticamente();
 </script>
   
-</body></html>
+<style>
+    #painel-ob-automatico{
+          max-width:1200px;
+          margin:20px auto;
+          padding:16px;
+          font-family:Arial, sans-serif;
+    }
+    .resumo-ob{
+          display:flex;
+          gap:16px;
+          flex-wrap:wrap;
+          margin-bottom:20px;
+    }
+    .card-resumo-ob{
+          background:#ffffff;
+          border:1px solid #d9e2ef;
+          border-radius:10px;
+          padding:16px;
+          min-width:180px;
+          box-shadow:0 2px 8px rgba(0,0,0,0.05);
+    }
+    .card-resumo-ob span{
+          display:block;
+          color:#5d6b82;
+          font-size:12px;
+          text-transform:uppercase;
+          margin-bottom:6px;
+    }
+    .card-resumo-ob strong{
+          color:#0b2447;
+          font-size:22px;
+    }
+    .filtros-ob{
+          display:flex;
+          gap:10px;
+          flex-wrap:wrap;
+          margin-bottom:20px;
+    }
+    .filtros-ob input{
+          padding:10px;
+          border:1px solid #ccd6e3;
+          border-radius:8px;
+          font-size:14px;
+          min-width:240px;
+    }
+    .card-ob{
+          background:#ffffff;
+          border:1px solid #d9e2ef;
+          border-radius:10px;
+          padding:20px;
+          margin-bottom:16px;
+          box-shadow:0 2px 8px rgba(0,0,0,0.05);
+    }
+    .topo-card-ob{
+          display:flex;
+          justify-content:space-between;
+          gap:20px;
+          flex-wrap:wrap;
+          margin-bottom:20px;
+    }
+    .linha-campos-ob{
+          display:grid;
+          grid-template-columns:1fr 1fr;
+          gap:22px;
+          margin-bottom:18px;
+    }
+    .campo-ob label{
+          display:block;
+          color:#63708a;
+          font-size:12px;
+          text-transform:uppercase;
+          margin-bottom:6px;
+    }
+    .campo-ob strong{
+          display:block;
+          color:#071d38;
+          font-size:15px;
+          word-break:break-word;
+    }
+    .campo-ob small{
+          display:block;
+          color:#63708a;
+          margin-top:4px;
+          font-size:12px;
+    }
+    .observacao-ob{
+          background:#f8fbff;
+          border:1px solid #d9e2ef;
+          border-radius:8px;
+          padding:12px;
+          color:#40506a;
+          font-size:13px;
+    }
+    .nf-ob{
+          color:#0b3a75;
+          font-weight:bold;
+          margin-bottom:16px;
+          font-size:16px;
+    }
+    .erro-ob{
+          background:#fff0f0;
+          border:1px solid #dd7777;
+          color:#8a0000;
+          padding:16px;
+          border-radius:8px;
+    }
+    @media(max-width:700px){
+          .linha-campos-ob{
+                  grid-template-columns:1fr;
+          }
+    }
+  </style>
+  <div id="painel-ob-automatico">
+      <div id="status-ob">Carregando Ordens Bancarias...</div>div>
+  </div>div>
+  <script>
+    async function carregarOrdensBancarias(){
+        try{
+              const resposta=await fetch('./data/dados.json?t='+Date.now());
+              if(!resposta.ok){
+                      throw new Error('Nao foi possivel carregar o arquivo data/dados.json');
+              }
+              const dados=await resposta.json();
+              const registros=dados.data||[];
+              window.dadosDaPlanilha=registros;
+              renderizarOrdensBancarias(registros,dados);
+        }catch(erro){
+              console.error('Erro ao carregar Ordens Bancarias:',erro);
+              document.getElementById('painel-ob-automatico').innerHTML=`
+                    <div class="erro-ob">
+                            <strong>Erro ao carregar dados.</strong><br>
+                                    ${erro.message}
+                                          </div>
+                                              `;
+        }
+    }
+    function renderizarOrdensBancarias(registros,dadosGerais){
+        const painel=document.getElementById('painel-ob-automatico');
+        const totalOrdens=registros.length;
+        const valorTotal=dadosGerais.valorTotalPagoFormatado||calcularValorTotal(registros);
+        painel.innerHTML=`
+            <div class="resumo-ob">
+                  <div class="card-resumo-ob">
+                          <span>Total de Ordens Bancarias</span>
+                                  <strong>${totalOrdens}</strong>
+                                        </div>
+                                              <div class="card-resumo-ob">
+                                                      <span>Valor Total Pago</span>
+                                                              <strong>${valorTotal}</strong>
+                                                                    </div>
+                                                                          <div class="card-resumo-ob">
+                                                                                  <span>Ultima atualizacao</span>
+                                                                                          <strong style="font-size:14px;">${formatarDataAtualizacao(dadosGerais.updatedAt)}</strong>
+                                                                                                </div>
+                                                                                                    </div>
+                                                                                                        <div class="filtros-ob">
+                                                                                                              <input id="busca-ob" type="text" placeholder="Buscar por OB, favorecido, CNPJ, NP ou NF">
+                                                                                                                  </div>
+                                                                                                                      <div id="lista-ob"></div>
+                                                                                                                        `;
+        document.getElementById('busca-ob').addEventListener('input',function(){
+              const termo=this.value.toLowerCase().trim();
+              const filtrados=registros.filter(item=>{
+                      return JSON.stringify(item).toLowerCase().includes(termo);
+              });
+              renderizarListaOB(filtrados);
+        });
+        renderizarListaOB(registros);
+    }
+    function renderizarListaOB(registros){
+        const lista=document.getElementById('lista-ob');
+        if(!registros.length){
+              lista.innerHTML='<div class="erro-ob">Nenhuma Ordem Bancaria encontrada.</div>';
+              return;
+        }
+        lista.innerHTML=registros.map(item=>`
+            <div class="card-ob">
+                  <div class="nf-ob">NF: ${item.nf||'Nao informada'}</div>
+                        <div class="topo-card-ob">
+                                <div class="campo-ob">
+                                          <label>Ordem Bancaria (OB)</label>
+                                                    <strong>${item.ordemBancaria||''}</strong>
+                                                            </div>
+                                                                    <div class="campo-ob">
+                                                                              <label>Valor Total Pago</label>
+                                                                                        <strong>${item.valorTotalPagoFormatado||''}</strong>
+                                                                                                </div>
+                                                                                                      </div>
+                                                                                                            <div class="linha-campos-ob">
+                                                                                                                    <div class="campo-ob">
+                                                                                                                              <label>Favorecido</label>
+                                                                                                                                        <strong>${item.favorecido||''}</strong>
+                                                                                                                                                  <small>CNPJ: ${item.cnpj||''}</small>
+                                                                                                                                                          </div>
+                                                                                                                                                                  <div class="campo-ob">
+                                                                                                                                                                            <label>Nota de Pagamento (NP)</label>
+                                                                                                                                                                                      <strong>${item.notaPagamento||''}</strong>
+                                                                                                                                                                                              </div>
+                                                                                                                                                                                                    </div>
+                                                                                                                                                                                                          <div class="linha-campos-ob">
+                                                                                                                                                                                                                  <div class="campo-ob">
+                                                                                                                                                                                                                            <label>OM que cadastrou</label>
+                                                                                                                                                                                                                                      <strong>${item.omQueCadastrou||''}</strong>
+                                                                                                                                                                                                                                              </div>
+                                                                                                                                                                                                                                                      <div class="campo-ob">
+                                                                                                                                                                                                                                                                <label>Saque Bacen</label>
+                                                                                                                                                                                                                                                                          <strong>${item.saqueBacen||''}</strong>
+                                                                                                                                                                                                                                                                                  </div>
+                                                                                                                                                                                                                                                                                        </div>
+                                                                                                                                                                                                                                                                                              <div class="linha-campos-ob">
+                                                                                                                                                                                                                                                                                                      <div class="campo-ob">
+                                                                                                                                                                                                                                                                                                                <label>Data de Emissao</label>
+                                                                                                                                                                                                                                                                                                                          <strong>${item.dataEmissao||''}</strong>
+                                                                                                                                                                                                                                                                                                                                  </div>
+                                                                                                                                                                                                                                                                                                                                        </div>
+                                                                                                                                                                                                                                                                                                                                              <div class="observacao-ob">
+                                                                                                                                                                                                                                                                                                                                                      <strong>Observacao original:</strong> ${item.observacaoOriginal||''}
+                                                                                                                                                                                                                                                                                                                                                            </div>
+                                                                                                                                                                                                                                                                                                                                                                </div>
+                                                                                                                                                                                                                                                                                                                                                                  `).join('');
+    }
+    function calcularValorTotal(registros){
+        const total=registros.reduce((soma,item)=>{
+              return soma+Number(item.valorTotalPago||0);
+        },0);
+        return total.toLocaleString('pt-BR',{
+              style:'currency',
+              currency:'BRL'
+        });
+    }
+    function formatarDataAtualizacao(dataISO){
+        if(!dataISO){
+              return 'Sem data';
+        }
+        const data=new Date(dataISO);
+        if(Number.isNaN(data.getTime())){
+              return dataISO;
+        }
+        return data.toLocaleString('pt-BR');
+    }
+    carregarOrdensBancarias();
+  </script>
+  
+<  style></body></html>
