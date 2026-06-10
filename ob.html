@@ -216,4 +216,48 @@ function card(d){
   carregarDadosAutomaticamente();
 </script>
   
+<script>
+  async function carregarDadosAutomaticamente(){
+    try{
+          const resposta=await fetch('./data/dados.json?t='+Date.now());
+          if(!resposta.ok){
+                  throw new Error('Não foi possível carregar data/dados.json');
+          }
+          const dados=await resposta.json();
+          const registros=dados.data||[];
+          window.dadosDaPlanilha=registros;
+          window.ordensBancarias=registros;
+          window.dadosOB=registros;
+          console.log('Dados automáticos carregados:',registros.length,registros[0]);
+          if(typeof carregarDados==='function'){
+                  carregarDados(registros);
+                  return;
+          }
+          if(typeof renderizarDados==='function'){
+                  renderizarDados(registros);
+                  return;
+          }
+          if(typeof renderizarOrdens==='function'){
+                  renderizarOrdens(registros);
+                  return;
+          }
+          if(typeof atualizarTela==='function'){
+                  atualizarTela(registros);
+                  return;
+          }
+          if(typeof aplicarBusca==='function'){
+                  aplicarBusca();
+                  return;
+          }
+          const contador=document.querySelector('[data-total-ordens]');
+          if(contador){
+                  contador.textContent=registros.length+' ORDENS';
+          }
+    }catch(erro){
+          console.error('Erro ao alimentar painel automaticamente:',erro);
+    }
+  }
+  carregarDadosAutomaticamente();
+</script>
+  
 </body></html>
