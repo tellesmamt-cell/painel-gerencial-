@@ -101,6 +101,7 @@ header{margin-bottom:24px;display:flex;justify-content:space-between;align-items
 
 <script>
 let DADOS = [];
+  const el = id => document.getElementById(id);
 let DATA_REF = "";
 let campo = 'nf';
 const fmtMoeda = v => 'R$ ' + Number(v).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
