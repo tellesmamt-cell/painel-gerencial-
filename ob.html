@@ -45,30 +45,6 @@ header{margin-bottom:24px;display:flex;justify-content:space-between;align-items
 .htitle p{color:var(--suave);margin-top:4px;font-size:15px}
 .tag{display:inline-block;background:var(--azul);color:#fff;font-size:11px;font-weight:600;padding:3px 10px;border-radius:20px;margin-top:10px;letter-spacing:.5px}
 .tag.off{background:#a0aec0}
-.adminLink{font-size:12px;color:#a0aec0;cursor:pointer;user-select:none;padding:4px 8px;border-radius:6px}
-.adminLink:hover{color:var(--azul2);background:var(--cinza2)}
-.box{background:#fff;border:1px solid var(--borda);border-radius:14px;padding:22px;box-shadow:0 1px 3px rgba(0,0,0,.04);margin-bottom:20px}
-.adminBox{border:2px solid var(--amar-bd);background:var(--amar-bg)}
-.hidden{display:none!important}
-.drop{border:2px dashed #cbd5e0;border-radius:12px;padding:22px;text-align:center;cursor:pointer;transition:.15s;background:#fff}
-.drop:hover,.drop.over{border-color:var(--azul2);background:#ebf4ff}
-.drop b{color:var(--azul);font-size:15px}
-.drop span{display:block;font-size:13px;color:var(--suave);margin-top:6px}
-.lbl{display:block;font-size:13px;font-weight:600;color:var(--texto);margin-bottom:8px}
-.adminHdr{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
-.adminHdr .t{font-weight:700;color:var(--amar-tx);font-size:14px}
-.sair{font-size:12px;color:var(--suave);cursor:pointer;text-decoration:underline}
-.pinrow{display:flex;gap:10px;align-items:center}
-.pinrow input{width:140px;border:1px solid #cbd5e0;border-radius:8px;padding:10px 14px;font-size:16px;letter-spacing:3px;text-align:center}
-.btn{background:var(--azul);color:#fff;border:none;padding:10px 18px;border-radius:9px;font-size:14px;font-weight:600;cursor:pointer;transition:.15s}
-.btn:hover{background:var(--azul2)}
-.btn.verde{background:var(--verde)}
-.btn.verde:hover{filter:brightness(1.1)}
-.btn:disabled{background:#cbd5e0;cursor:not-allowed}
-.filtros{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px}
-.filtros button{background:var(--cinza2);border:1px solid var(--borda);color:var(--suave);padding:6px 14px;border-radius:8px;font-size:13px;cursor:pointer;font-weight:500;transition:.15s}
-.filtros button.on{background:var(--azul);color:#fff;border-color:var(--azul)}
-.search input{width:100%;border:1px solid #cbd5e0;border-radius:10px;padding:13px 16px;font-size:15px;outline:none;transition:.15s}
 .search input:focus{border-color:var(--azul2);box-shadow:0 0 0 3px rgba(44,82,130,.12)}
 .search input:disabled{background:#edf2f7;cursor:not-allowed}
 .hint{font-size:12px;color:var(--suave);margin-top:10px}
@@ -100,35 +76,10 @@ header{margin-bottom:24px;display:flex;justify-content:space-between;align-items
     <div class="htitle">
       <h1>Consulta de Ordens Bancarias</h1>
       <p>Situacao de pagamento de Notas Fiscais — GAP-GL (UG 120645)</p>
-    </div>
-    <div class="adminLink" id="adminLink" title="Area administrativa">⚙ admin</div>
+  
   </header>
-
-  <!-- LOGIN ADMIN -->
-    <div class="adminHdr"><span class="t">🔒 Area administrativa</span><span class="sair" id="cancelLogin">fechar</span></div>
-    <div class="pinrow">
-      <input type="password" id="pin" placeholder="PIN" maxlength="8" inputmode="numeric">
-      <button class="btn" id="btnEntrar">Entrar</button>
-    </div>
-    <div id="pinErro" class="erro" style="margin-top:8px;display:none">PIN incorreto.</div>
-  </div>
-
-  <!-- PAINEL ADMIN -->
-  <div class="box adminBox hidden" id="adminPanel">
-    <div class="adminHdr"><span class="t">🔒 Modo administrador</span><span class="sair" id="sairAdmin">sair do modo admin</span></div>
-    <span class="lbl">Alimentar com a planilha do Tesouro Gerencial</span>
-    <div class="drop" id="drop">
-      <b>Clique ou arraste a planilha (.xlsx)</b>
-      <span id="dropInfo"><b style="color:var(--verde)">2850 ordens carregadas</b> (2842 com NF). Ja pode consultar e publicar.</span>
-    </div>
-    <input type="file" id="file" accept=".xlsx,.xls" style="display:none">
-    <div style="margin-top:16px">
-      <button class="btn verde" id="btnExport">💾 Copiar/baixar HTML para publicar (com dados embutidos)</button>
-      <div class="aviso">Atencao: o arquivo gerado contem a base de pagamentos embutida. Publique apenas em local interno e autorizado.</div>
-    </div>
-  </div>
-
-  <!-- BUSCA (todos veem) -->
+  
+    <!-- BUSCA (todos veem) -->
   <div class="box">
     <span class="lbl">Buscar</span>
     <div class="filtros">
@@ -148,30 +99,13 @@ header{margin-bottom:24px;display:flex;justify-content:space-between;align-items
 </div>
 
 <script>
-const PIN = "1234";
 let DADOS = [];
 let DATA_REF = "";
 let campo = 'nf';
-const el = id => document.getElementById(id);
 const fmtMoeda = v => 'R$ ' + Number(v).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
 
 // Se este arquivo foi gerado com dados embutidos, carrega-os:
 if(window.DADOS_EMBUTIDOS){ DADOS = window.DADOS_EMBUTIDOS; DATA_REF = window.DATA_REF||""; ativarBusca(); }
-
-// ---------- Admin ----------
-el('adminLink').onclick = ()=>{ el('loginBox').classList.toggle('hidden'); el('pin').focus(); };
-el('cancelLogin').onclick = ()=> el('loginBox').classList.add('hidden');
-el('btnEntrar').onclick = entrar;
-el('pin').addEventListener('keydown', e=>{ if(e.key==='Enter') entrar(); });
-function entrar(){
-  if(el('pin').value === PIN){
-    el('loginBox').classList.add('hidden');
-    el('adminPanel').classList.remove('hidden');
-    el('pinErro').style.display='none';
-    el('pin').value='';
-  } else { el('pinErro').style.display='block'; }
-}
-el('sairAdmin').onclick = ()=> el('adminPanel').classList.add('hidden');
 
 // ---------- Extracao NF ----------
 function extraiNF(txt){
