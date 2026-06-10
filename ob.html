@@ -228,6 +228,7 @@ function card(d){
           window.dadosDaPlanilha=registros;
           window.ordensBancarias=registros;
           window.dadosOB=registros;
+      atualizarContadorOrdens(registros.length);
           console.log('Dados automáticos carregados:',registros.length,registros[0]);
           if(typeof carregarDados==='function'){
                   carregarDados(registros);
@@ -258,6 +259,17 @@ function card(d){
     }
   }
   carregarDadosAutomaticamente();
+
+  function atualizarContadorOrdens(total){
+      const elementos=[...document.querySelectorAll('body *')];
+      const contador=elementos.find(el=>{
+            const texto=(el.textContent||'').trim().toUpperCase();
+            return /^\d+\s+ORDENS$/.test(texto)||texto==='SEM DADOS';
+      });
+      if(contador){
+            contador.textContent=total+' ORDENS';
+      }
+  }
 </script>
   
 </body></html>
