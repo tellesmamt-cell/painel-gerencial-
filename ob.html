@@ -155,48 +155,6 @@ function processar(rows){
   return Object.values(mapa);
 }
 
-function lerArquivo(f){
-  el('dropInfo').innerHTML='Processando <b>'+f.name+'</b>...';
-  const reader=new FileReader();
-  reader.onload=e=>{
-    try{
-      const wb=XLSX.read(new Uint8Array(e.target.result),{type:'array'});
-      const rows=XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]],{header:1,raw:false,defval:''});
-      DADOS=processar(rows);
-      if(DADOS.length===0) throw new Error('Nenhuma OB encontrada.');
-      DATA_REF=f.name;
-      const comNf=DADOS.filter(d=>d.nf).length;
-      el('dropInfo').innerHTML='<b style="color:var(--verde)">'+DADOS.length+' ordens carregadas</b> ('+comNf+' com NF). Ja pode consultar e publicar.';
-      el('btnExport').disabled=false;
-      ativarBusca();
-    }catch(err){ el('dropInfo').innerHTML='<span class="erro">Erro: '+err.message+'</span>'; }
-  };
-  reader.readAsArrayBuffer(f);
-}
-
-el('drop').onclick=()=>el('file').click();
-el('file').addEventListener('change',e=>{ if(e.target.files[0]) lerArquivo(e.target.files[0]); });
-el('drop').addEventListener('dragover',e=>{e.preventDefault();el('drop').classList.add('over');});
-el('drop').addEventListener('dragleave',()=>el('drop').classList.remove('over'));
-el('drop').addEventListener('drop',e=>{e.preventDefault();el('drop').classList.remove('over');if(e.dataTransfer.files[0])lerArquivo(e.dataTransfer.files[0]);});
-
-// ---------- Exportar HTML com dados embutidos ----------
-el('btnExport').onclick=()=>{
-  // clona o documento, remove estado de UI (paineis abertos, valor de busca) p/ exportar limpo
-  const clone=document.documentElement.cloneNode(true);
-  // garante que paineis admin saiam fechados no arquivo publicado
-  ['loginBox','adminPanel'].forEach(id=>{const x=clone.querySelector('#'+id); if(x)x.classList.add('hidden');});
-  const qx=clone.querySelector('#q'); if(qx)qx.removeAttribute('value');
-  let htmlAtual=clone.outerHTML;
-  const inj='<script>window.DADOS_EMBUTIDOS='+JSON.stringify(DADOS)+';window.DATA_REF='+JSON.stringify(DATA_REF)+';<\/script>';
-  // injeta na ancora unica (nao no primeiro <head> que pode aparecer em textos)
-  const novo=htmlAtual.replace('<!--DADOS_ANCHOR-->', inj);
-  const blob=new Blob(['<!DOCTYPE html>\n<html lang="pt-BR">\n'+novo.replace(/^<html[^>]*>/,'')],{type:'text/html'});
-  const url=URL.createObjectURL(blob);
-  const a=document.createElement('a');
-  a.href=url; a.download='consulta_ob_publicar.html'; a.click();
-  URL.revokeObjectURL(url);
-};
 
 // ---------- Busca ----------
 function ativarBusca(){
