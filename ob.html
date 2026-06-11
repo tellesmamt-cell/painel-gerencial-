@@ -173,7 +173,7 @@ el('q').addEventListener('input',buscar);
 function buscar(){
   const termo=el('q').value.trim().toLowerCase();
   if(!termo){ el('res').innerHTML=''; el('stat').textContent=''; return; }
-  const achados=DADOS.filter(d=>String(d[campo]||'').toLowerCase().includes(termo));
+  const base=(window.dadosDaPlanilha&&window.dadosDaPlanilha.length)?window.dadosDaPlanilha:DADOS; const achados=base.filter(d=>{const alvo=(campo==='nf'||campo==='notaFiscal'||campo==='Nota Fiscal')?(String(d.nf||d.notaFiscal||d.NF||'')+' '+String(d.observacaoOriginal||d.obs||'')):String(d[campo]||''); return alvo.toLowerCase().includes(termo);});
   if(campo==='nf'||campo==='notaFiscal'||campo==='Nota Fiscal'){
     const termoNF=String(termo||'').replace(/\D/g,'');
     achados.sort((a,b)=>{
