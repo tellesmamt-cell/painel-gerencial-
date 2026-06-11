@@ -194,13 +194,13 @@ function card(d){
   const nfTxt=d.nf?('NF: <b>'+d.nf+'</b>'):'<span class="semNf">Sem NF (pagamento por oficio/processo)</span>';
   return '<div class="card"><div class="card-top"><div class="nf">'+nfTxt+'</div>'+badge+'</div><div class="card-body">'+
     '<div class="field"><div class="k">Ordem Bancaria (OB)</div><div class="v">'+d.ob+'</div></div>'+
-    '<div class="field"><div class="k">Valor Total Pago</div><div class="v valor">'+fmtMoeda(d.valor)+'</div></div>'+
+    '<div class="field"><div class="k">Valor Total Pago</div><div class="v valor">'+(d.valorTotalPagoFormatado||fmtMoeda(d.valorTotalPago!=null?d.valorTotalPago:d.valor))+'</div></div>'+
     '<div class="field full"><div class="k">Favorecido</div><div class="v">'+d.favorecido+'</div><div class="v" style="font-size:12px;color:var(--suave);font-weight:400">CNPJ: '+d.cnpj+'</div></div>'+
-    '<div class="field"><div class="k">OM que cadastrou</div><div class="v">'+d.om+'</div></div>'+
+    '<div class="field"><div class="k">OM que cadastrou</div><div class="v">'+(d.omQueCadastrou||d.om||'-')+'</div></div>'+
     '<div class="field"><div class="k">Nota de Pagamento (NP)</div><div class="v" style="font-size:13px">'+d.np+'</div></div>'+
-    '<div class="field"><div class="k">Data de Emissao</div><div class="v">'+(d.emissao||'-')+'</div></div>'+
-    '<div class="field"><div class="k">Saque Bacen</div><div class="v">'+(d.saque||'-')+'</div></div>'+
-    '<div class="obs"><b>Observacao original:</b> '+d.obs+'</div></div></div>';
+    '<div class="field"><div class="k">Data de Emissao</div><div class="v">'+(d.dataEmissao||d.emissao||'-')+'</div></div>'+
+    '<div class="field"><div class="k">Saque Bacen</div><div class="v">'+(d.saqueBacen||d.saque||'-')+'</div></div>'+
+    '<div class="obs"><b>Observacao original:</b> '+(d.observacaoOriginal||d.obs||'-')+'</div></div></div>';
 }
 </script>
 
