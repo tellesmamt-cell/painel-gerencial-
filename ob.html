@@ -190,8 +190,8 @@ function buscar(){
   el('res').innerHTML=achados.slice(0,50).map(card).join('');
 }
 function card(d){
-  const badge=d.pago?'<span class="badge paga">Paga</span>':'<span class="badge proc">Em processamento</span>';
-  const nfTxt=d.nf?('NF: <b>'+d.nf+'</b>'):'<span class="semNf">Sem NF (pagamento por oficio/processo)</span>';
+  const badge='<span class="badge paga">Paga</span>';
+  const nfRaw=d.nf||((String(d.observacaoOriginal||d.obs||'').match(/NF\s+([A-Za-z0-9.\/-]+)/i)||[])[1])||''; const nfTxt=nfRaw?('NF: <b>'+nfRaw+'</b>'):'<span class="semNf">Sem NF (pagamento por oficio/processo)</span>';
   return '<div class="card"><div class="card-top"><div class="nf">'+nfTxt+'</div>'+badge+'</div><div class="card-body">'+
     '<div class="field"><div class="k">Ordem Bancaria (OB)</div><div class="v">'+d.ob+'</div></div>'+
     '<div class="field"><div class="k">Valor Total Pago</div><div class="v valor">'+(d.valorTotalPagoFormatado||fmtMoeda(d.valorTotalPago!=null?d.valorTotalPago:d.valor))+'</div></div>'+
