@@ -189,7 +189,7 @@ function buscar(){
   }
   el('stat').textContent=achados.length+' resultado(s) encontrado(s)';
   if(achados.length===0){ el('res').innerHTML='<div class="vazio"><h3>Nada encontrado</h3><p>Nenhuma ordem bancaria corresponde a essa busca.</p></div>'; return; }
-  const dnum=s=>{const m=String(s||'').match(/(\d{2})\/(\d{2})\/(\d{4})/);return m?(m[3]+m[2]+m[1]):'00000000';}; achados.sort((a,b)=>dnum(b.dataEmissao||b.emissao).localeCompare(dnum(a.dataEmissao||a.emissao)));
+  const dnum=s=>{const m=String(s||'').match(/(\d{2})\/(\d{2})\/(\d{4})/);return m?(m[3]+m[2]+m[1]):'00000000';}; if(campo!=='nf'&&campo!=='notaFiscal'&&campo!=='Nota Fiscal'){achados.sort((a,b)=>dnum(b.dataEmissao||b.emissao).localeCompare(dnum(a.dataEmissao||a.emissao)));}
   el('res').innerHTML=achados.slice(0,50).map(card).join('');
 }
 function card(d){
