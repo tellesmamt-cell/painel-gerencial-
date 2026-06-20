@@ -214,8 +214,8 @@ function card(d){
 
             // Aqui ficam os dados da planilha:
             const linhas=dados.data;
-
-            // Teste inicial: mostra os dados no console
+item.favorecido
+        // Teste inicial: mostra os dados no console
             console.table(linhas);
 
       }catch(erro){
@@ -234,7 +234,7 @@ function card(d){
                   throw new Error('Não foi possível carregar data/dados.json');
           }
           const dados=await resposta.json();
-          const registros=(dados.data||[]).map(item=>{const ob=item.ob||item.OB||item.ordemBancaria||item['__EMPTY_8']||''; if(!/OB\d/i.test(String(ob)))return null; const obsv=item.observacaoOriginal||item.obs||item['__EMPTY_7']||''; const nfMatch=(String(obsv).match(/NF\s+([A-Za-z0-9.\/-]+)/i)||[]); const nf=item.nf||item.notaFiscal||item.nfBusca||nfMatch[1]||''; return {ob:String(ob), OB:String(ob), nf:String(nf), notaFiscal:String(nf), NF:String(nf), favorecido:item.favorecido||item['__EMPTY_2']||'', cnpj:item.cnpj||item['__EMPTY_1']||'', omQueCadastrou:item.omQueCadastrou||item.om||item['__EMPTY']||'', np:item.np||item.notaPagamento||item['__EMPTY_3']||'', dataEmissao:item.dataEmissao||item.emissao||item['__EMPTY_6']||'', saqueBacen:item.saqueBacen||item.saque||item['__EMPTY_9']||'', observacaoOriginal:String(obsv), obs:String(obsv), valorTotalPago:(item.valorTotalPago!=null?item.valorTotalPago:(item.valor!=null?item.valor:item['__EMPTY_10'])), valorTotalPagoFormatado:item.valorTotalPagoFormatado||''};}).filter(Boolean);
+          const registros=(dados.data||[]).map(item=>{const ob=item.ob||item.OB||item.ordemBancaria||item['__EMPTY_8']||''; if(!/OB\d/i.test(String(ob)))return null; const obsv=item.observacaoOriginal||item.obs||item['__EMPTY_7']||''; const nfMatch=(String(obsv).match(/NF\s+([A-Za-z0-9.\/-]+)/i)||[]); const nf=item.nf||item.notaFiscal||item.nfBusca||nfMatch[1]||''; return {ob:String(ob), OB:String(ob), nf:String(nf), notaFiscal:String(nf), NF:String(nf), favorecido:item.favorecido||item['__EMPTY_2']||'', cnpj:item.cnpj||item['__EMPTY_1']||'', omQueCadastrou:item.omQueCadastrou||item.om||item['__EMPTY']||'', np:item.np||item.notaPagamento||item['__EMPTY_3']||'', dataEmissao:item.dataEmissao||item.emissao||item['__EMPTY_6']||'', saqueBacen:item.saqueBacen||item.saque||item['__EMPTY_9']||'', observacaoOriginal:String(obsv), obs:String(obsv), valorTotalPago:(item.valorTotalPago!=null?item.valorTotalPago:(item.valor!=null?item.valor:item['__EMPTY_10'])), valorTotalPagoFormatado:item.valorTotalPagoFormatado||''};}).filter(Boolean);let _pFav='',_pCnpj='',_pOm='';registros.forEach(r=>{if(r.favorecido){_pFav=r.favorecido;}else{r.favorecido=_pFav;}if(r.cnpj){_pCnpj=r.cnpj;}else{r.cnpj=_pCnpj;}if(r.omQueCadastrou){_pOm=r.omQueCadastrou;}else{r.omQueCadastrou=_pOm;}});
           window.dadosDaPlanilha=registros;
           window.ordensBancarias=registros;
           window.dadosOB=registros; try{ if(typeof DADOS!=='undefined'){ DADOS.length=0; registros.forEach(r=>DADOS.push(r)); } if(typeof ativarBusca==='function') ativarBusca(); if(typeof buscar==='function') buscar(); }catch(e){ console.error('pos-carregamento:',e); }
