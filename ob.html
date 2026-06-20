@@ -179,9 +179,13 @@ function buscar(){
     achados.sort((a,b)=>{
       const nfA=String(a.nf||a.notaFiscal||a.NF||'').replace(/\D/g,'');
       const nfB=String(b.nf||b.notaFiscal||b.NF||'').replace(/\D/g,'');
-      const scoreA=nfA===termoNF?0:nfA.endsWith(termoNF)?1:nfA.includes(termoNF)?2:3;
-      const scoreB=nfB===termoNF?0:nfB.endsWith(termoNF)?1:nfB.includes(termoNF)?2:3;
-      return scoreA-scoreB;
+      const rank=(nf)=>{if(nf===termoNF)return 0;if(nf.startsWith(termoNF))return 1;if(nf.includes(termoNF))return 2;return 3;};
+      const rA=rank(nfA),rB=rank(nfB);
+      if(rA!==rB)return rA-rB;
+      const vA=parseInt(nfA||'0',10),vB=parseInt(nfB||'0',10);
+      if(vA!==vB)return vA-vB;
+      return nfA.length-nfB.length;
+    });
     });
   }
   el('stat').textContent=achados.length+' resultado(s) encontrado(s)';
