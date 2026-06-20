@@ -186,7 +186,6 @@ function buscar(){
       if(vA!==vB)return vA-vB;
       return nfA.length-nfB.length;
     });
-    });
   }
   el('stat').textContent=achados.length+' resultado(s) encontrado(s)';
   if(achados.length===0){ el('res').innerHTML='<div class="vazio"><h3>Nada encontrado</h3><p>Nenhuma ordem bancaria corresponde a essa busca.</p></div>'; return; }
