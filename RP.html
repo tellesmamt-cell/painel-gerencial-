@@ -1084,7 +1084,7 @@ select{border-radius:11px; padding:6px 11px; padding-right:28px}
   .empty-org-card::before, .empty-org-lens{ animation:none !important; }
 }
 </style>
-<style>aside{display:none !important;}main.no-selection .tabs,main.no-selection [id^="tab-"]{display:none !important;}#orgBar{display:flex;align-items:center;gap:12px;flex-wrap:wrap;padding:4px 0 16px;margin-bottom:14px;border-bottom:1px solid var(--b);}#orgBar .ob-label{font-size:11px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;color:var(--t3);}#orgCombo{position:relative;min-width:300px;max-width:480px;flex:1;}#orgInput{width:100%;-webkit-appearance:none;appearance:none;background-color:var(--white);border:1.5px solid var(--b2);border-radius:10px;padding:12px 40px 12px 16px;font-size:14px;font-family:Sora,sans-serif;color:var(--t);outline:none;cursor:text;transition:border-color .15s,box-shadow .15s;}#orgInput::placeholder{color:var(--t4);}#orgInput:hover{border-color:var(--blue);}#orgInput:focus{border-color:var(--blue);box-shadow:0 0 0 3px var(--bl);}.org-caret{position:absolute;right:13px;top:50%;transform:translateY(-50%);width:17px;height:17px;pointer-events:none;opacity:.55;background:center/contain no-repeat;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23003366' stroke-width='2' stroke-linecap='round'%3E%3Ccircle cx='11' cy='11' r='7'/%3E%3Cpath d='M21 21l-4.3-4.3'/%3E%3C/svg%3E");}.org-list{position:absolute;left:0;right:0;top:calc(100% + 6px);z-index:60;max-height:320px;overflow-y:auto;background:var(--white);border:1px solid var(--b);border-radius:12px;box-shadow:0 16px 40px rgba(0,51,102,.18);padding:6px;display:none;}#orgCombo.open .org-list{display:block;}.org-item{padding:9px 12px;border-radius:8px;font-size:13px;color:var(--t2);cursor:pointer;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}.org-item:hover,.org-item.is-active{background:var(--bl);color:var(--blue);}.org-item.is-sel{font-weight:600;color:var(--blue);}.org-empty{padding:14px;font-size:12.5px;color:var(--t4);text-align:center;}.empty-org{display:none;flex:1;align-items:center;justify-content:center;min-height:50vh;padding:24px;}main.no-selection .empty-org{display:flex;}.empty-org-card{width:100%;max-width:460px;background:var(--white);border:1px solid var(--b);border-radius:var(--r);box-shadow:var(--sh);padding:36px 34px;text-align:center;}.empty-org-icon{font-size:40px;line-height:1;margin-bottom:12px;}.empty-org-card h2{font-size:19px;color:var(--blue);margin-bottom:8px;font-weight:700;}.empty-org-card p{font-size:13px;color:var(--t3);line-height:1.6;}</style></head>
+</head>
 <body class="is-admin">
 
 <!-- ADMIN LOGIN MODAL -->
@@ -1211,7 +1211,7 @@ select{border-radius:11px; padding:6px 11px; padding-right:28px}
     <div class="slabel">Organização</div>
     <div class="navlist" id="ugList"><div class="nitem nitem-all"><div class="nc">🌐 VISÃO GERAL</div><div class="nn">Todas as OMs · Consolidado</div><div class="nv">— · 0 OMs</div></div><div class="ndiv"></div></div>
   </aside>
-  <main class="no-selection"><div id="orgBar"><span class="ob-label">Organização</span><div id="orgCombo" class="org-combo"><input id="orgInput" type="text" autocomplete="off" placeholder="Buscar organização…" role="combobox" aria-expanded="false" aria-controls="orgList" aria-autocomplete="list"><span class="org-caret" aria-hidden="true"></span><div id="orgList" class="org-list" role="listbox"></div></div></div>
+  <main class="">
     <div class="tabs">
       <div class="tab active" onclick="setTab('home')">Página Inicial</div>
       <div class="tab" onclick="setTab('saldos')">Saldos por Conta</div>
@@ -1276,7 +1276,7 @@ select{border-radius:11px; padding:6px 11px; padding-right:28px}
         <div class="sgrid" id="stagGrid"></div>
       </div>
     </div>
-  <div id="emptyOrg" class="empty-org"><div class="empty-org-card"><div class="empty-org-lens" aria-hidden="true"></div><h2>Restos a Pagar — GAP-GL</h2><p>Escolha uma organização na caixa acima para visualizar os dados.</p></div></div></main>
+  </main>
 </div>
 
 <script>
@@ -2033,6 +2033,11 @@ function buildExportHTML(){
   var errBar=clone.querySelector('#errBar');
   if(errBar){errBar.style.display='none';errBar.textContent='';}
 
+  // Remove elementos/estilos injetados em runtime para o arquivo exportado
+  // não trazê-los embutidos (senão o patch os recria e duplica ao recarregar).
+  ['orgBar','emptyOrg','nag-orgbar-style'].forEach(function(id){ var n=clone.querySelector('#'+id); if(n) n.remove(); });
+  var _cmain=clone.querySelector('main'); if(_cmain) _cmain.classList.remove('no-selection');
+
   var doc='<!DOCTYPE html>\n'+clone.outerHTML;
 
   // Substitui a constante DATA_B64 pelos dados atuais
@@ -2129,6 +2134,7 @@ async function copyHTML(){
 
   // 1) Estilos: oculta a coluna lateral, estiliza a barra/caixa suspensa
   var st = document.createElement('style');
+  st.id = 'nag-orgbar-style';
   st.textContent =
     'aside{display:none !important;}'
     + 'main.no-selection .tabs,'
@@ -2161,12 +2167,16 @@ async function copyHTML(){
     + '.empty-org-icon{font-size:40px;line-height:1;margin-bottom:12px;}'
     + '.empty-org-card h2{font-size:19px;color:var(--blue);margin-bottom:8px;font-weight:700;}'
     + '.empty-org-card p{font-size:13px;color:var(--t3);line-height:1.6;}';
-  document.head.appendChild(st);
+  if(!document.getElementById('nag-orgbar-style')) document.head.appendChild(st);
 
   var main = document.querySelector('main');
 
-  // 2) Barra fixa no topo do conteúdo com a caixa suspensa
+  // 2) Barra fixa no topo do conteúdo com a caixa suspensa.
+  //    Idempotente: remove instâncias prévias (ex.: arquivo exportado/republicado
+  //    que já trazia esses elementos embutidos) para não duplicar ao recarregar.
   if(main){
+    var _ob=document.getElementById('orgBar'); if(_ob) _ob.remove();
+    var _eo=document.getElementById('emptyOrg'); if(_eo) _eo.remove();
     var bar = document.createElement('div');
     bar.id = 'orgBar';
     bar.innerHTML =
