@@ -285,5 +285,5 @@ item.favorecido
   }
 </script>
   
-<script>(function(){try{var d=new Date(document.lastModified);var dd=String(d.getDate()).padStart(2,"0");var mm=String(d.getMonth()+1).padStart(2,"0");var yy=d.getFullYear();var hh=String(d.getHours()).padStart(2,"0");var mi=String(d.getMinutes()).padStart(2,"0");var el=document.getElementById("ultAtualizacao");if(el){el.textContent="última atualização: "+dd+"/"+mm+"/"+yy+" "+hh+":"+mi;}}catch(e){}})();</script>
+<script>(async function(){function fmt(iso){try{var d=new Date(iso);if(isNaN(d))return null;var p=function(n){return String(n).padStart(2,"0");};return p(d.getDate())+"/"+p(d.getMonth()+1)+"/"+d.getFullYear()+" "+p(d.getHours())+":"+p(d.getMinutes());}catch(e){return null;}}try{var resp=await fetch("./data/dados.json?t="+Date.now());var dados=await resp.json();var quando=fmt(dados&&dados.updatedAt);var el=document.getElementById("ultAtualizacao");if(el){el.textContent=quando?("última atualização: "+quando):"";}}catch(e){var el2=document.getElementById("ultAtualizacao");if(el2){el2.textContent="";}}})();</script>
 </body></html>
