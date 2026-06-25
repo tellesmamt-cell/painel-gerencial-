@@ -76,7 +76,7 @@ header{margin-bottom:24px;display:flex;justify-content:space-between;align-items
 <div class="wrap">
   <header>
     <div class="htitle">
-      <h1>Consulta de Ordens Bancarias</h1>
+      <h1>Consulta de Ordens Bancarias <small id="ultAtualizacao" style="font-size:12px;font-weight:400;color:var(--suave);margin-left:10px;white-space:nowrap;">última atualização: —</small></h1>
       <p>Situacao de pagamento de Notas Fiscais — GAP-GL (UG 120645)</p>
       <span id="tag" class="tag off">SEM DADOS</span>
     </div>
@@ -285,4 +285,5 @@ item.favorecido
   }
 </script>
   
+<script>(function(){try{var d=new Date(document.lastModified);var dd=String(d.getDate()).padStart(2,"0");var mm=String(d.getMonth()+1).padStart(2,"0");var yy=d.getFullYear();var hh=String(d.getHours()).padStart(2,"0");var mi=String(d.getMinutes()).padStart(2,"0");var el=document.getElementById("ultAtualizacao");if(el){el.textContent="última atualização: "+dd+"/"+mm+"/"+yy+" "+hh+":"+mi;}}catch(e){}})();</script>
 </body></html>
