@@ -2317,17 +2317,103 @@ async function copyHTML(){
 })();
 
 // BOOT — dados embutidos (com tratamento de erro para diagnóstico)
-try {
-  initData(BUILTIN_RECORDS, BUILTIN_CONTAS);
-} catch (e) {
-  console.error('[GAP-GL Dashboard] Erro na inicialização:', e);
-  // Mostra mensagem visível para o usuário se o boot falhar
-  var errBar = document.createElement('div');
-  errBar.style.cssText = 'position:fixed;top:54px;left:0;right:0;background:#fef2f2;color:#dc2626;padding:14px 20px;font-family:sans-serif;font-size:13px;z-index:9998;text-align:center;border-bottom:2px solid #dc2626;box-shadow:0 2px 8px rgba(0,0,0,.15)';
-  errBar.innerHTML = '<strong>⚠️ Erro ao inicializar o dashboard:</strong> ' + (e.message || e) +
-                     '<br><span style="font-size:11px;color:#7f1d1d">Abra o Console do navegador (F12) para mais detalhes. Tente recarregar com Ctrl+F5.</span>';
-  if(document.body) document.body.insertBefore(errBar, document.body.firstChild);
+// BOOT - tenta carregar dados do RP.json; usa dados embutidos como fallback
+function __showBootErr(msg){
+  try{
+    var bar = document.createElement('div');
+    bar.style.cssText = 'position:fixed;top:0;left:0;right:0;background:#dc2626;color:#fff;padding:12px 20px;font-family:sans-serif;font-size:13px;z-index:99999;text-align:center';
+    bar.textContent = msg;
+    if(document.body) document.body.insertBefore(bar, document.body.firstChild);
+  }catch(_){}
 }
+// Converte o RP.json (planilha bruta com __EMPTY_n) para o formato RECORDS do painel
+function __parseRPJson(json){
+  var rows = (json && json.data) ? json.data : [];
+  var records = [], contaNames = {};
+  var monthCols = {}; // ex.: { '__EMPTY_6':'JAN/2026', ... }
+  var curUG = '';
+  var headerSeen = false;
+  for(var i=0;i<rows.length;i++){
+    var row = rows[i] || {};
+    var first = row['CONTROLE RESTOS A PAGAR'];
+    // Linha de UG responsavel
+    if(typeof first === 'string' && first.indexOf('UG Respons') !== -1){
+      curUG = first.replace(/^[^:]*:\s*/, '').trim(); // remove 'UG Responsável: '
+      continue;
+    }
+    // Linha de cabecalho com os meses (contem 'Conta Cont' ou 'Mes Lan')
+    if(typeof first === 'string' && (first.indexOf('Conta Cont') !== -1)){
+      monthCols = {};
+      for(var k in row){
+        var v = row[k];
+        if(typeof v === 'string' && /\b[A-Z]{3}\/20\d{2}\b/.test(v)){ monthCols[k] = v.trim(); }
+      }
+      headerSeen = true;
+      continue;
+    }
+    // Linhas auxiliares de cabecalho / paginas
+    if(!headerSeen) continue;
+    if(typeof first === 'string' && first.indexOf('gina') !== -1) continue;
+    // Linha de dados: precisa de conta_code numerico
+    var hasCode = first !== undefined && first !== null && String(first).trim() !== '' && /\d/.test(String(first));
+    var anyMonth = false;
+    var meses = {};
+    for(var mk in monthCols){
+      var raw = row[mk];
+      var num = NaN;
+      if(typeof raw === 'number'){ num = raw; }
+      else if(typeof raw === 'string' && /\d/.test(raw)){ num = parseFloat(raw.replace(/\./g,'').replace(',', '.')); }
+      if(!isNaN(num)){ meses[monthCols[mk]] = num; anyMonth = true; }
+      else { meses[monthCols[mk]] = 0; }
+    }
+    // So aceita linha de dados real: precisa de conta_code numerico E pelo menos um valor de mes numerico
+    if(!hasCode || !anyMonth) continue;
+    var contaCode = String(first || '').trim();
+    var type = (row['__EMPTY'] || '').toString().replace(/^'?=?\s*/, '').trim();
+    var rec = {
+      ug: curUG,
+      conta_code: contaCode,
+      conta: contaCode,
+      type: type,
+      ne: (row['__EMPTY_1'] || '').toString().trim(),
+      emissao: (row['__EMPTY_2'] || '').toString().trim(),
+      cc: (row['__EMPTY_3'] || '').toString().trim(),
+      cnpj: (row['__EMPTY_4'] || '').toString().trim(),
+      empresa: (row['__EMPTY_5'] || '').toString().trim(),
+      u: curUG,
+      cn: contaCode,
+      val: 0,
+      meses: meses
+    };
+    if(contaCode && !contaNames[contaCode]) contaNames[contaCode] = type || contaCode;
+    records.push(rec);
+  }
+  return { records: records, contaNames: contaNames };
+}
+(function(){
+  var ok = false;
+  function boot(recs, names){
+    if(ok) return; ok = true;
+    try{ initData(recs, names); }
+    catch(e){ console.error('[GAP-GL Dashboard] Erro no initData:', e); __showBootErr('Falha ao inicializar o painel. Veja o Console (F12).'); }
+  }
+  try{
+    fetch('data/RP.json', {cache:'no-store'})
+      .then(function(r){ if(!r.ok) throw new Error('HTTP '+r.status); return r.json(); })
+      .then(function(json){
+        var parsed = __parseRPJson(json);
+        if(parsed.records && parsed.records.length){ boot(parsed.records, parsed.contaNames); }
+        else { console.warn('[GAP-GL Dashboard] RP.json sem registros; usando dados embutidos.'); boot(BUILTIN_RECORDS, BUILTIN_CONTAS); }
+      })
+      .catch(function(err){
+        console.warn('[GAP-GL Dashboard] Nao foi possivel carregar RP.json (' + err + '); usando dados embutidos.');
+        boot(BUILTIN_RECORDS, BUILTIN_CONTAS);
+      });
+  }catch(err){
+    console.warn('[GAP-GL Dashboard] fetch indisponivel; usando dados embutidos.', err);
+    boot(BUILTIN_RECORDS, BUILTIN_CONTAS);
+  }
+})();
 
 // ══════════════════════════════════════════
 // ADMIN AUTHENTICATION
