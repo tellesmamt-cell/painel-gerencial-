@@ -1,13 +1,13 @@
 {
-  "updatedAt": "2026-06-25T22:44:54.717Z",
+  "updatedAt": "2026-06-28T13:21:33.751Z",
   "reportType": "CONTROLE RESTOS A PAGAR",
-  "totalRows": 5,
+  "totalRows": 37,
   "data": [
     {
       "CONTROLE RESTOS A PAGAR": "Páginas:"
     },
     {
-      "CONTROLE RESTOS A PAGAR": "UG Responsável: 120670:GRUPAMENTO DE APOIO LOGISTICO DE CAMPANHA"
+      "CONTROLE RESTOS A PAGAR": "UG Responsável: 120001:GABINETE DO COMANDANTE DA AERONAUTICA"
     },
     {
       "CONTROLE RESTOS A PAGAR": "Conta Contábil",
@@ -18,8 +18,8 @@
       "__EMPTY_6": "JAN/2026",
       "__EMPTY_7": "FEV/2026",
       "__EMPTY_8": "MAR/2026",
-      "__EMPTY_9": "ABR/2026",
-      "__EMPTY_10": "MAI/2026"
+      "__EMPTY_9": "MAI/2026",
+      "__EMPTY_10": "JUN/2026"
     },
     {
       "__EMPTY_4": "NE CCor - Favorecido",
@@ -30,18 +30,278 @@
       "__EMPTY_10": "Saldo - Moeda Origem (Conta Contábil)"
     },
     {
+      "CONTROLE RESTOS A PAGAR": "622920103",
+      "__EMPTY": "'= EMPENHOS LIQUIDADOS A PAGAR",
+      "__EMPTY_1": "120645000012026NE000653",
+      "__EMPTY_2": "09/04/2026",
+      "__EMPTY_3": "2026NE00065339",
+      "__EMPTY_4": "10256548000150",
+      "__EMPTY_5": "MAEDRO SUPRIMENTOS E SERVICOS LTDA",
+      "__EMPTY_9": 549.07
+    },
+    {
+      "__EMPTY_1": "120645000012026NE001246",
+      "__EMPTY_2": "03/06/2026",
+      "__EMPTY_3": "2026NE00124622",
+      "__EMPTY_4": "07412807000180",
+      "__EMPTY_5": "LATTANZI COMERCIO DE PRODUTOS DE LIMPEZA E DESCARTAVEIS",
+      "__EMPTY_10": 1514.7
+    },
+    {
       "CONTROLE RESTOS A PAGAR": "631100000",
       "__EMPTY": "'= RP NAO PROCESSADOS A LIQUIDAR",
-      "__EMPTY_1": "120645000012025NE001497",
-      "__EMPTY_2": "26/05/2025",
-      "__EMPTY_3": "2025NE00149784",
-      "__EMPTY_4": "06698091000590",
-      "__EMPTY_5": "AUTOPEL AUTOMACAO COMERCIAL E INFORMATICA LTDA.",
-      "__EMPTY_6": 24,
-      "__EMPTY_7": 24,
-      "__EMPTY_8": 24,
-      "__EMPTY_9": 24,
-      "__EMPTY_10": 24
+      "__EMPTY_1": "120645000012025NE003902",
+      "__EMPTY_2": "04/11/2025",
+      "__EMPTY_3": "2025NE00390217",
+      "__EMPTY_4": "22955070000136",
+      "__EMPTY_5": "S D C MARTINS COMERCIO E SERVICOS LTDA",
+      "__EMPTY_6": 3086.29
+    },
+    {
+      "__EMPTY_1": "120645000012025NE003909",
+      "__EMPTY_2": "04/11/2025",
+      "__EMPTY_3": "2025NE00390978",
+      "__EMPTY_4": "07834090000165",
+      "__EMPTY_5": "DEDETEC SERVICOS DE IMUNIZACAO LTDA",
+      "__EMPTY_6": 1694.96
+    },
+    {
+      "__EMPTY_1": "120645000012025NE004099",
+      "__EMPTY_2": "07/11/2025",
+      "__EMPTY_3": "2025NE00409917",
+      "__EMPTY_4": "23646559000199",
+      "__EMPTY_5": "LBR SOLUCOES EM TECNOLOGIA LTDA",
+      "__EMPTY_6": 2543.64,
+      "__EMPTY_7": 2543.64
+    },
+    {
+      "CONTROLE RESTOS A PAGAR": "631300000",
+      "__EMPTY": "'= RP NAO PROCESSADOS LIQUIDADOS A PAGAR",
+      "__EMPTY_1": "120645000012025NE003898",
+      "__EMPTY_2": "04/11/2025",
+      "__EMPTY_3": "2025NE00389834",
+      "__EMPTY_4": "54362519000149",
+      "__EMPTY_5": "CREATIVE LICITACOES LTDA",
+      "__EMPTY_6": 9085,
+      "__EMPTY_7": 531.47
+    },
+    {
+      "__EMPTY_1": "120645000012025NE003899",
+      "__EMPTY_2": "04/11/2025",
+      "__EMPTY_3": "2025NE00389934",
+      "__EMPTY_4": "71052559000537",
+      "__EMPTY_5": "BELMICRO TECNOLOGIA S/A",
+      "__EMPTY_6": 8315.19
+    },
+    {
+      "__EMPTY_1": "120645000012025NE003901",
+      "__EMPTY_2": "04/11/2025",
+      "__EMPTY_3": "2025NE00390120",
+      "__EMPTY_4": "08944032000157",
+      "__EMPTY_5": "ALAIDE RAISI ZANOLLO",
+      "__EMPTY_6": 2475
+    },
+    {
+      "__EMPTY_1": "120645000012025NE003902",
+      "__EMPTY_2": "04/11/2025",
+      "__EMPTY_3": "2025NE00390217",
+      "__EMPTY_4": "22955070000136",
+      "__EMPTY_5": "S D C MARTINS COMERCIO E SERVICOS LTDA",
+      "__EMPTY_7": 3086.29,
+      "__EMPTY_8": 180.55
+    },
+    {
+      "__EMPTY_1": "120645000012025NE003903",
+      "__EMPTY_2": "04/11/2025",
+      "__EMPTY_3": "2025NE00390320",
+      "__EMPTY_4": "36310930000199",
+      "__EMPTY_5": "Y S DIAS COMERCIO DE PAPELARIA",
+      "__EMPTY_6": 312
+    },
+    {
+      "__EMPTY_1": "120645000012025NE003904",
+      "__EMPTY_2": "04/11/2025",
+      "__EMPTY_3": "2025NE00390420",
+      "__EMPTY_4": "29843853000177",
+      "__EMPTY_5": "R2 S ABRAHAO COMERCIO E SERVICOS LTDA",
+      "__EMPTY_6": 645.12
+    },
+    {
+      "__EMPTY_1": "120645000012025NE003909",
+      "__EMPTY_2": "04/11/2025",
+      "__EMPTY_3": "2025NE00390978",
+      "__EMPTY_4": "07834090000165",
+      "__EMPTY_5": "DEDETEC SERVICOS DE IMUNIZACAO LTDA",
+      "__EMPTY_7": 1694.96
+    },
+    {
+      "__EMPTY_1": "120645000012025NE003921",
+      "__EMPTY_2": "04/11/2025",
+      "__EMPTY_3": "2025NE00392120",
+      "__EMPTY_4": "08944032000157",
+      "__EMPTY_5": "ALAIDE RAISI ZANOLLO",
+      "__EMPTY_6": 160
+    },
+    {
+      "__EMPTY_1": "120645000012025NE004118",
+      "__EMPTY_2": "10/11/2025",
+      "__EMPTY_3": "2025NE00411820",
+      "__EMPTY_4": "29843853000177",
+      "__EMPTY_5": "R2 S ABRAHAO COMERCIO E SERVICOS LTDA",
+      "__EMPTY_6": 752.64
+    },
+    {
+      "__EMPTY_1": "120645000012025NE004515",
+      "__EMPTY_2": "28/11/2025",
+      "__EMPTY_3": "2025NE00451520",
+      "__EMPTY_4": "29843853000177",
+      "__EMPTY_5": "R2 S ABRAHAO COMERCIO E SERVICOS LTDA",
+      "__EMPTY_6": 1290.24
+    },
+    {
+      "CONTROLE RESTOS A PAGAR": "Páginas:"
+    },
+    {
+      "CONTROLE RESTOS A PAGAR": "UG Responsável: 120001:GABINETE DO COMANDANTE DA AERONAUTICA"
+    },
+    {
+      "CONTROLE RESTOS A PAGAR": "Conta Contábil",
+      "__EMPTY_1": "NE CCor",
+      "__EMPTY_2": "NE CCor - Dia Emissão",
+      "__EMPTY_3": "Conta Corrente",
+      "__EMPTY_4": "Mês Lançamento",
+      "__EMPTY_6": "JAN/2026",
+      "__EMPTY_7": "FEV/2026",
+      "__EMPTY_8": "MAR/2026",
+      "__EMPTY_9": "MAI/2026"
+    },
+    {
+      "__EMPTY_4": "NE CCor - Favorecido",
+      "__EMPTY_6": "Saldo - Moeda Origem (Conta Contábil)",
+      "__EMPTY_7": "Saldo - Moeda Origem (Conta Contábil)",
+      "__EMPTY_8": "Saldo - Moeda Origem (Conta Contábil)",
+      "__EMPTY_9": "Saldo - Moeda Origem (Conta Contábil)"
+    },
+    {
+      "CONTROLE RESTOS A PAGAR": "622920103",
+      "__EMPTY": "'= EMPENHOS LIQUIDADOS A PAGAR",
+      "__EMPTY_1": "120645000012026NE000653",
+      "__EMPTY_2": "09/04/2026",
+      "__EMPTY_3": "2026NE00065339",
+      "__EMPTY_4": "10256548000150",
+      "__EMPTY_5": "MAEDRO SUPRIMENTOS E SERVICOS LTDA",
+      "__EMPTY_9": 549.07
+    },
+    {
+      "CONTROLE RESTOS A PAGAR": "631100000",
+      "__EMPTY": "'= RP NAO PROCESSADOS A LIQUIDAR",
+      "__EMPTY_1": "120645000012025NE003902",
+      "__EMPTY_2": "04/11/2025",
+      "__EMPTY_3": "2025NE00390217",
+      "__EMPTY_4": "22955070000136",
+      "__EMPTY_5": "S D C MARTINS COMERCIO E SERVICOS LTDA",
+      "__EMPTY_6": 3086.29
+    },
+    {
+      "__EMPTY_1": "120645000012025NE003909",
+      "__EMPTY_2": "04/11/2025",
+      "__EMPTY_3": "2025NE00390978",
+      "__EMPTY_4": "07834090000165",
+      "__EMPTY_5": "DEDETEC SERVICOS DE IMUNIZACAO LTDA",
+      "__EMPTY_6": 1694.96
+    },
+    {
+      "__EMPTY_1": "120645000012025NE004099",
+      "__EMPTY_2": "07/11/2025",
+      "__EMPTY_3": "2025NE00409917",
+      "__EMPTY_4": "23646559000199",
+      "__EMPTY_5": "LBR SOLUCOES EM TECNOLOGIA LTDA",
+      "__EMPTY_6": 2543.64,
+      "__EMPTY_7": 2543.64
+    },
+    {
+      "CONTROLE RESTOS A PAGAR": "631300000",
+      "__EMPTY": "'= RP NAO PROCESSADOS LIQUIDADOS A PAGAR",
+      "__EMPTY_1": "120645000012025NE003898",
+      "__EMPTY_2": "04/11/2025",
+      "__EMPTY_3": "2025NE00389834",
+      "__EMPTY_4": "54362519000149",
+      "__EMPTY_5": "CREATIVE LICITACOES LTDA",
+      "__EMPTY_6": 9085,
+      "__EMPTY_7": 531.47
+    },
+    {
+      "__EMPTY_1": "120645000012025NE003899",
+      "__EMPTY_2": "04/11/2025",
+      "__EMPTY_3": "2025NE00389934",
+      "__EMPTY_4": "71052559000537",
+      "__EMPTY_5": "BELMICRO TECNOLOGIA S/A",
+      "__EMPTY_6": 8315.19
+    },
+    {
+      "__EMPTY_1": "120645000012025NE003901",
+      "__EMPTY_2": "04/11/2025",
+      "__EMPTY_3": "2025NE00390120",
+      "__EMPTY_4": "08944032000157",
+      "__EMPTY_5": "ALAIDE RAISI ZANOLLO",
+      "__EMPTY_6": 2475
+    },
+    {
+      "__EMPTY_1": "120645000012025NE003902",
+      "__EMPTY_2": "04/11/2025",
+      "__EMPTY_3": "2025NE00390217",
+      "__EMPTY_4": "22955070000136",
+      "__EMPTY_5": "S D C MARTINS COMERCIO E SERVICOS LTDA",
+      "__EMPTY_7": 3086.29,
+      "__EMPTY_8": 180.55
+    },
+    {
+      "__EMPTY_1": "120645000012025NE003903",
+      "__EMPTY_2": "04/11/2025",
+      "__EMPTY_3": "2025NE00390320",
+      "__EMPTY_4": "36310930000199",
+      "__EMPTY_5": "Y S DIAS COMERCIO DE PAPELARIA",
+      "__EMPTY_6": 312
+    },
+    {
+      "__EMPTY_1": "120645000012025NE003904",
+      "__EMPTY_2": "04/11/2025",
+      "__EMPTY_3": "2025NE00390420",
+      "__EMPTY_4": "29843853000177",
+      "__EMPTY_5": "R2 S ABRAHAO COMERCIO E SERVICOS LTDA",
+      "__EMPTY_6": 645.12
+    },
+    {
+      "__EMPTY_1": "120645000012025NE003909",
+      "__EMPTY_2": "04/11/2025",
+      "__EMPTY_3": "2025NE00390978",
+      "__EMPTY_4": "07834090000165",
+      "__EMPTY_5": "DEDETEC SERVICOS DE IMUNIZACAO LTDA",
+      "__EMPTY_7": 1694.96
+    },
+    {
+      "__EMPTY_1": "120645000012025NE003921",
+      "__EMPTY_2": "04/11/2025",
+      "__EMPTY_3": "2025NE00392120",
+      "__EMPTY_4": "08944032000157",
+      "__EMPTY_5": "ALAIDE RAISI ZANOLLO",
+      "__EMPTY_6": 160
+    },
+    {
+      "__EMPTY_1": "120645000012025NE004118",
+      "__EMPTY_2": "10/11/2025",
+      "__EMPTY_3": "2025NE00411820",
+      "__EMPTY_4": "29843853000177",
+      "__EMPTY_5": "R2 S ABRAHAO COMERCIO E SERVICOS LTDA",
+      "__EMPTY_6": 752.64
+    },
+    {
+      "__EMPTY_1": "120645000012025NE004515",
+      "__EMPTY_2": "28/11/2025",
+      "__EMPTY_3": "2025NE00451520",
+      "__EMPTY_4": "29843853000177",
+      "__EMPTY_5": "R2 S ABRAHAO COMERCIO E SERVICOS LTDA",
+      "__EMPTY_6": 1290.24
     }
   ]
 }
