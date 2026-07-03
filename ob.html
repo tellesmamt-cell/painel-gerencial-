@@ -209,28 +209,6 @@ function card(d){
 
 <script>
   async function carregarDadosAutomaticamente(){
-      try{
-            const resposta=await fetch('./data/dados.json?t='+Date.now());
-            const dados=await resposta.json();
-
-            console.log('Dados carregados automaticamente:',dados);
-
-            // Aqui ficam os dados da planilha:
-            const linhas=dados.data;
-item.favorecido
-        // Teste inicial: mostra os dados no console
-            console.table(linhas);
-
-      }catch(erro){
-            console.error('Erro ao carregar dados.json:',erro);
-      }
-  }
-
-  carregarDadosAutomaticamente();
-</script>
-  
-<script>
-  async function carregarDadosAutomaticamente(){
     try{
           const resposta=await fetch('./data/dados.json?t='+Date.now());
           if(!resposta.ok){
