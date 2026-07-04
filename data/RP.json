@@ -1,7 +1,7 @@
 {
-  "updatedAt": "2026-07-03T22:27:17.620Z",
+  "updatedAt": "2026-07-04T11:12:32.365Z",
   "reportType": "CONTROLE RESTOS A PAGAR",
-  "totalRows": 2783,
+  "totalRows": 2793,
   "data": [
     {
       "CONTROLE RESTOS A PAGAR": "UG Responsável",
@@ -417,8 +417,7 @@
       "__EMPTY_6": "10256548000150",
       "__EMPTY_7": "MAEDRO SUPRIMENTOS E SERVICOS LTDA",
       "__EMPTY_12": 4230.72,
-      "__EMPTY_13": 3361.16,
-      "__EMPTY_14": 3361.16
+      "__EMPTY_13": 3361.16
     },
     {
       "__EMPTY_3": "120645000012026NE000619",
@@ -572,8 +571,7 @@
       "__EMPTY_5": "2026NE00093439",
       "__EMPTY_6": "10256548000150",
       "__EMPTY_7": "MAEDRO SUPRIMENTOS E SERVICOS LTDA",
-      "__EMPTY_13": 4258.39,
-      "__EMPTY_14": 4258.39
+      "__EMPTY_13": 4258.39
     },
     {
       "__EMPTY_3": "120645000012026NE000949",
@@ -600,6 +598,22 @@
       "__EMPTY_7": "S D C MARTINS COMERCIO E SERVICOS LTDA",
       "__EMPTY_13": 19527.84,
       "__EMPTY_14": 19527.84
+    },
+    {
+      "__EMPTY_3": "120645000012026NE001025",
+      "__EMPTY_4": "19/05/2026",
+      "__EMPTY_5": "2026NE00102516",
+      "__EMPTY_6": "73315905000124",
+      "__EMPTY_7": "FEMAR CONSTRUCOES LTDA",
+      "__EMPTY_14": 732.58
+    },
+    {
+      "__EMPTY_3": "120645000012026NE001026",
+      "__EMPTY_4": "19/05/2026",
+      "__EMPTY_5": "2026NE00102616",
+      "__EMPTY_6": "73315905000124",
+      "__EMPTY_7": "FEMAR CONSTRUCOES LTDA",
+      "__EMPTY_14": 2024.15
     },
     {
       "__EMPTY_3": "120645000012026NE001080",
@@ -3196,7 +3210,8 @@
       "__EMPTY_5": "2026NE00024946",
       "__EMPTY_6": "28871366000155",
       "__EMPTY_7": "KIARGOS SERVICOS E FACILITY LTDA",
-      "__EMPTY_12": 449444
+      "__EMPTY_12": 449444,
+      "__EMPTY_14": 18722.67
     },
     {
       "__EMPTY_3": "120645000012026NE000253",
@@ -3215,6 +3230,14 @@
       "__EMPTY_11": 9776.94
     },
     {
+      "__EMPTY_3": "120645000012026NE000348",
+      "__EMPTY_4": "12/03/2026",
+      "__EMPTY_5": "2026NE00034846",
+      "__EMPTY_6": "28871366000155",
+      "__EMPTY_7": "KIARGOS SERVICOS E FACILITY LTDA",
+      "__EMPTY_14": 24914.49
+    },
+    {
       "__EMPTY_3": "120645000012026NE000349",
       "__EMPTY_4": "12/03/2026",
       "__EMPTY_5": "2026NE00034924",
@@ -3230,7 +3253,7 @@
       "__EMPTY_7": "LIGHT SERVICOS DE ELETRICIDADE S A",
       "__EMPTY_12": 55291.15,
       "__EMPTY_13": 51019.29,
-      "__EMPTY_14": 12127.83
+      "__EMPTY_14": 22756.68
     },
     {
       "__EMPTY_3": "120645000012026NE000377",
@@ -3291,6 +3314,14 @@
       "__EMPTY_6": "46143523000198",
       "__EMPTY_7": "AJAX R2 COMERCIO DE MATERIAS E SERVICOS LTDA",
       "__EMPTY_11": 50000.35
+    },
+    {
+      "__EMPTY_3": "120645000012026NE000481",
+      "__EMPTY_4": "18/03/2026",
+      "__EMPTY_5": "2026NE00048146",
+      "__EMPTY_6": "28871366000155",
+      "__EMPTY_7": "KIARGOS SERVICOS E FACILITY LTDA",
+      "__EMPTY_14": 41221.41
     },
     {
       "__EMPTY_3": "120645000012026NE000501",
@@ -3417,6 +3448,14 @@
       "__EMPTY_14": 23976
     },
     {
+      "__EMPTY_3": "120645000012026NE001112",
+      "__EMPTY_4": "22/05/2026",
+      "__EMPTY_5": "2026NE00111224",
+      "__EMPTY_6": "46143523000198",
+      "__EMPTY_7": "AJAX R2 COMERCIO DE MATERIAS E SERVICOS LTDA",
+      "__EMPTY_14": 34047.41
+    },
+    {
       "__EMPTY_3": "120645000012026NE001118",
       "__EMPTY_4": "25/05/2026",
       "__EMPTY_5": "2026NE00111858",
@@ -3440,7 +3479,15 @@
       "__EMPTY_6": "13552053000167",
       "__EMPTY_7": "RELEVO CONSTRUCOES LTDA",
       "__EMPTY_13": 25000,
-      "__EMPTY_14": 125000
+      "__EMPTY_14": 200000
+    },
+    {
+      "__EMPTY_3": "120645000012026NE001143",
+      "__EMPTY_4": "25/05/2026",
+      "__EMPTY_5": "2026NE00114316",
+      "__EMPTY_6": "39109806000158",
+      "__EMPTY_7": "MEGA ENGENHARIA LTDA",
+      "__EMPTY_14": 50000
     },
     {
       "__EMPTY_3": "120645000012026NE001145",
@@ -4597,14 +4644,6 @@
       "__EMPTY_9": 235.81,
       "__EMPTY_13": 344.19,
       "__EMPTY_14": 134.19
-    },
-    {
-      "__EMPTY_3": "120645000012026NE000206",
-      "__EMPTY_4": "24/02/2026",
-      "__EMPTY_5": "2026NE00020643",
-      "__EMPTY_6": "60444437000146",
-      "__EMPTY_7": "LIGHT SERVICOS DE ELETRICIDADE S A",
-      "__EMPTY_14": 7024.43
     },
     {
       "__EMPTY_3": "120645000012026NE000302",
@@ -5793,8 +5832,7 @@
       "__EMPTY_6": "08318369000159",
       "__EMPTY_7": "ROMARFEL COMERCIO E SERVICOS LTDA",
       "__EMPTY_12": 36620.98,
-      "__EMPTY_13": 464.8,
-      "__EMPTY_14": 464.8
+      "__EMPTY_13": 464.8
     },
     {
       "__EMPTY_3": "120645000012026NE000488",
@@ -5803,7 +5841,7 @@
       "__EMPTY_6": "53023450000166",
       "__EMPTY_7": "KLOSER ENGENHARIA LTDA",
       "__EMPTY_13": 59666.66,
-      "__EMPTY_14": 59666.66
+      "__EMPTY_14": 52796.42
     },
     {
       "__EMPTY_3": "120645000012026NE000492",
@@ -7032,7 +7070,7 @@
       "__EMPTY_11": 13410,
       "__EMPTY_12": 23950.5,
       "__EMPTY_13": 50861.2,
-      "__EMPTY_14": 39341.2
+      "__EMPTY_14": 33581.2
     },
     {
       "__EMPTY_3": "120645000012024NE001495",
@@ -7276,7 +7314,7 @@
       "__EMPTY_7": "FEMAR CONSTRUCOES LTDA",
       "__EMPTY_11": 23726.02,
       "__EMPTY_13": 166082.14,
-      "__EMPTY_14": 166082.14
+      "__EMPTY_14": 47452.04
     },
     {
       "__EMPTY_3": "120645000012025NE002926",
@@ -7411,8 +7449,7 @@
       "__EMPTY_6": "08318369000159",
       "__EMPTY_7": "ROMARFEL COMERCIO E SERVICOS LTDA",
       "__EMPTY_10": 64.19,
-      "__EMPTY_13": 98054.85,
-      "__EMPTY_14": 98054.85
+      "__EMPTY_13": 98054.85
     },
     {
       "__EMPTY_3": "120645000012025NE004385",
@@ -7432,8 +7469,7 @@
       "__EMPTY_10": 103067.85,
       "__EMPTY_11": 84692.72,
       "__EMPTY_12": 74288.95,
-      "__EMPTY_13": 27355.45,
-      "__EMPTY_14": 27355.45
+      "__EMPTY_13": 27355.45
     },
     {
       "__EMPTY_3": "120645000012025NE004387",
@@ -7469,7 +7505,7 @@
       "__EMPTY_6": "08318369000159",
       "__EMPTY_7": "ROMARFEL COMERCIO E SERVICOS LTDA",
       "__EMPTY_13": 62752.19,
-      "__EMPTY_14": 62752.19
+      "__EMPTY_14": 41925.68
     },
     {
       "__EMPTY_3": "120645000012025NE004414",
@@ -7901,6 +7937,14 @@
       "__EMPTY_6": "34260596000180",
       "__EMPTY_7": "CONSELHO REGIONAL DE ENGENHARIA E AGRONOMIA DO RIO DE J",
       "__EMPTY_12": 285.59
+    },
+    {
+      "__EMPTY_3": "120645000012026NE001441",
+      "__EMPTY_4": "26/06/2026",
+      "__EMPTY_5": "2026NE00144106",
+      "__EMPTY_6": "07797967000195",
+      "__EMPTY_7": "NP TECNOLOGIA E GESTAO DE DADOS LTDA",
+      "__EMPTY_14": 24600
     },
     {
       "__EMPTY_1": "631100000",
@@ -10561,7 +10605,8 @@
       "__EMPTY_7": "CNS NACIONAL DE SERVICOS LIMITADA",
       "__EMPTY_9": 31482.47,
       "__EMPTY_10": 33743.87,
-      "__EMPTY_11": 633.37
+      "__EMPTY_11": 633.37,
+      "__EMPTY_14": 115.84
     },
     {
       "__EMPTY_3": "120645000012026NE000074",
@@ -10570,7 +10615,8 @@
       "__EMPTY_6": "05531749000189",
       "__EMPTY_7": "ELEVADORES IVIMAIA LTDA",
       "__EMPTY_11": 2432.31,
-      "__EMPTY_12": 2432.31
+      "__EMPTY_12": 2432.31,
+      "__EMPTY_14": 1714.07
     },
     {
       "__EMPTY_3": "120645000012026NE000088",
@@ -10626,8 +10672,7 @@
       "__EMPTY_5": "2026NE00013858",
       "__EMPTY_6": "02558157000162",
       "__EMPTY_7": "TELEFONICA BRASIL S.A.",
-      "__EMPTY_13": 926.46,
-      "__EMPTY_14": 926.46
+      "__EMPTY_13": 926.46
     },
     {
       "__EMPTY_3": "120645000012026NE000139",
@@ -10730,7 +10775,8 @@
       "__EMPTY_5": "2026NE00029578",
       "__EMPTY_6": "33285255000105",
       "__EMPTY_7": "CNS NACIONAL DE SERVICOS LIMITADA",
-      "__EMPTY_11": 31729.59
+      "__EMPTY_11": 31729.59,
+      "__EMPTY_14": 34623.41
     },
     {
       "__EMPTY_3": "120645000012026NE000297",
@@ -10852,6 +10898,14 @@
       "__EMPTY_6": "48817203000100",
       "__EMPTY_7": "ONE BOSS DISTRIBUIDORA DE ALIMENTOS LTDA",
       "__EMPTY_12": 50999.4
+    },
+    {
+      "__EMPTY_3": "120645000012026NE001088",
+      "__EMPTY_4": "21/05/2026",
+      "__EMPTY_5": "2026NE00108817",
+      "__EMPTY_6": "05531749000189",
+      "__EMPTY_7": "ELEVADORES IVIMAIA LTDA",
+      "__EMPTY_14": 718.24
     },
     {
       "__EMPTY_3": "120645000012026NE001119",
@@ -12999,6 +13053,14 @@
       "__EMPTY": "COMISSAO DE IMPLANT.DO SIST.DE CONTR.DO E AER",
       "__EMPTY_1": "622920103",
       "__EMPTY_2": "'= EMPENHOS LIQUIDADOS A PAGAR",
+      "__EMPTY_3": "120645000012026NE001298",
+      "__EMPTY_4": "15/06/2026",
+      "__EMPTY_5": "2026NE00129824",
+      "__EMPTY_6": "17812036000172",
+      "__EMPTY_7": "AEROVISION - EMPREENDIMENTOS COMERCIAIS LTDA",
+      "__EMPTY_14": 5664.05
+    },
+    {
       "__EMPTY_3": "120645000012026NE001299",
       "__EMPTY_4": "15/06/2026",
       "__EMPTY_5": "2026NE00129924",
@@ -13013,6 +13075,14 @@
       "__EMPTY_6": "54501597000187",
       "__EMPTY_7": "ALD12 DISTRIBUIDORA DE MATERIAIS E EQUIPAMENTOS LTDA",
       "__EMPTY_14": 399
+    },
+    {
+      "__EMPTY_3": "120645000012026NE001301",
+      "__EMPTY_4": "15/06/2026",
+      "__EMPTY_5": "2026NE00130124",
+      "__EMPTY_6": "17812036000172",
+      "__EMPTY_7": "AEROVISION - EMPREENDIMENTOS COMERCIAIS LTDA",
+      "__EMPTY_14": 1168.06
     },
     {
       "__EMPTY_3": "120645000012026NE001302",
@@ -13056,8 +13126,7 @@
       "__EMPTY_5": "2026NE00033046",
       "__EMPTY_6": "02352819000143",
       "__EMPTY_7": "LAVANDERIA E TINTURARIA IRMAOS CONFORTI LTDA",
-      "__EMPTY_13": 400,
-      "__EMPTY_14": 400
+      "__EMPTY_13": 400
     },
     {
       "__EMPTY_3": "120645000012026NE000713",
@@ -13620,8 +13689,7 @@
       "__EMPTY_5": "2026NE00054458",
       "__EMPTY_6": "02558157000162",
       "__EMPTY_7": "TELEFONICA BRASIL S.A.",
-      "__EMPTY_13": 1130.56,
-      "__EMPTY_14": 1130.56
+      "__EMPTY_13": 1130.56
     },
     {
       "__EMPTY_3": "120645000012026NE000666",
@@ -14782,8 +14850,7 @@
       "__EMPTY_5": "2026NE00083646",
       "__EMPTY_6": "02352819000143",
       "__EMPTY_7": "LAVANDERIA E TINTURARIA IRMAOS CONFORTI LTDA",
-      "__EMPTY_13": 590.59,
-      "__EMPTY_14": 590.59
+      "__EMPTY_13": 590.59
     },
     {
       "__EMPTY_3": "120645000012026NE000955",
@@ -16070,8 +16137,7 @@
       "__EMPTY_5": "2026NE00058546",
       "__EMPTY_6": "02352819000143",
       "__EMPTY_7": "LAVANDERIA E TINTURARIA IRMAOS CONFORTI LTDA",
-      "__EMPTY_13": 42.13,
-      "__EMPTY_14": 42.13
+      "__EMPTY_13": 42.13
     },
     {
       "__EMPTY_3": "120645000012026NE000884",
@@ -16460,7 +16526,8 @@
       "__EMPTY_5": "2026NE00004017",
       "__EMPTY_6": "32260390000125",
       "__EMPTY_7": "ELETRONICA GUTERRES LTDA",
-      "__EMPTY_12": 2565.57
+      "__EMPTY_12": 2565.57,
+      "__EMPTY_14": 2565.57
     },
     {
       "__EMPTY_3": "120645000012026NE000301",
@@ -18312,8 +18379,7 @@
       "__EMPTY_6": "23907388000104",
       "__EMPTY_7": "LIMPLACE COMERCIO E SERVICOS LTDA",
       "__EMPTY_11": 4564.38,
-      "__EMPTY_13": 4472.64,
-      "__EMPTY_14": 4472.64
+      "__EMPTY_13": 4472.64
     },
     {
       "__EMPTY_3": "120645000012025NE004551",
@@ -18776,6 +18842,14 @@
       "__EMPTY_8": 4028.17
     },
     {
+      "__EMPTY_3": "120645000012025NE003509",
+      "__EMPTY_4": "07/10/2025",
+      "__EMPTY_5": "2025NE00350922",
+      "__EMPTY_6": "54311254000150",
+      "__EMPTY_7": "ANTOLIMP - EMPRESA BRASILEIRA DE MATERIAL DE LIMPEZA, H",
+      "__EMPTY_14": 10841.8
+    },
+    {
       "__EMPTY_3": "120645000012025NE003516",
       "__EMPTY_4": "07/10/2025",
       "__EMPTY_5": "2025NE00351622",
@@ -18983,8 +19057,7 @@
       "__EMPTY_6": "120645",
       "__EMPTY_7": "GRUPAMENTO DE APOIO DO GALEAO",
       "__EMPTY_11": 12335.48,
-      "__EMPTY_13": 5206.19,
-      "__EMPTY_14": 5206.19
+      "__EMPTY_13": 5206.19
     },
     {
       "__EMPTY_3": "120645000012026NE000013",
@@ -19048,7 +19121,7 @@
       "__EMPTY_11": 100952.05,
       "__EMPTY_12": 2209.5,
       "__EMPTY_13": 2209.5,
-      "__EMPTY_14": 53470.25
+      "__EMPTY_14": 10037.83
     },
     {
       "__EMPTY_3": "120645000012026NE000051",
@@ -19209,8 +19282,7 @@
       "__EMPTY_6": "34028316000294",
       "__EMPTY_7": "EMPRESA BRASILEIRA DE CORREIOS E TELEGRAFOS",
       "__EMPTY_12": 611.74,
-      "__EMPTY_13": 929.61,
-      "__EMPTY_14": 929.61
+      "__EMPTY_13": 929.61
     },
     {
       "__EMPTY_3": "120645000012026NE000359",
@@ -19893,7 +19965,7 @@
       "__EMPTY_7": "MAEDRO SUPRIMENTOS E SERVICOS LTDA",
       "__EMPTY_12": 732.11,
       "__EMPTY_13": 21837.56,
-      "__EMPTY_14": 21837.56
+      "__EMPTY_14": 18795.55
     },
     {
       "__EMPTY_3": "120645000012026NE000866",
@@ -19917,8 +19989,7 @@
       "__EMPTY_5": "2026NE00087547",
       "__EMPTY_6": "34028316000294",
       "__EMPTY_7": "EMPRESA BRASILEIRA DE CORREIOS E TELEGRAFOS",
-      "__EMPTY_13": 744.8,
-      "__EMPTY_14": 744.8
+      "__EMPTY_13": 744.8
     },
     {
       "__EMPTY_3": "120645000012026NE000876",
@@ -19926,7 +19997,7 @@
       "__EMPTY_5": "2026NE00087644",
       "__EMPTY_6": "42644220000106",
       "__EMPTY_7": "AGUAS DO RIO 4 SPE S.A",
-      "__EMPTY_14": 1433.43
+      "__EMPTY_14": 1433.39
     },
     {
       "__EMPTY_3": "120645000012026NE000878",
@@ -19968,8 +20039,7 @@
       "__EMPTY_5": "2026NE00091858",
       "__EMPTY_6": "02339355000135",
       "__EMPTY_7": "SOMADATTA INFORMATICA LTDA",
-      "__EMPTY_13": 147.45,
-      "__EMPTY_14": 147.45
+      "__EMPTY_13": 147.45
     },
     {
       "__EMPTY_3": "120645000012026NE000920",
@@ -19985,8 +20055,7 @@
       "__EMPTY_5": "2026NE00092258",
       "__EMPTY_6": "02339355000135",
       "__EMPTY_7": "SOMADATTA INFORMATICA LTDA",
-      "__EMPTY_13": 68.94,
-      "__EMPTY_14": 68.94
+      "__EMPTY_13": 68.94
     },
     {
       "__EMPTY_3": "120645000012026NE000936",
@@ -20044,7 +20113,7 @@
       "__EMPTY_6": "02352819000143",
       "__EMPTY_7": "LAVANDERIA E TINTURARIA IRMAOS CONFORTI LTDA",
       "__EMPTY_13": 24140.37,
-      "__EMPTY_14": 24140.37
+      "__EMPTY_14": 12282.36
     },
     {
       "__EMPTY_3": "120645000012026NE001005",
@@ -20378,8 +20447,7 @@
       "__EMPTY_5": "2026NE00129458",
       "__EMPTY_6": "02558157000162",
       "__EMPTY_7": "TELEFONICA BRASIL S.A.",
-      "__EMPTY_13": 8377.54,
-      "__EMPTY_14": 4344.9
+      "__EMPTY_13": 8377.54
     },
     {
       "__EMPTY_3": "120645000012026NE001296",
@@ -21967,7 +22035,7 @@
       "__EMPTY_11": 84212.08,
       "__EMPTY_12": 81070.48,
       "__EMPTY_13": 67273.34,
-      "__EMPTY_14": 67273.34
+      "__EMPTY_14": 64708.7
     },
     {
       "__EMPTY_3": "120645000012025NE004122",
@@ -23004,8 +23072,7 @@
       "__EMPTY_10": 55089.6,
       "__EMPTY_11": 55089.6,
       "__EMPTY_12": 55089.6,
-      "__EMPTY_13": 24300,
-      "__EMPTY_14": 24300
+      "__EMPTY_13": 24300
     },
     {
       "__EMPTY_3": "120645000012025NE004678",
@@ -23360,7 +23427,7 @@
       "__EMPTY_11": 4050,
       "__EMPTY_12": 4050,
       "__EMPTY_13": 730,
-      "__EMPTY_14": 730
+      "__EMPTY_14": 190
     },
     {
       "__EMPTY_3": "120645000012025NE004723",
@@ -23467,8 +23534,7 @@
       "__EMPTY_10": 24980.8,
       "__EMPTY_11": 24980.8,
       "__EMPTY_12": 11780.8,
-      "__EMPTY_13": 10829.8,
-      "__EMPTY_14": 10829.8
+      "__EMPTY_13": 10829.8
     },
     {
       "__EMPTY_3": "120645000012025NE004743",
@@ -24989,8 +25055,7 @@
       "__EMPTY_9": 128.83,
       "__EMPTY_10": 123.55,
       "__EMPTY_12": 123.2,
-      "__EMPTY_13": 54.44,
-      "__EMPTY_14": 54.44
+      "__EMPTY_13": 54.44
     },
     {
       "__EMPTY_3": "120645000012025NE003834",
@@ -25284,7 +25349,7 @@
       "__EMPTY_11": 3530.48,
       "__EMPTY_12": 3515.6,
       "__EMPTY_13": 13793.14,
-      "__EMPTY_14": 13793.14
+      "__EMPTY_14": 16357.78
     },
     {
       "__EMPTY_3": "120645000012025NE004105",
@@ -26157,7 +26222,7 @@
       "__EMPTY_6": "26788865000158",
       "__EMPTY_7": "MARISOL COMERCIO ATACADISTA DE ALIMENTOS EM GERAL LTDA",
       "__EMPTY_13": 24300,
-      "__EMPTY_14": 24300
+      "__EMPTY_14": 48600
     },
     {
       "__EMPTY_3": "120645000012025NE004678",
@@ -26415,7 +26480,7 @@
       "__EMPTY_6": "26788865000158",
       "__EMPTY_7": "MARISOL COMERCIO ATACADISTA DE ALIMENTOS EM GERAL LTDA",
       "__EMPTY_13": 2200,
-      "__EMPTY_14": 2200
+      "__EMPTY_14": 2740
     },
     {
       "__EMPTY_3": "120645000012025NE004723",
@@ -26529,7 +26594,7 @@
       "__EMPTY_7": "MARISOL COMERCIO ATACADISTA DE ALIMENTOS EM GERAL LTDA",
       "__EMPTY_12": 13200,
       "__EMPTY_13": 951,
-      "__EMPTY_14": 951
+      "__EMPTY_14": 11780.8
     },
     {
       "__EMPTY_3": "120645000012025NE004744",
@@ -26680,7 +26745,7 @@
       "__EMPTY_11": 5456.85,
       "__EMPTY_12": 3566.14,
       "__EMPTY_13": 200.86,
-      "__EMPTY_14": 217.96
+      "__EMPTY_14": 200.86
     },
     {
       "__EMPTY_3": "120645000012025NE004822",
@@ -26795,8 +26860,7 @@
       "__EMPTY_5": "2025NE00493958",
       "__EMPTY_6": "02558157000162",
       "__EMPTY_7": "TELEFONICA BRASIL S.A.",
-      "__EMPTY_13": 3433.4,
-      "__EMPTY_14": 3433.4
+      "__EMPTY_13": 3433.4
     },
     {
       "__EMPTY_3": "120645000012025NE004945",
@@ -26822,8 +26886,7 @@
       "__EMPTY_6": "02339355000135",
       "__EMPTY_7": "SOMADATTA INFORMATICA LTDA",
       "__EMPTY_9": 110.02,
-      "__EMPTY_13": 140.84,
-      "__EMPTY_14": 140.84
+      "__EMPTY_13": 140.84
     },
     {
       "__EMPTY_3": "120645000012025NE004966",
